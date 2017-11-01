@@ -1,0 +1,94 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>steed</groupId>
+	<artifactId>hibernateMaster</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>hibernateMaster</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+
+	<dependencies>
+		<!-- 依赖jar包开始 -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>5.0.9.Final</version>
+		</dependency>
+
+		<!-- If using JPA, add: -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>5.0.9.Final</version>
+		</dependency>
+
+		<!-- 依赖jar包结束 -->
+
+		<!-- 可选jar包开始 -->
+
+		<!-- 日志包开始 -->
+			<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-core</artifactId>
+		    <version>2.6.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.21</version>
+		</dependency>
+		<dependency> <!-- 桥接：告诉Slf4j使用Log4j2 -->
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>2.6.2</version>
+		</dependency>
+		<!-- 日志包结束 -->
+		
+		<!-- druid连接池 -->
+		<dependency>
+		     <groupId>com.alibaba</groupId>
+		     <artifactId>druid</artifactId>
+		     <version>1.1.5</version>
+		</dependency>
+		
+		<!-- proxool连接池 -->
+		<!-- <dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-proxool</artifactId>
+			<version>5.2.1.Final</version>
+		</dependency> -->
+
+		<!-- mysql驱动 -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.22</version>
+		</dependency>
+		
+		<!-- ehcache -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-ehcache</artifactId>
+			<version>5.0.9.Final</version>
+		</dependency>
+
+		<!-- 可选jar包结束 -->
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>

@@ -1,0 +1,71 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../main/config/ehcache.xsd" name="tc"
+	updateCheck="false">
+	<diskStore path="java.io.tmpdir" />
+	<!-- timeToLiveSeconds是缓存中每个元素（这里也就是一个POJO）的超时时间， 如果eternal="false"，超过指定的时间，这个元素就被移走了。 
+		timeToIdleSeconds 发呆时间超时就会把硬盘的缓存移除 · name：Cache的唯一标识 · maxElementsInMemory：内存中最大缓存对象数。 
+		· maxElementsOnDisk：磁盘中最大缓存对象数，若是0表示无穷大。 · eternal：Element是否永久有效，一但设置了，timeout将不起作用。 
+		· overflowToDisk：配置此属性，当内存中Element数量达到maxElementsInMemory时，Ehcache将会Element写到磁盘中。 
+		· timeToIdleSeconds：设置Element在失效前的允许闲置时间。仅当element不是永久有效时使用，可选属性，默认值是0，也就是可闲置时间无穷大。 
+		· timeToLiveSeconds：设置Element在失效前允许存活时间。最大时间介于创建时间和失效时间之间。仅当element不是永久有效时使用，默认是0.，也就是element存活时间无穷大。发呆时间超时就会把硬盘的缓存移除 
+		· diskPersistent：是否缓存虚拟机重启期数据。（这个虚拟机是指什么虚拟机一直没看明白是什么,有高人还希望能指点一二）。 · diskExpiryThreadIntervalSeconds：磁盘失效线程运行时间间隔，默认是120秒。 
+		· diskSpoolBufferSizeMB：这个参数设置DiskStore（磁盘缓存）的缓存区大小。默认是30MB。每个Cache都应该有自己的一个缓冲区。 
+		· memoryStoreEvictionPolicy：当达到maxElementsInMemory限制时，Ehcache将会根据指定的策略去清理内存。默认策略是LRU（最近最少使用）。你可以设置为FIFO（先进先出）或是LFU（较少使用）。这里比较遗憾，Ehcache并没有提供一个用户定制策略的接口，仅仅支持三种指定策略，感觉做的不够理想。 
+		· Cache Exception Handling配置 -->
+	<defaultCache maxElementsInMemory="100000" eternal="false"
+		timeToIdleSeconds="120" timeToLiveSeconds="12000" overflowToDisk="true"
+		diskSpoolBufferSizeMB="30" maxElementsOnDisk="10000" diskPersistent="false"
+		diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU"
+		statistics="false">
+		<cacheEventListenerFactory
+			class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+			properties="replicateAsynchronously=true, replicatePuts=true, replicateUpdates=true,
+replicateUpdatesViaCopy=false, replicateRemovals=true " />
+
+	</defaultCache>
+	<!-- timeToLive 0是限制在同一个服务器 1是限制在同一个子网 32是限制在同一个网站 64是限制在同一个region 128是限制在同一个大洲 
+		255是不限制 -->
+	<cacheManagerPeerProviderFactory
+		class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
+		properties="peerDiscovery=automatic, multicastGroupAddress=230.0.0.1,
+					multicastGroupPort=4446, timeToLive=1" />
+
+	<cacheManagerPeerListenerFactory
+		class="net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory"
+		properties="port=40002,
+        socketTimeoutMillis=2000" />
+
+
+	<!-- 查询缓存 -->
+	<cache name="org.hibernate.cache.internal.StandardQueryCache"
+		maxElementsInMemory="5000" eternal="false" timeToIdleSeconds="1200"
+		timeToLiveSeconds="13000" overflowToDisk="true" diskSpoolBufferSizeMB="30"
+		maxElementsOnDisk="10000" diskPersistent="false"
+		diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU"
+		statistics="false">
+		<cacheEventListenerFactory
+			class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+			properties="replicateAsynchronously=true, replicatePuts=true, replicateUpdates=true,
+replicateUpdatesViaCopy=false, replicateRemovals=true " />
+	</cache>
+
+	<!-- 作用：保证二级缓存数据有效性。 情景：事务1查询了数据，保存到二级缓存，当事务1再次使用本线程的二级缓存前， 有事务2更新了数据库，导致事务1的二级缓存数据是无效的。更新时间戳在二级缓存开辟一个区域，保存每次读写的时间， 
+		当执行查询时先对比时间戳区内的版本，如果大于类缓存区中的版本，就重新查询数据库。 -->
+	<cache name="org.hibernate.cache.spi.UpdateTimestampsCache"
+		maxElementsInMemory="5000" eternal="true" overflowToDisk="true">
+		<cacheEventListenerFactory
+			class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+			properties="replicateAsynchronously=true, replicatePuts=true, replicateUpdates=true,
+replicateUpdatesViaCopy=false, replicateRemovals=true " />
+	</cache>
+
+	<cache name="sampleCache1" maxElementsInMemory="10000"
+		maxElementsOnDisk="1000" eternal="false" overflowToDisk="true"
+		diskSpoolBufferSizeMB="20" timeToIdleSeconds="300" timeToLiveSeconds="600"
+		memoryStoreEvictionPolicy="LFU" transactionalMode="off">
+		<cacheEventListenerFactory
+			class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
+			properties="replicateAsynchronously=true, replicatePuts=true, replicateUpdates=true,
+replicateUpdatesViaCopy=false, replicateRemovals=true " />
+	</cache>
+</ehcache>

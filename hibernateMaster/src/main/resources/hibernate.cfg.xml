@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+ "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+	
+        <!-- 事务无论提交还是回滚，session都将自动释放 -->
+        <!-- <property name="current_session_context_class">thread</property> -->
+
+		<!-- #c3p0连接池 -->
+       <!--  <property name="hibernate.connection.pool_size">5</property>
+        <property name="hibernate.c3p0.min_size">50</property>
+        <property name="hibernate.c3p0.max_size">800</property>
+        <property name="hibernate.c3p0.max_statements">50</property>
+        <property name="hibernate.jdbc.batch_size">10</property>
+        <property name="hibernate.c3p0.timeout">300</property>
+        <property name="hibernate.c3p0.idle_test_period">3000</property>
+        <property name="hibernate.c3p0.testConnectionOnCheckout">true</property>
+        
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">root</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/steedframework4web?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.connection.provider_class">org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider</property>
+		 --><!-- /c3p0连接池 -->
+		 
+		<!-- #druid连接池 详细属性配置见https://github.com/alibaba/druid/wiki/DruidDataSource%E9%85%8D%E7%BD%AE%E5%B1%9E%E6%80%A7%E5%88%97%E8%A1%A8 -->
+        <!-- <property name="username">root</property>
+        <property name="password">root</property> -->
+        <property name="username">testused</property>
+        <property name="password">2yMFGst#3N^2aIn7</property>
+      
+        <!-- <property name="url">jdbc:mysql://localhost:3306/ifs?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property> -->
+        <property name="url">jdbc:mysql://120.25.233.227:3306/ifs2?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.connection.provider_class">com.alibaba.druid.support.hibernate.DruidConnectionProvider</property>
+        <property name="validationQuery">select 1</property>
+        <property name="testWhileIdle">true</property>
+        <!-- 定时输出统计信息到日志中   单位:毫秒 配置了timeBetweenLogStatsMillis属性（大于0）之后，就会定时输出统计信息到日志中。每次输出日志会导致清零（reset）连接池相关的计数器。-->
+        <property name="timeBetweenLogStatsMillis">3600000</property>
+        <property name="filters">stat,wall,slf4j</property>
+        
+        <!-- 连接泄漏监测 开始-->
+        <property name="removeAbandoned" >true</property> <!-- 打开removeAbandoned功能 -->
+  		<property name="removeAbandonedTimeout" >1800</property> <!-- 关闭1800秒都没使用过的链接，也就是30分钟 -->
+  		<property name="logAbandoned" >true</property> <!-- 关闭abanded连接时输出错误日志 -->
+		 <!-- 连接泄漏监测 结束-->
+		 
+		<!-- /druid连接池 -->
+
+
+        <!-- #proxool连接池  数据库连接信息请到pool-one.properties编辑 -->
+       <!--  <property name="hibernate.connection.provider_class">org.hibernate.connection.ProxoolConnectionProvider</property>
+        <property name="hibernate.proxool.pool_alias">pool-one</property>
+        <property name="hibernate.connection.pool_size">120</property>
+        
+        <property name="hibernate.jdbc.batch_size">240</property>
+        <property name="hibernate.proxool.properties">pool-one.properties</property> -->
+        <!-- /proxool连接池 -->
+        
+        <!-- jndi连接池 -->
+        <!-- <property name="hibernate.connection.datasource">java:comp/env/jdbc/default</property>
+        
+		<property name="dialect">
+			org.hibernate.dialect.MySQLDialect
+		</property>
+		<property name="current_session_context_class">thread</property>
+		 -->
+		<property name="show_sql">true</property>
+		<property name="hbm2ddl.auto">update</property>
+        <property name="hibernate.cache.region_prefix">hibernate.steed</property>
+        <property name="hibernate.max_fetch_depth">3</property>
+        <property name="hibernate.cache.region.factory_class">org.hibernate.testing.cache.CachingRegionFactory</property>
+		<!-- 使用查询缓存 -->
+		<property name="cache.use_query_cache">false</property>
+		<!-- 使用二级缓存 -->
+        <property name="cache.use_second_level_cache">true</property>
+        <property name="cache.use_structured_entries">true</property>
+        <property name="cache.region.factory_class">org.hibernate.cache.EhCacheRegionFactory</property>
+        <!-- 开发模式下的ehache配置 -->
+       <!--  <property name="net.sf.ehcache.configurationResourceName">/ehcacheDevMode.xml</property> -->
+        <!-- 生产模式下的ehache配置 -->
+        <property name="net.sf.ehcache.configurationResourceName">/ehcache.xml</property>
+		
+		<!-- 自动扫描实体类不用手动配置 -->
+		
+		<!-- 系统实体类 	
+		<mapping class="steed.ext.domain.system.Config"/>
+		<mapping class="steed.ext.domain.system.LoginLog"/>
+		<mapping class="steed.ext.domain.system.Property"/>
+		<mapping class="steed.ext.domain.system.Address"/>
+		<mapping class="steed.domain.system.LogisticsCompany"/>
+		
+		/微信框架实体类
+		<mapping class="steed.domain.wechat.WechatUser"/>
+		#微信框架实体类
+		
+		权限，用户模块
+		<mapping class="steed.ext.domain.user.Power"/>
+		<mapping class="steed.ext.domain.user.Role"/>
+		<mapping class="steed.ext.domain.user.User"/>
+		
+		系统功能实体类 
+		<mapping class="steed.ext.domain.system.Menu"/>
+		
+		资讯模块
+		<mapping class="steed.ext.domain.information.Programa"/>
+		<mapping class="steed.ext.domain.information.Information"/>
+		
+		
+		终端
+		<mapping class="steed.ext.domain.terminal.TerminalUser"/> -->
+		
+	</session-factory>
+</hibernate-configuration>
