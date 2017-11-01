@@ -24,8 +24,8 @@ public class QuickStart {
 	}
 	
 	/**
-	 * 运行之后会把主键为"战马"的user实体类的数据库记录中name列设置为'战小马',其他列设置为null.因为会把其他列设置为null,所以一般不直接update
-	 * 
+	 * 运行之后会把主键为"战马"的user实体类的数据库记录中name列设置为'战小马',
+	 * 其他列设置为null.因为会把其他列设置为null,所以一般不直接update
 	 * @see #updateNotNullFild()
 	 */
 	@Test
