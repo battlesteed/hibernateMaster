@@ -1,0 +1,2 @@
+# hibernateMaster
+hibernateMaster(hibernate大湿)--实现0sql和0hql伟大构想的项目让数据库操作变得比吃饭还简单
