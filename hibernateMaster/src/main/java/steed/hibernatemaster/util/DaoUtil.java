@@ -1425,7 +1425,8 @@ public class DaoUtil {
 					if (matcher.find()) {
 						//sum(weight),count(id)之类的
 						//temp = temp.replace(matcher.group(1), domainSimpleName+"."+matcher.group(1));
-						hql.append(temp).append(" as ").append(matcher.group(1).replace(".", "__").replace("\r", "")).append(",");
+						hql.append(temp).append(" as ").append(matcher.group(1).replace(".", "__").replace("\r", "")
+								.replace("*", "_")).append(",");
 					}else {
 						if (!temp.contains(".")) {
 						}else {
