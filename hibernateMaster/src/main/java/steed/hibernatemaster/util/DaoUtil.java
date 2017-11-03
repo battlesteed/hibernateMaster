@@ -1188,7 +1188,7 @@ public class DaoUtil {
 	public static void beginTransaction(){
 		if (currentTransaction.get() == null) {
 			BaseUtil.getLogger().debug("开启事务.....");
-			transactionType.set(true);
+//			transactionType.set(true);
 			currentTransaction.set(HibernateUtil.getSession().beginTransaction());
 		}
 	}
@@ -1207,6 +1207,10 @@ public class DaoUtil {
 		Boolean boolean1 = transactionType.get();
 		try {
 			if (boolean1 == null) {
+				if (currentTransaction.get() != null) {
+					BaseUtil.getLogger().debug("当前事务未进行写操作,回滚事务,防止对查询出来的实体类的更改保存到数据库..");
+					rollbackTransaction();
+				}
 				return true;
 			}
 			if (boolean1) {
