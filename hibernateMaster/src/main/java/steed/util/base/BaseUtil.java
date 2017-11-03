@@ -2,7 +2,6 @@ package steed.util.base;
 
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
-import steed.util.logging.Logger;
 /**
  * 基础工具类，拥有许多基础方法
  * @author 战马
@@ -56,10 +55,6 @@ public class BaseUtil {
 	public static void outLine(Object o){
 		String line = "------------------------"+o+"------------------------";
 		out(line);
-	}
-	
-	public static Logger getLogger(){
-		return steed.util.logging.LoggerFactory.getLogger(BaseUtil.class);
 	}
 	
 	/**

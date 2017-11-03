@@ -68,7 +68,7 @@ public class DomainUtil{
 				try {
 					temp.set(domain, null);
 				} catch (IllegalArgumentException | IllegalAccessException e) {
-					BaseUtil.getLogger().warn("净化实体类出错",e);
+					steed.util.logging.LoggerFactory.getLogger().warn("净化实体类出错",e);
 				}
 			}
 		}
@@ -488,7 +488,7 @@ public class DomainUtil{
 				}
 			}
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			BaseUtil.getLogger().debug("putField2Map出错",e);
+			steed.util.logging.LoggerFactory.getLogger().debug("putField2Map出错",e);
 		}
 	}
 	

@@ -55,6 +55,26 @@ class JdkLogger extends Logger {
 		clazzName = name;
 	}
 	
+	public void debug(String format, Object... args){
+		debug(String.format(format, args));
+	} 
+	
+	public void info(String format, Object... args){
+		info(String.format(format, args));
+	}
+	
+	public void warn(String format, Object... args){
+		warn(String.format(format, args));
+	}
+	
+	public void error(String format, Object... args){
+		error(String.format(format, args));
+	} 
+	
+	public void trace(String format, Object... args){
+		trace(String.format(format, args));
+	} 
+	
 	public void debug(String message) {
 		log.logp(Level.FINE, clazzName, Thread.currentThread().getStackTrace()[1].getMethodName(), message);
 	}

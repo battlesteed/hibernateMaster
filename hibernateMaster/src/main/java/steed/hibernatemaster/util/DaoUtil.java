@@ -23,8 +23,6 @@ import org.hibernate.NonUniqueObjectException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import steed.hibernatemaster.Config;
 import steed.hibernatemaster.domain.BaseDomain;
@@ -36,6 +34,7 @@ import steed.util.base.CollectionsUtil;
 import steed.util.base.DomainUtil;
 import steed.util.base.RegUtil;
 import steed.util.base.StringUtil;
+import steed.util.logging.Logger;
 import steed.util.reflect.ReflectUtil;
 /**
  * 实现0sql和0hql伟大构想的dao工具类，用该类即可满足绝大多数数据库操作
@@ -61,13 +60,11 @@ ___#######________######____#####_____#####____<br>
 ____######________#####_____#####_____####_____<br>
 _____#####________####______#####_____###______<br>
 ______#####_______###________###______#________<br>
-________##_______####________####______________ <br>
+________##_______####________####______________<br>
                                      	葱官赐福   百无禁忌
  * @author 战马
  */
 public class DaoUtil {
-	private static final Logger logger = LoggerFactory.getLogger(DaoUtil.class);
-	
 	private static final ThreadLocal<Boolean> transactionType = new ThreadLocal<>();
 	// 具体的错误提示用
 	private static final ThreadLocal<Exception> exception = new ThreadLocal<>();
@@ -106,7 +103,7 @@ public class DaoUtil {
 	}
 	public static void setException(Exception exception) {
 		DaoUtil.exception.set(exception);
-		logger.error("数据库操作发生异常",exception);
+		steed.util.logging.LoggerFactory.getLogger().error("数据库操作发生异常",exception);
 	}
 	public static Transaction getCurrentTransaction() {
 		return currentTransaction.get();
@@ -135,7 +132,7 @@ public class DaoUtil {
 	 * @return 
 	 */
 	public static ImmediatelyTransactionData immediatelyTransactionBegin(){
-		BaseUtil.getLogger().debug("立即事务开始");
+		steed.util.logging.LoggerFactory.getLogger().debug("立即事务开始");
 		Session session = getSession();
 		Transaction currentTransaction = getCurrentTransaction();
 		Boolean autoManagTransaction = getAutoManagTransaction();
@@ -159,7 +156,7 @@ public class DaoUtil {
 		DaoUtil.setCurrentTransaction(immediatelyTransactionData.currentTransaction);
 		DaoUtil.setAutoManagTransaction(immediatelyTransactionData.autoManagTransaction);
 		HibernateUtil.setSession(immediatelyTransactionData.session);
-		BaseUtil.getLogger().debug("立即事务结束");
+		steed.util.logging.LoggerFactory.getLogger().debug("立即事务结束");
 	}
 	
 	
@@ -611,7 +608,7 @@ public class DaoUtil {
 			DomainUtil.setDomainId(newInstance, key);
 			return delete(newInstance);
 		} catch (InstantiationException | IllegalAccessException e) {
-			BaseUtil.getLogger().error(clazz+"实例化失败！！",e);
+			steed.util.logging.LoggerFactory.getLogger().error(clazz+"实例化失败！！",e);
 			throw new RuntimeException(clazz+"实例化失败！！",e);
 		}
 	}
@@ -1187,7 +1184,7 @@ public class DaoUtil {
 	 */
 	public static void beginTransaction(){
 		if (currentTransaction.get() == null) {
-			BaseUtil.getLogger().debug("开启事务.....");
+			steed.util.logging.LoggerFactory.getLogger().debug("开启事务.....");
 //			transactionType.set(true);
 			currentTransaction.set(HibernateUtil.getSession().beginTransaction());
 		}
@@ -1208,7 +1205,7 @@ public class DaoUtil {
 		try {
 			if (boolean1 == null) {
 				if (currentTransaction.get() != null) {
-					BaseUtil.getLogger().debug("当前事务未进行写操作,回滚事务,防止对查询出来的实体类的更改保存到数据库..");
+					steed.util.logging.LoggerFactory.getLogger().debug("当前事务未进行写操作,回滚事务,防止对查询出来的实体类的更改保存到数据库..");
 					rollbackTransaction();
 				}
 				return true;
@@ -1250,7 +1247,7 @@ public class DaoUtil {
 		Transaction transaction = getTransaction();
 		if (transaction != null) {
 			transaction.commit();
-			BaseUtil.getLogger().debug("提交事务.....");
+			steed.util.logging.LoggerFactory.getLogger().debug("提交事务.....");
 		}
 		currentTransaction.remove();
 	}
@@ -1263,7 +1260,7 @@ public class DaoUtil {
 		Transaction transaction = getTransaction();
 		if (transaction != null) {
 			transaction.rollback();
-			BaseUtil.getLogger().debug("回滚事务.....");
+			steed.util.logging.LoggerFactory.getLogger().debug("回滚事务.....");
 		}
 		currentTransaction.remove();
 	}
@@ -1370,7 +1367,7 @@ public class DaoUtil {
 		
 		appendHqlWhere(domainSimpleName, hql, queryCondition);
 		
-		logger.debug("hql------>"+hql.toString());
+		steed.util.logging.LoggerFactory.getLogger().debug("hql------>"+hql.toString());
 		return hql;
 	}
 	/**
@@ -1480,7 +1477,7 @@ public class DaoUtil {
 		appendHqlWhere(domainSimpleName, hql, queryMap);
 		appendHqlOrder(hql, desc, asc, domainSimpleName);
 		
-		logger.debug("hql------>{}",hql.toString());
+		steed.util.logging.LoggerFactory.getLogger().debug("hql------>%s",hql.toString());
 		
 		return hql;
 	}
@@ -1529,7 +1526,7 @@ public class DaoUtil {
 		}else {
 			countHql.insert(0, "select "+selectedField+" ");
 		}
-		logger.debug("countHql--->"+countHql);
+		steed.util.logging.LoggerFactory.getLogger().debug("countHql--->"+countHql);
 		return countHql;
 	}
 	
@@ -1543,8 +1540,8 @@ public class DaoUtil {
 	 * @return
 	 */
 	public static Query createQuery(Map<String, Object> map,StringBuffer hql) {
-		logger.debug("hql---->"+hql.toString());
-		logger.debug("参数---->"+map);
+		steed.util.logging.LoggerFactory.getLogger().debug("hql---->"+hql.toString());
+		steed.util.logging.LoggerFactory.getLogger().debug("参数---->"+map);
 		Query query = getSession().createQuery(hql.toString());
 		setMapParam(map, query);
 		return query;
@@ -1556,8 +1553,8 @@ public class DaoUtil {
 	 * @return
 	 */
 	public static Query createSQLQuery(Map<String, Object> map,StringBuffer sql) {
-		logger.debug("sql---->"+sql.toString());
-		logger.debug("参数---->"+map);
+		steed.util.logging.LoggerFactory.getLogger().debug("sql---->"+sql.toString());
+		steed.util.logging.LoggerFactory.getLogger().debug("参数---->"+map);
 		Query query = getSession().createSQLQuery(sql.toString());
 		setMapParam(map, query);
 		return query;
@@ -1772,7 +1769,7 @@ public class DaoUtil {
 				}
 			}
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			BaseUtil.getLogger().debug("putField2Map出错",e);
+			steed.util.logging.LoggerFactory.getLogger().debug("putField2Map出错",e);
 		}
 	}
 	

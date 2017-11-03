@@ -17,6 +17,7 @@ import steed.hibernatemaster.util.DaoUtil;
 import steed.hibernatemaster.util.HqlGenerator;
 import steed.util.base.BaseUtil;
 import steed.util.base.DomainUtil;
+import steed.util.logging.LoggerFactory;
 import steed.util.reflect.ReflectUtil;
 /**
  * 关系型数据库基础实体类
@@ -209,11 +210,11 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 					}
 					f.set(this, value);
 				} catch (IllegalAccessException e) {
-					BaseUtil.getLogger().debug("copyObj", e);
+					LoggerFactory.getLogger().debug("copyObj", e);
 				} 
 			}
 		} catch (Exception e) {
-			BaseUtil.getLogger().error("hibernate代理Collection转java内置Collection失败!!",e);
+			LoggerFactory.getLogger().error("hibernate代理Collection转java内置Collection失败!!",e);
 		//	throw new RuntimeException(e);
 		}
 		return this;

@@ -25,6 +25,9 @@ package steed.util.logging.impl;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.spi.LoggerContext;
+import org.apache.logging.log4j.util.LoaderUtil;
+import org.apache.logging.log4j.util.ReflectionUtil;
 
 import steed.util.logging.Logger;
 import steed.util.logging.LoggerFactory.InternalLoggerFactory;
@@ -44,8 +47,30 @@ public class Log4jLoggerFactory implements InternalLoggerFactory {
 class Log4jLogger extends Logger { 
 	private org.apache.logging.log4j.Logger log;
 	
+	/**
+     * Gets the {@link LoggerContext} associated with the given caller class.
+     *
+     * @param callerClass the caller class
+     * @return the LoggerContext for the calling class
+     */
+    protected LoggerContext getContext(final Class<?> callerClass) {
+        ClassLoader cl = null;
+        if (callerClass != null) {
+            cl = callerClass.getClassLoader();
+        }
+        if (cl == null) {
+            cl = LoaderUtil.getThreadContextClassLoader();
+        }
+        return LogManager.getContext(cl, false);
+    }
+	
+    protected LoggerContext getContext() {
+        final Class<?> anchor = ReflectionUtil.getCallerClass(steed.util.logging.Logger.class.getName(), "steed.util.logging");
+        return anchor == null ? LogManager.getContext() : getContext(ReflectionUtil.getCallerClass(anchor));
+    }
+	
 	Log4jLogger(Class<?> clazz) {
-		log = LogManager.getLogger(clazz);
+		log = getContext().getLogger(clazz.getName());
 	}
 	
 	Log4jLogger(String name) {
@@ -71,7 +96,6 @@ class Log4jLogger extends Logger {
 		String msg = String.format(format, args);
 		log.log(Level.ERROR, msg);
 	}
-	
 	
 	public void info(String message) {
 		log.log(Level.INFO, message);

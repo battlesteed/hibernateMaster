@@ -32,8 +32,12 @@ public class SingleDomainScanner implements DomainScanner{
 		List<File> allFile = new ArrayList<>();
 //		List<File> allFile = new FileUtil().getAllFile(classesPath,null);
 //		if (Config.devMode) {
-			allFile.addAll(new FileUtil().getAllFile(classesPath.replaceFirst("classes", "test-classes"),null));
+		allFile.addAll(new FileUtil().getAllFile(classesPath,null));
+		if (classesPath.contains("test-classes")) {
 			allFile.addAll(new FileUtil().getAllFile(classesPath.replaceFirst("test-classes", "classes"),null));
+		}else {
+			allFile.addAll(new FileUtil().getAllFile(classesPath.replaceFirst("classes", "test-classes"),null));
+		}
 //		}
 		
 		for (File f:allFile) {
@@ -44,7 +48,7 @@ public class SingleDomainScanner implements DomainScanner{
 			String replaceAll = absolutePath.substring(absolutePath.indexOf("classes")+"classes.".length()).replace("\\", ".").replace("/", ".");
 			try {
 				String domainClassName = replaceAll.substring(0,replaceAll.length() - 6);
-				BaseUtil.getLogger().debug("扫描{}",domainClassName);
+				steed.util.logging.LoggerFactory.getLogger().debug("扫描%s",domainClassName);
 				Class<?> domainClass = Class.forName(domainClassName);
 				if (BaseRelationalDatabaseDomain.class.isAssignableFrom(domainClass)) {
 					if (domainClass.getAnnotation(Entity.class) != null) {

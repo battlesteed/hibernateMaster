@@ -45,8 +45,13 @@ public class LoggerFactory {
 		return factory.getLogger(clazz);
 	}
 	
+	private static Logger logger ;
+	
 	public static Logger getLogger() {
-		return factory.getLogger(LoggerFactory.class);
+		if (logger == null) {
+			logger = factory.getLogger(LoggerFactory.class);
+		}
+		return logger;
 	}
 	public static Logger getLogger(String name) {
 		return factory.getLogger(name);
