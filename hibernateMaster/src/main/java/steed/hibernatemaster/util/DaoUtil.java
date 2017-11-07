@@ -78,11 +78,6 @@ public class DaoUtil {
 	 */
 	private static final ThreadLocal<Boolean> autoManagTransaction = new ThreadLocal<>();
 	
-	/**
-	 * 是否自动开启事务,防止用户直接获取session执行写操作,而忘记开启事务
-	 */
-	private static boolean autoBeginTransaction = Config.autoBeginTransaction;
-	
 	private DaoUtil() {
 	}
 
@@ -1562,7 +1557,7 @@ public class DaoUtil {
 	
 	public static Session getSession(){
 		Session session = HibernateUtil.getSession();
-		if (autoBeginTransaction) {
+		if (Config.autoBeginTransaction) {
 			beginTransaction();
 		}
 		return session;

@@ -12,10 +12,10 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import steed.hibernatemaster.Config;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.DomainScanner;
-import steed.util.base.BaseUtil;
 
 public class SingleFactoryEngine implements FactoryEngine{
 	
+	@Override
 	public SessionFactory buildFactory(String configFile) {
 		try {
 			//configuration = new Configuration().configure(configFile);
