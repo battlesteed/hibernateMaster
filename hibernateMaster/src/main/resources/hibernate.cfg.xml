@@ -26,13 +26,10 @@
 		 --><!-- /c3p0连接池 -->
 		 
 		<!-- #druid连接池 详细属性配置见https://github.com/alibaba/druid/wiki/DruidDataSource%E9%85%8D%E7%BD%AE%E5%B1%9E%E6%80%A7%E5%88%97%E8%A1%A8 -->
-        <!-- <property name="username">root</property>
-        <property name="password">root</property> -->
-        <property name="username">testused</property>
-        <property name="password">2yMFGst#3N^2aIn7</property>
+        <property name="username">root</property>
+        <property name="password">root</property>
       
-        <!-- <property name="url">jdbc:mysql://localhost:3306/ifs?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property> -->
-        <property name="url">jdbc:mysql://120.25.233.227:3306/ifs2?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
+        <property name="url">jdbc:mysql://localhost:3307/hibernateMaster?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="hibernate.connection.provider_class">com.alibaba.druid.support.hibernate.DruidConnectionProvider</property>
         <property name="validationQuery">select 1</property>
@@ -84,33 +81,6 @@
         <property name="net.sf.ehcache.configurationResourceName">/ehcache.xml</property>
 		
 		<!-- 自动扫描实体类不用手动配置 -->
-		
-		<!-- 系统实体类 	
-		<mapping class="steed.ext.domain.system.Config"/>
-		<mapping class="steed.ext.domain.system.LoginLog"/>
-		<mapping class="steed.ext.domain.system.Property"/>
-		<mapping class="steed.ext.domain.system.Address"/>
-		<mapping class="steed.domain.system.LogisticsCompany"/>
-		
-		/微信框架实体类
-		<mapping class="steed.domain.wechat.WechatUser"/>
-		#微信框架实体类
-		
-		权限，用户模块
-		<mapping class="steed.ext.domain.user.Power"/>
-		<mapping class="steed.ext.domain.user.Role"/>
-		<mapping class="steed.ext.domain.user.User"/>
-		
-		系统功能实体类 
-		<mapping class="steed.ext.domain.system.Menu"/>
-		
-		资讯模块
-		<mapping class="steed.ext.domain.information.Programa"/>
-		<mapping class="steed.ext.domain.information.Information"/>
-		
-		
-		终端
-		<mapping class="steed.ext.domain.terminal.TerminalUser"/> -->
 		
 	</session-factory>
 </hibernate-configuration>
