@@ -1478,7 +1478,7 @@ public class DaoUtil {
 		appendHqlOrder(hql, desc, asc, domainSimpleName);
 		
 		steed.util.logging.LoggerFactory.getLogger().debug("hql------>%s",hql.toString());
-		steed.util.logging.LoggerFactory.getLogger().debug("参数------>%s",queryMap.toString());
+		steed.util.logging.LoggerFactory.getLogger().debug("参数------>%s",queryMap==null?null:queryMap.toString());
 		
 		return hql;
 	}
