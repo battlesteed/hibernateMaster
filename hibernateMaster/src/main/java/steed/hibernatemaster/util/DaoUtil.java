@@ -1407,15 +1407,15 @@ public class DaoUtil {
 		
 		hql.append(prefix).append(" ");
 		
+		Set<String> domainSelected = new HashSet<>();
+		Set<String> innerJoin = new HashSet<>();
 		if ("select".equals(prefix)) {
 			if ((selectedFields == null || selectedFields.length == 0)) {
 				hql.append(domainSimpleName);
-				appendSelectTarget(fullClassName, hql, domainSimpleName);
 			}else{
 				if (selectedFields.length > 1) {
 					hql.append("new map( ");
 				}
-				Set<String> domainSelected = new HashSet<>();
 				for(String temp:selectedFields){
 					Matcher matcher = RegUtil.getPattern(".+\\((.+)\\)").matcher(temp);
 					if (matcher.find()) {
@@ -1432,56 +1432,55 @@ public class DaoUtil {
 							append(temp).append(" as ").append(temp.replace(".", "__")).append(",");
 					}
 				}
-				Set<String> innerJoin = new HashSet<>();
-				if (queryMap != null) {
-					for(String temp:queryMap.keySet()){
-						if (temp.contains(".")) {
-							String key = temp.substring(0, temp.indexOf("."));
-							innerJoin.add(key);
-							domainSelected.remove(key);
-						}
-					}
-				}
 				
 				hql.deleteCharAt(hql.length()-1);
 				if (selectedFields.length > 1) {
 					hql.append(" )");
 				}
 				
-				hql.append(" from ")
-				.append(fullClassName)
-				.append(" ")
-				.append(domainSimpleName);
-				
-				for(String temp:domainSelected){
-					hql.append(" left join ").append(domainSimpleName).append(".")
-						.append(temp).append(" ");
-				}
-				for(String temp:innerJoin){
-					hql.append(" inner join ").append(domainSimpleName).append(".")
-					.append(temp).append(" ");
-				}
-				
-				hql.append(" where  1=1 ");
 			}
 		}else {
-			appendSelectTarget(fullClassName, hql, domainSimpleName);
+			hql.append(" from ")
+			.append(fullClassName)
+			.append(" ")
+			.append(domainSimpleName)
+			.append(" where 1=1 ");
 		}
+		
+		if (queryMap != null) {
+			for(String temp:queryMap.keySet()){
+				if (temp.contains(".")) {
+					String key = temp.substring(0, temp.indexOf("."));
+					innerJoin.add(key);
+					domainSelected.remove(key);
+				}
+			}
+		}
+		
+		hql.append(" from ")
+		.append(fullClassName)
+		.append(" ")
+		.append(domainSimpleName);
+		
+		for(String temp:domainSelected){
+			hql.append(" left join ").append(domainSimpleName).append(".")
+				.append(temp).append(" ");
+		}
+		for(String temp:innerJoin){
+			hql.append(" inner join ").append(domainSimpleName).append(".")
+			.append(temp).append(" ");
+		}
+		
+		hql.append(" where  1=1 ");
 		
 		
 		appendHqlWhere(domainSimpleName, hql, queryMap);
 		appendHqlOrder(hql, desc, asc, domainSimpleName);
 		
 		steed.util.logging.LoggerFactory.getLogger().debug("hql------>%s",hql.toString());
+		steed.util.logging.LoggerFactory.getLogger().debug("参数------>%s",queryMap.toString());
 		
 		return hql;
-	}
-	private static void appendSelectTarget(String fullClassName, StringBuffer hql, String domainSimpleName) {
-		hql.append(" from ")
-		.append(fullClassName)
-		.append(" ")
-		.append(domainSimpleName)
-		.append(" where 1=1 ");
 	}
 	/**
 	 * 根据查询对象生成hql
