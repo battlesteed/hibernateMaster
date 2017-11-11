@@ -18,8 +18,6 @@ import javax.persistence.IdClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xml.internal.txw2.IllegalAnnotationException;
-
 import steed.hibernatemaster.annotation.FuzzyQuery;
 import steed.hibernatemaster.annotation.FuzzyQuery.FuzzyQuerystrategy;
 import steed.hibernatemaster.domain.BaseDomain;
@@ -278,7 +276,7 @@ public class DomainUtil{
 			StringBuffer sb = new StringBuffer("按照约定含有");
 			sb.append(IdClass.class.getName());
 			sb.append("注解的domain不能有ID字段!!!只能有getDomainID()方法。");
-			throw new IllegalAnnotationException(sb.toString());
+			throw new RuntimeException(sb.toString());
 		}
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field f:fields) {
@@ -301,7 +299,7 @@ public class DomainUtil{
 			try {
 				return clazz.getDeclaredMethod("getDomainID");
 			} catch (NoSuchMethodException e) {
-				throw new IllegalAnnotationException("含有"+IdClass.class.getName()+
+				throw new RuntimeException("含有"+IdClass.class.getName()+
 						"的domain必须实现"+UnionKeyDomain.class.getName()+"接口!!!",e);
 			}
 		}

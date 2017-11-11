@@ -1439,13 +1439,12 @@ public class DaoUtil {
 				}
 				
 			}
-		}else {
+		}/*else {
 			hql.append(" from ")
 			.append(fullClassName)
 			.append(" ")
-			.append(domainSimpleName)
-			.append(" where 1=1 ");
-		}
+			.append(domainSimpleName);
+		}*/
 		
 		if (queryMap != null) {
 			for(String temp:queryMap.keySet()){
