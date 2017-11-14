@@ -69,7 +69,7 @@ public class SimpleHqlGenerator implements HqlGenerator{
 	protected void appendSingleWhereCondition(String domainSimpleName, StringBuffer hql,
 			List<String> removedEntry, Map<String, Object> query,Entry<String, Object> e,Map<String, Object> put) {
 		String key = e.getKey();
-		if ((e.getValue() instanceof Collection || e.getValue().getClass().isArray()) 
+		if (e.getValue() != null && (e.getValue() instanceof Collection || e.getValue().getClass().isArray()) 
 				&& !key.endsWith("_not_join")) {
 			//TODO 添加不联表的in和not in
 			boolean isNotIn = key.endsWith("_not_in_1");
