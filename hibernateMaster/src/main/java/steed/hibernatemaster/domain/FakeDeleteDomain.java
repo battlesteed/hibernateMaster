@@ -11,19 +11,20 @@ import javax.persistence.MappedSuperclass;
 public abstract class FakeDeleteDomain extends BaseDatabaseDomain{
 	private static final long serialVersionUID = -539927350380405542L;
 	
-	private Boolean isDeleted = false;
+	private Boolean deleted = false;
 
-	public Boolean getIsDeleted() {
-		return isDeleted;
+	
+	public Boolean getDeleted() {
+		return deleted;
 	}
 
-	public void setIsDeleted(Boolean isDeleted) {
-		this.isDeleted = isDeleted;
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	@Override
 	public boolean delete() {
-		isDeleted = true;
+		deleted = true;
 		return updateNotNullField(null,true);
 	}
 	

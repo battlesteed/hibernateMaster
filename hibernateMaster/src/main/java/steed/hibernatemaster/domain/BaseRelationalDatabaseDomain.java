@@ -128,7 +128,9 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	
 	@Override
 	public boolean updateNotNullField(List<String> updateEvenNull,boolean strictlyMode){
-		return DomainUtil.fillDomain(this.smartGet(), this,updateEvenNull,strictlyMode).update();
+		BaseRelationalDatabaseDomain smartGet = this.smartGet();
+		DomainUtil.fillDomain(smartGet, this,updateEvenNull,strictlyMode);
+		return smartGet.update();
 	}
 	/*public void initializeAll(){
 		this.initialize();

@@ -57,7 +57,7 @@ public class SimpleHqlGenerator implements HqlGenerator{
 	}
 
 	/**
-	 * append 单个 where 条件
+	 * append 单个 where 条件,一般不需要重新该方法
 	 * @param domainSimpleName
 	 * @param hql
 	 * @param query

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,7 +35,6 @@ import steed.util.base.CollectionsUtil;
 import steed.util.base.DomainUtil;
 import steed.util.base.RegUtil;
 import steed.util.base.StringUtil;
-import steed.util.logging.Logger;
 import steed.util.reflect.ReflectUtil;
 /**
  * 实现0sql和0hql伟大构想的dao工具类，用该类即可满足绝大多数数据库操作
@@ -78,6 +78,16 @@ public class DaoUtil {
 	 */
 	private static final ThreadLocal<Boolean> autoManagTransaction = new ThreadLocal<>();
 	
+//	private static final Map<Class<?>, CRUDListener<?>> CRUDListenerMap = new HashMap<>();
+	
+	
+	public interface CRUDListener<T>{
+		public default void onDelete(T t){};
+		public default void onSave(T t){};
+		public default void onUpdate(){};
+	}
+	
+	
 	private DaoUtil() {
 	}
 
@@ -115,6 +125,26 @@ public class DaoUtil {
 	public static Boolean getAutoManagTransaction() {
 		return autoManagTransaction.get();
 	}
+	
+	/*
+	public static void registCRUDListener(Class<?> clazz,CRUDListener<?> listener){
+		CRUDListenerMap.put(clazz, listener);
+	}
+	public static void unRegistCRUDListener(Class<?> clazz){
+		CRUDListenerMap.remove(clazz);
+	}
+	public static <T> CRUDListener<T> getCRUDListener(Class<?> clazz){
+		while (clazz != Object.class) {
+			CRUDListener<?> crudListener = CRUDListenerMap.get(clazz);
+			if (crudListener != null) {
+				return (CRUDListener<T>) crudListener;
+			}
+			clazz = clazz.getSuperclass();
+		}
+		return null;
+	}*/
+	
+	
 	/**
 	 * 立即事务开始，框架可能配置了多个数据库操作使用同一事务然后统一提交
 	 * 如某些操作可能要马上提交事务，可使用该方法
@@ -609,10 +639,12 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 聪明的通过id删除实体类方法,会自动把ids转换成实体类id类型,比如实体类id为Long,ids一样可以传string
+	 * 通过id删除实体类方法,不会会自动把ids转换成实体类id类型,比如实体类id为Long,ids不可以传string
 	 * @param clazz
 	 * @param ids
 	 * @return 删除的记录数（失败返回-1）
+	 * 
+	 * @see #smartDeleteByIds(Class, String...)
 	 */
 	public static int deleteByIds(Class<? extends BaseRelationalDatabaseDomain> clazz,Serializable... ids){
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -639,7 +671,7 @@ public class DaoUtil {
 		return deleteByIds(clazz, serializables);
 	}
 	/**
-	 * 删除obj对应的数据库记录
+	 * 根据obj的id删除对应的数据库记录
 	 * @param obj
 	 * @return
 	 */
@@ -655,14 +687,10 @@ public class DaoUtil {
 				session.delete(smartGet(obj));
 				return managTransaction(true);
 			} catch (Exception e) {
-				e.printStackTrace();
 				setException(e);
 				return managTransaction(false);
-			}finally{
-				closeSession();
 			}
 		}catch (Exception e) {
-			e.printStackTrace();
 			setException(e);
 			return managTransaction(false);
 		}finally{
@@ -725,22 +753,18 @@ public class DaoUtil {
 				}
 			}
 			session.delete(obj);
-			return true;
+			return managTransaction(true);
 		} catch (NonUniqueObjectException e1) {
 			try {
 				session.delete(smartGet(obj));
-				return true;
+				return managTransaction(true);
 			} catch (Exception e) {
-				e.printStackTrace();
 				setException(e);
-				return false;
-			} finally {
-				closeSession();
+				return managTransaction(false);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			setException(e);
-			return false;
+			return managTransaction(false);
 		} finally {
 			closeSession();
 		}
@@ -975,8 +999,21 @@ public class DaoUtil {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> listAllCustomField(Class<?> t,Map<String, Object> constraint,List<String> desc,List<String> asc,String... selectedFields){
+		return listAllCustomField(t, constraint, desc, asc, null, selectedFields);
+	}
+	/**
+	 * 获取所有实体类指定的字段
+	 * @param t
+	 * @param constraint 查询参数
+	 * @param desc
+	 * @param asc
+	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> listAllCustomField(Class<?> t,Map<String, Object> constraint,List<String> desc,List<String> asc,String[] groupBy,String... selectedFields){
 		try {
-			Query query = getSession().createQuery(getSelectHql(t, constraint, desc, asc,selectedFields).toString());
+			Query query = getSession().createQuery(getSelectHql(t, constraint, desc, asc,groupBy,selectedFields).toString());
 			setMapParam(constraint, query);
 			return query.list();
 		} catch (Exception e) {
@@ -1072,8 +1109,26 @@ public class DaoUtil {
 	 */
 	public static <T> Page<T> listCustomField(Class<?> t,int pageSize,int currentPage,Map<String, Object> constraint,
 			List<String> desc,List<String> asc,boolean queryRecordCount,String... selectField){
+		return listCustomField(t, pageSize, currentPage, constraint, desc, asc, queryRecordCount, null, selectField);
+	}
+	/**
+	 * 查询t里面指定的字段
+	 * @param t 要查询的类
+	 * @param pageSize
+	 * @param currentPage
+	 * @param constraint 查询条件
+	 * @param desc
+	 * @param asc
+	 * @param queryRecordCount 是否查询总记录数(记录很多时查询较费时间),若传false,则返回的page实体类的记录数为Long.MAX_VALUE,<br>
+	 * 			前端可做无限分页
+	 * @param selectField 要查询的字段,若不传,则查询该类所有字段,page里面放的是实体类,否则放的是map,不过map里面的key的'.'会被替换成'__'<br>
+	 * 			(这个是可变参数,没有请不传,切忌传null!)
+	 * @return
+	 */
+	public static <T> Page<T> listCustomField(Class<?> t,int pageSize,int currentPage,Map<String, Object> constraint,
+			List<String> desc,List<String> asc,boolean queryRecordCount,String[] groupBy,String... selectField){
 		try {
-			StringBuffer hql = getSelectHql(t, constraint, desc, asc,selectField);
+			StringBuffer hql = getSelectHql(t, constraint, desc, asc, groupBy, selectField);
 			Long recordCount = Long.MAX_VALUE;
 			if (queryRecordCount) {
 				recordCount = getRecordCount(constraint, hql);
@@ -1277,9 +1332,7 @@ public class DaoUtil {
 	/**
 	 * update实体类中不为空的字段
 	 * @param obj
-	 * @param updateEvenNull 即使为空也更新到数据库中的字段，如果为null，
-	 * 			则根据domain字段中的UpdateEvenNull注解进行更新，
-	 * 			所以想跳过UpdateEvenNull注解只更新不为空的字段可以传一个空的list
+	 * @param updateEvenNull 即使为空也更新到数据库中的字段
 	 * @return
 	 */
 	public static boolean updateNotNullField(BaseRelationalDatabaseDomain obj,List<String> updateEvenNull){
@@ -1288,9 +1341,7 @@ public class DaoUtil {
 	/**
 	 * update实体类中不为空的字段
 	 * @param obj
-	 * @param updateEvenNull 即使为空也更新到数据库中的字段，如果为null，
-	 * 			则根据domain字段中的UpdateEvenNull注解进行更新，
-	 * 			所以想跳过UpdateEvenNull注解只更新不为空的字段可以传一个空的list
+	 * @param updateEvenNull 即使为空也更新到数据库中的字段
 	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空，
 	 * 	否则调用BaseUtil.isObjEmpty判断字段是否为空
 	 * @see BaseUtil#isObjEmpty
@@ -1298,7 +1349,15 @@ public class DaoUtil {
 	 * @return
 	 */
 	public static boolean updateNotNullField(BaseRelationalDatabaseDomain obj,List<String> updateEvenNull,boolean strictlyMode){
-		return update(DomainUtil.fillDomain(smartGet(obj), obj,updateEvenNull,strictlyMode));
+		BaseRelationalDatabaseDomain smartGet = smartGet(obj);
+		DomainUtil.fillDomain(smartGet, obj,updateEvenNull,strictlyMode);
+		return smartGet.update();
+	}
+	
+	public static boolean updateNotNullFieldByHql(BaseRelationalDatabaseDomain obj,List<String> updateEvenNull,boolean strictlyMode){
+		BaseRelationalDatabaseDomain smartGet = smartGet(obj);
+		DomainUtil.fillDomain(smartGet, obj,updateEvenNull,strictlyMode);
+		return smartGet.update();
 	}
 	
 	public static boolean update(BaseRelationalDatabaseDomain obj){
@@ -1386,7 +1445,20 @@ public class DaoUtil {
 	 * @return 拼好的hql
 	 */
 	public static <T> StringBuffer getSelectHql(Class<T> t,Map<String, Object> map,List<String> desc,List<String> asc,String... selectedFields) {
-		return getHql(t, map, desc, asc,"select",selectedFields);
+		return getHql(t, map, desc, asc,"select",null,selectedFields);
+	}
+	
+	/**
+	 * 获取查询用的hql
+	 * 除了t其它均可为null
+	 * @param t 实体类
+	 * @param map 查询数据
+	 * @param desc 降序排列字段
+	 * @param asc 升序排列字段
+	 * @return 拼好的hql
+	 */
+	public static <T> StringBuffer getSelectHql(Class<T> t,Map<String, Object> map,List<String> desc,List<String> asc,String[] groupBy,String... selectedFields) {
+		return getHql(t, map, desc, asc,"select",groupBy, selectedFields);
 	}
 	/**
 	 * 
@@ -1401,6 +1473,22 @@ public class DaoUtil {
 	 */
 	public static <T> StringBuffer getHql(Class<T> t, Map<String, Object> queryMap,List<String> desc,
 			List<String> asc,String prefix,String... selectedFields) {
+		return getHql(t, queryMap, desc, asc, prefix, null,selectedFields);
+	}
+	/**
+	 * 
+	 * 获取hql
+	 * 除了t其它均可为null
+	 * @param t 实体类
+	 * @param queryMap 查询数据
+	 * @param desc 降序排列字段
+	 * @param asc 升序排列字段
+	 * @param prefix hql前面部分目前只支持"select"或"delete"
+	 * @param groupBy hql group by 的字段
+	 * @return 拼好的hql
+	 */
+	public static <T> StringBuffer getHql(Class<T> t, Map<String, Object> queryMap,List<String> desc,
+			List<String> asc,String prefix,String[] groupBy,String... selectedFields) {
 		String fullClassName = t.getName();
 		StringBuffer hql = new StringBuffer();
 		String domainSimpleName = getDomainSimpleName(fullClassName);
@@ -1474,6 +1562,18 @@ public class DaoUtil {
 		
 		
 		appendHqlWhere(domainSimpleName, hql, queryMap);
+		
+		if (groupBy != null && groupBy.length > 0) {
+			int i = 0;
+			hql.append(" group by ");
+			for (String temp:groupBy) {
+				hql.append(" ").append(temp);
+				if (++i < groupBy.length) {
+					hql.append(" ,");
+				}
+			}
+		}
+		
 		appendHqlOrder(hql, desc, asc, domainSimpleName);
 		
 		steed.util.logging.LoggerFactory.getLogger().debug("hql------>%s",hql.toString());
@@ -1699,6 +1799,7 @@ public class DaoUtil {
 		 * @see DaoUtil#putField2Map(Object, Map, String, boolean)
 		 */
 		public boolean beforePutField2Map(Map<String, Object> map,String prefixName,boolean getFieldByGetter);
+		public default void afterPutField2Map(Map<String, Object> map,String prefixName,boolean getFieldByGetter) {};
 		
 	}
 	
@@ -1725,6 +1826,9 @@ public class DaoUtil {
 			List<Field> Fields = ReflectUtil.getNotFinalFields(obj);
 			for (Field f:Fields) {
 				String fieldName = f.getName();
+				if (map.containsKey(prefixName+fieldName)) {
+					continue;
+				}
 				//不是索引字段且标有Transient即跳过
 				if (isSelectIndex(fieldName) == 0) {
 					if (ReflectUtil.getAnnotation(Transient.class, objClass, f) != null) {
@@ -1763,6 +1867,9 @@ public class DaoUtil {
 			}
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			steed.util.logging.LoggerFactory.getLogger().debug("putField2Map出错",e);
+		}
+		if (obj instanceof PutField2MapIntercepter) {
+			((PutField2MapIntercepter)obj).afterPutField2Map(map, prefixName, getFieldByGetter);
 		}
 	}
 	

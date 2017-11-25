@@ -14,7 +14,7 @@ public class QueryBuilder {
 		queryMap = DaoUtil.putField2Map(domain);
 	}
 	/**
-	 * 添加普通查询条件, 生成的hql将包含 "model.kee = :value "这个条件
+	 * 添加普通查询条件, 生成的hql将包含 "model.key = :value "这个条件
 	 * @param key
 	 * @param value
 	 * @return
@@ -25,7 +25,7 @@ public class QueryBuilder {
 	}
 	
 	/**
-	 * 添加不等于查询条件 生成的hql将包含 "model.kee != :value "这个条件
+	 * 添加不等于查询条件 生成的hql将包含 "model.key != :value "这个条件
 	 * @param key
 	 * @param value
 	 * @return
@@ -35,7 +35,7 @@ public class QueryBuilder {
 		return this;
 	}
 	/**
-	 * 添加in查询条件 生成的hql将包含 "model.kee in( :value )"这个条件
+	 * 添加in查询条件 生成的hql将包含 "model.key in( :value )"这个条件
 	 * @param key
 	 * @param value
 	 * @return
@@ -46,9 +46,9 @@ public class QueryBuilder {
 	}
 	
 	/**
-	 * 添加非空查询条件 生成的hql将包含 "model.kee is null "(notNull为false)或者 "model.kee is not null "(notNull为true)这个条件
+	 * 添加非空查询条件 生成的hql将包含 "model.key is null "(notNull为false)或者 "model.key is not null "(notNull为true)这个条件
 	 * @param key
-	 * @param value
+	 * @param notNull
 	 * @return
 	 */
 	public QueryBuilder addNotNull(String key,boolean notNull){
@@ -57,7 +57,7 @@ public class QueryBuilder {
 	}
 	
 	/**
-	 * 添加小于查询条件 生成的hql将包含 "model.kee <= :value "这个条件
+	 * 添加小于查询条件 生成的hql将包含 "model.key <= :value "这个条件
 	 * @param key
 	 * @param value
 	 * @return
@@ -67,7 +67,7 @@ public class QueryBuilder {
 		return this;
 	}
 	/**
-	 * 添加大于于查询条件 生成的hql将包含 "model.kee >= :value "这个条件
+	 * 添加大于于查询条件 生成的hql将包含 "model.key >= :value "这个条件
 	 * @param key
 	 * @param value
 	 * @return
@@ -77,6 +77,10 @@ public class QueryBuilder {
 		return this;
 	}
 
+	/**
+	 * 获取daoutil查询用的查询参数
+	 * @return DaoUtil查询用的查询参数
+	 */
 	public Map<String, Object> getQueryMap() {
 		return queryMap;
 	}

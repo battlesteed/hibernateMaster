@@ -2,16 +2,54 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>steed</groupId>
+	<groupId>com.github.battlesteed</groupId>
 	<artifactId>hibernateMaster</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2</version>
+	<description>hibernateMaster--让数据操作更简单</description>
+
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>battlesteed</name>
+			<email>battle_steed@163.com</email>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>+8</timezone>
+		</developer>
+	</developers>
+	<scm>
+		<connection>scm:git:https://github.com/battlesteed/hibernateMaster.git</connection>
+		<developerConnection>scm:git:https://github.com/battlesteed/hibernateMaster.git</developerConnection>
+		<url>https://github.com/battlesteed/hibernateMaster</url>
+		<tag>v${project.version}</tag>
+	</scm>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<name>Maven Central Staging Repository</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+
+
 	<packaging>jar</packaging>
 
 	<name>hibernateMaster</name>
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/battlesteed/hibernateMaster</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
 	</properties>
 
 
@@ -21,6 +59,7 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>5.0.9.Final</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- If using JPA, add: -->
@@ -28,6 +67,7 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>5.0.9.Final</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- 依赖jar包结束 -->
@@ -35,38 +75,37 @@
 		<!-- 可选jar包开始 -->
 
 		<!-- 日志包开始 -->
-			<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
 		<dependency>
-		    <groupId>org.apache.logging.log4j</groupId>
-		    <artifactId>log4j-core</artifactId>
-		    <version>2.6.2</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.6.2</version>
+			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.21</version>
 		</dependency>
-		<dependency> <!-- 桥接：告诉Slf4j使用Log4j2 -->
+		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
 			<version>2.6.2</version>
+			<scope>provided</scope>
 		</dependency>
 		<!-- 日志包结束 -->
-		
+
 		<!-- druid连接池 -->
 		<dependency>
-		     <groupId>com.alibaba</groupId>
-		     <artifactId>druid</artifactId>
-		     <version>1.1.5</version>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>1.1.5</version>
 		</dependency>
-		
+
 		<!-- proxool连接池 -->
-		<!-- <dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-proxool</artifactId>
-			<version>5.2.1.Final</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>org.hibernate</groupId> <artifactId>hibernate-proxool</artifactId> 
+			<version>5.2.1.Final</version> </dependency> -->
 
 		<!-- mysql驱动 -->
 		<dependency>
@@ -74,7 +113,7 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.22</version>
 		</dependency>
-		
+
 		<!-- ehcache -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -91,4 +130,84 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	  <build>
+	<plugins>
+    <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.3</version>
+        <extensions>true</extensions>
+        <configuration>
+            <serverId>ossrh</serverId>
+            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+        </configuration>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.3</version>
+        <executions>
+            <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                    <goal>jar</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+            <execution>
+                <id>attach-sources</id>
+                <goals>
+                    <goal>jar-no-fork</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+    <plugin>  
+        <groupId>org.apache.maven.plugins</groupId>  
+        <artifactId>maven-compiler-plugin</artifactId>  
+        <configuration>  
+          <source>1.8</source>  
+          <target>1.8</target>  
+          <encoding>UTF-8</encoding>
+        </configuration>  
+      </plugin>  
+      <plugin>
+   <groupId>org.apache.maven.plugins</groupId>
+   <artifactId>maven-javadoc-plugin</artifactId>
+   <version>2.9.1</version>
+   <configuration>
+      <charset>UTF-8</charset>
+      <docencoding>UTF-8</docencoding>
+   </configuration>
+   <executions>
+      <execution>
+         <id>attach-javadocs</id>
+         <goals>
+            <goal>jar</goal>
+         </goals>
+      </execution>
+   </executions>
+</plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+            <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                    <goal>sign</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+</plugins>
+	  </build>
 </project>

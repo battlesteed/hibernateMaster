@@ -10,6 +10,11 @@ import java.util.Map;
 import steed.util.base.BaseUtil;
 import steed.util.base.DomainUtil;
 
+/**
+ * 数据库实体类(关系型数据库,nosql,newsql)
+ * @author 战马
+ *
+ */
 public abstract class BaseDatabaseDomain extends BaseDomain{
 	private static final long serialVersionUID = -6872283825535497093L;
 

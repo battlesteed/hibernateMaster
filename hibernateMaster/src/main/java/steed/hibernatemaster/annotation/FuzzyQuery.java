@@ -32,9 +32,20 @@ public @interface FuzzyQuery {
 	 */
 	public enum FuzzyQuerystrategy{
 		/**
-		 * 在左边加'%",后面两个枚举同理可推,不再赘述
+		 * 在左边加'%"
 		 */
 		left,
-		right,none
+		/**
+		 * 在右边加'%"
+		 */
+		right,
+		/**
+		 * 不使用模糊查询
+		 */
+		none,
+		/**
+		 * 在左右两边加'%"
+		 */
+		both
 	}
 }

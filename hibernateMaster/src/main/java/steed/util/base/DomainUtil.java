@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -325,22 +326,25 @@ public class DomainUtil{
 	 * @return 
 	 * @return filled
 	 */
-	public static <T> T fillDomain(T filled,T fill,Collection<String> fieldsNotSkip){
-		return fillDomain(filled, fill, fieldsNotSkip, false);
+	public static <T> void fillDomain(T filled,T fill,Collection<String> fieldsNotSkip){
+		fillDomain(filled, fill, fieldsNotSkip, false);
 	}
+/*	public static <T> List<DifferenceField> getDifferenceField(T oldObject,T newObj,Collection<String> fieldsNotSkip){
+		return getDifferenceField(oldObject, newObj, fieldsNotSkip, false);
+	}
+*/	
 	/**
-	 * 把fill中不为null的字段填充给filled
-	 * @param filled
-	 * @param fill
+	 * 获取newObj中不为空的字段跟oldObj中值不一样的字段,一般用于更新功能比较用户修改了哪些东西
+	 * @param oldObject
+	 * @param newObj
 	 * @param fieldsNotSkip 即使为null也不跳过的字段,如果没有可以传个null
-	 *  @param strictlyMode 严格模式，如果为true则 字段==null才算空，
-	 * 	否则调用BaseUtil.isObjEmpty判断字段是否为空
+	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空，否则调用BaseUtil.isObjEmpty判断字段是否为空
 	 * @see BaseUtil#isObjEmpty
-	 * @return 
-	 * @return filled
+	 * @return
 	 */
-	public static <T> T fillDomain(T filled,T fill,Collection<String> fieldsNotSkip,boolean strictlyMode){
-		List<Field> fields = ReflectUtil.getAllFields(fill);
+	public static <T> List<DifferenceField> getDifferenceField(T oldObject,T newObj,Collection<String> fieldsNotSkip,boolean strictlyMode){
+		List<Field> fields = ReflectUtil.getAllFields(newObj);
+		List<DifferenceField> differenceFields = new ArrayList<>();
 		try {
 			if(fieldsNotSkip == null){
 				fieldsNotSkip = new ArrayList<String>();
@@ -350,32 +354,55 @@ public class DomainUtil{
 					continue;
 				}
 				f.setAccessible(true);
-				Object temp = ReflectUtil.getFieldValueByGetter(fill, f.getName());
-				if (temp == null) {
-					temp = f.get(fill);
-				}
+				Object newField = getFieldValue(newObj, f);
+				
 				boolean isNull;
 				if (strictlyMode) {
-					isNull = temp == null;
+					isNull = newField == null;
 				}else {
-					isNull = BaseUtil.isObjEmpty(temp);
+					isNull = BaseUtil.isObjEmpty(newField);
 				}
 				if (!isNull || fieldsNotSkip.contains(f.getName())) {
-					try {
-						f.set(filled, temp);
-					} catch (IllegalAccessException e) {
-						e.printStackTrace();
+					Object oldField = getFieldValue(oldObject, f);
+					if (newField != null && !newField.equals(oldField)) {
+						differenceFields.add(new DifferenceField(f.getName(), newObj.getClass(), newField, oldField,f));
 					}
 				}
 			}
-			return filled;
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			return null;
-		} catch (IllegalAccessException e1) {
-			e1.printStackTrace();
-			return null;
-		} 
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			steed.util.logging.LoggerFactory.getLogger().info("获取字段值出错",e);
+		}
+		return differenceFields;
+	}
+	
+	private static <T> Object getFieldValue(T target, Field f) throws IllegalAccessException {
+		Object field = ReflectUtil.getFieldValueByGetter(target, f.getName());
+		if (field == null) {
+			field = f.get(target);
+		}
+		return field;
+	}
+	
+	/**
+	 * 把fill中不为null的字段填充给filled
+	 * @param filled
+	 * @param fill
+	 * @param fieldsNotSkip 即使为null也不跳过的字段,如果没有可以传个null
+	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空，
+	 * 	否则调用BaseUtil.isObjEmpty判断字段是否为空
+	 * @see BaseUtil#isObjEmpty
+	 * @return 
+	 * @return filled
+	 */
+	public static <T> void fillDomain(T filled,T fill,Collection<String> fieldsNotSkip,boolean strictlyMode){
+		List<DifferenceField> differenceField = getDifferenceField(filled, fill, fieldsNotSkip, strictlyMode);
+		for (DifferenceField temp:differenceField) {
+			try {
+				temp.getField().set(filled, temp.getNewField());
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				steed.util.logging.LoggerFactory.getLogger().info("设置字段出错",e);
+			}
+		}
 	}
 	
 	private static void fuzzyQueryInitialize(String prefix,BaseDomain obj,boolean skipId,String ...fieldsSkip){
@@ -405,6 +432,9 @@ public class DomainUtil{
 								break;
 							case right:
 								f.set(obj, value+"%");
+								break;
+							case both:
+								f.set(obj, "%"+value+"%");
 								break;
 
 							default:

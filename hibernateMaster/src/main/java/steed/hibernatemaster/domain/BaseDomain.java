@@ -6,7 +6,11 @@ import java.io.Serializable;
 import steed.util.base.DomainUtil;
 
 
-
+/**
+ * 基础实体类
+ * @author 战马
+ *
+ */
 public abstract class BaseDomain implements Serializable{
 	private static final long serialVersionUID = 3930474378471185938L;
 	private Object tempData;
