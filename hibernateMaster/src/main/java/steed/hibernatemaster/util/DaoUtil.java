@@ -1508,9 +1508,17 @@ public class DaoUtil {
 					Matcher matcher = RegUtil.getPattern(".+\\((.+)\\)").matcher(temp);
 					if (matcher.find()) {
 						//sum(weight),count(id)之类的
+						// 0    1
 						//temp = temp.replace(matcher.group(1), domainSimpleName+"."+matcher.group(1));
-						hql.append(temp).append(" as ").append(matcher.group(1).replace(".", "__").replace("\r", "")
-								.replace("*", "_")).append(",");
+						String selectedField = temp;
+						String group = matcher.group(1);
+						if (!StringUtil.isStringEmpty(group)
+								&&!StringUtil.isStringEmpty(group.trim())) {
+							selectedField = temp.replaceAll("\\(.?+\\)", "("+domainSimpleName+"."+group+")");
+						}
+						hql.append(selectedField)
+							.append(" as ").append(group.replace(".", "__").replace("\r", "").replace("*", "_"))
+							.append(",");
 					}else {
 						if (!temp.contains(".")) {
 						}else {
@@ -1567,9 +1575,9 @@ public class DaoUtil {
 			int i = 0;
 			hql.append(" group by ");
 			for (String temp:groupBy) {
-				hql.append(" ").append(temp);
+				hql.append(" ").append(temp).append(" ");
 				if (++i < groupBy.length) {
-					hql.append(" ,");
+					hql.append(",");
 				}
 			}
 		}
