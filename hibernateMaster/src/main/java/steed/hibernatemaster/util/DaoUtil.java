@@ -1514,7 +1514,7 @@ public class DaoUtil {
 						String group = matcher.group(1);
 						if (!StringUtil.isStringEmpty(group)
 								&&!StringUtil.isStringEmpty(group.trim())) {
-							selectedField = temp.replaceAll("\\(.?+\\)", "("+domainSimpleName+"."+group+")");
+							selectedField = temp.replace("("+group+")", "("+domainSimpleName+"."+group+")");
 						}
 						hql.append(selectedField)
 							.append(" as ").append(group.replace(".", "__").replace("\r", "").replace("*", "_"))
