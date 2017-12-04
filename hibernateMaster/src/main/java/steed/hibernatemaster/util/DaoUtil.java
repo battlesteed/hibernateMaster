@@ -21,6 +21,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.hibernate.NonUniqueObjectException;
+import org.hibernate.NonUniqueResultException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -1945,8 +1946,12 @@ public class DaoUtil {
 	 */
 	private static Long getRecordCount(Map<String, Object> map,StringBuffer hql) {
 		Query query = createQuery(map, getCountHql(hql));
-		Long recordCount = (Long) query.uniqueResult();
-		return recordCount;
+		try {
+			Long recordCount = (Long) query.uniqueResult();
+			return recordCount;
+		} catch (NonUniqueResultException e) {
+			return (long) query.list().size();
+		}
 	}
 
 	/**
