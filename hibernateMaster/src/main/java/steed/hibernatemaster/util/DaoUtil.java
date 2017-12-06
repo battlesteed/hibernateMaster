@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,6 +26,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import steed.hibernatemaster.Config;
+import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
 import steed.hibernatemaster.domain.BaseRelationalDatabaseDomain;
 import steed.hibernatemaster.domain.BaseUnionKeyDomain;
@@ -36,6 +36,7 @@ import steed.util.base.CollectionsUtil;
 import steed.util.base.DomainUtil;
 import steed.util.base.RegUtil;
 import steed.util.base.StringUtil;
+import steed.util.reflect.ReflectResult;
 import steed.util.reflect.ReflectUtil;
 /**
  * 实现0sql和0hql伟大构想的dao工具类，用该类即可满足绝大多数数据库操作
@@ -1522,8 +1523,10 @@ public class DaoUtil {
 							.append(",");
 					}else {
 						if (!temp.contains(".")) {
-						}else {
-							domainSelected.add(temp.substring(0, temp.indexOf(".")));
+							String chain = getMaxDepthDomainChain(temp, t);
+							if (chain != null) {
+								domainSelected.add(chain);
+							}
 						}
 						hql.append(domainSimpleName).append(".").
 							append(temp).append(" as ").append(temp.replace(".", "__")).append(",");
@@ -1546,9 +1549,11 @@ public class DaoUtil {
 		if (queryMap != null) {
 			for(String temp:queryMap.keySet()){
 				if (temp.contains(".")) {
-					String key = temp.substring(0, temp.indexOf("."));
-					innerJoin.add(key);
-					domainSelected.remove(key);
+					String chain = getMaxDepthDomainChain(temp, t);
+					if (chain != null) {
+						innerJoin.add(chain);
+						domainSelected.remove(chain);
+					}
 				}
 			}
 		}
@@ -1590,6 +1595,17 @@ public class DaoUtil {
 		
 		return hql;
 	}
+	
+	private static String getMaxDepthDomainChain(String chain,Class<?> clazz){
+		ReflectResult chainField = ReflectUtil.getChainField(clazz, chain);
+		if (chainField != null && BaseDatabaseDomain.class.isAssignableFrom(chainField.getField().getType())) {
+			return chain;
+		}else if (chain.contains(".")) {
+			return getMaxDepthDomainChain(chain.substring(0, chain.lastIndexOf(".")), clazz);
+		}
+		return null;
+	}
+	
 	/**
 	 * 根据查询对象生成hql
 	 * @param domain
@@ -1944,13 +1960,14 @@ public class DaoUtil {
 	 * @param hql 普通查询hql,会自动转换成查询记录总数的hql
 	 * @return
 	 */
-	private static Long getRecordCount(Map<String, Object> map,StringBuffer hql) {
+	private static long getRecordCount(Map<String, Object> map,StringBuffer hql) {
 		Query query = createQuery(map, getCountHql(hql));
 		try {
-			Long recordCount = (Long) query.uniqueResult();
-			return recordCount;
+			return (Long) query.uniqueResult();
 		} catch (NonUniqueResultException e) {
 			return (long) query.list().size();
+		}catch (NullPointerException e) {
+			return 0;
 		}
 	}
 
