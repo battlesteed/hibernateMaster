@@ -3,6 +3,7 @@ package steed.hibernatemaster.util;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -164,7 +166,7 @@ public class DaoUtil {
 		Transaction currentTransaction = getCurrentTransaction();
 		Boolean autoManagTransaction = getAutoManagTransaction();
 		Boolean transactionType = getTransactionType();
-		setAutoManagTransaction(true);
+//		setAutoManagTransaction(true);
 		setCurrentTransaction(null);
 		setTransactionType(null);
 		ImmediatelyTransactionData immediatelyTransactionData = new ImmediatelyTransactionData(currentTransaction, autoManagTransaction,session);
@@ -173,8 +175,10 @@ public class DaoUtil {
 		return immediatelyTransactionData;
 	}
 	/**
-	 * 立即事务结束
+	 * 立即事务结束,调用该方法之前请先调用<code>{@link #managTransaction()}</code> 提交立即事务,否则
+	 * immediatelyTransactionBegin和immediatelyTransactionEnd之间做的数据库操作不会生效
 	 * @see #immediatelyTransactionBegin
+	 * @see #managTransaction()
 	 * @param immediatelyTransactionData
 	 */
 	public static void immediatelyTransactionEnd(ImmediatelyTransactionData immediatelyTransactionData){
@@ -999,7 +1003,6 @@ public class DaoUtil {
 	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> List<T> listAllCustomField(Class<?> t,Map<String, Object> constraint,List<String> desc,List<String> asc,String... selectedFields){
 		return listAllCustomField(t, constraint, desc, asc, null, selectedFields);
 	}
@@ -1167,7 +1170,7 @@ public class DaoUtil {
 			T t2 = (T) getSession().get(t, key);
 			return t2;
 		} catch (Exception e) {
-			e.printStackTrace();
+			setException(e);
 			return null;
 		}finally{
 			closeSession();
@@ -1182,7 +1185,7 @@ public class DaoUtil {
 			}
 			return list;
 		} catch (Exception e) {
-			e.printStackTrace();
+			setException(e);
 			return null;
 		}finally{
 			closeSession();
@@ -1196,7 +1199,7 @@ public class DaoUtil {
 			Session session = getSession();
 			return session.load(t, key);
 		} catch (Exception e) {
-			e.printStackTrace();
+			setException(e);
 			return null;
 		}finally{
 			closeSession();
@@ -1215,13 +1218,14 @@ public class DaoUtil {
 	 */
 	private static boolean managTransaction(Boolean isCommit){
 		if (shouldCommitNow()) {
-			if (isCommit) {
+			if (isCommit == null || isCommit) {
 				commitTransaction();
-			}else if(!isCommit){
+				return true;
+			}else {
 				rollbackTransaction();
 			}
 			return isCommit;
-		}else{
+		}else if (isCommit != null) {
 			Boolean type = transactionType.get();
 			if (type == null) {
 				transactionType.set(isCommit);
@@ -1229,6 +1233,8 @@ public class DaoUtil {
 				transactionType.set(type&&isCommit);
 			}
 			return transactionType.get();
+		}else {
+			return true;
 		}
 	}
 	/**
@@ -1324,7 +1330,6 @@ public class DaoUtil {
 			session.save(obj);
 			return managTransaction(true);
 		} catch (Exception e) {
-			e.printStackTrace();
 			setException(e);
 			return managTransaction(false);
 		}finally{
@@ -1369,7 +1374,7 @@ public class DaoUtil {
 			session.update(obj);
 			return managTransaction(true);
 		} catch (Exception e) {
-			e.printStackTrace();
+			setException(e);
 			return managTransaction(false);
 		}finally{
 			closeSession();
@@ -1516,20 +1521,29 @@ public class DaoUtil {
 						String group = matcher.group(1);
 						if (!StringUtil.isStringEmpty(group)
 								&&!StringUtil.isStringEmpty(group.trim())) {
-							selectedField = temp.replace("("+group+")", "("+domainSimpleName+"."+group+")");
+							//TODO 支持二级及以上实体类加减乘除操作
+							//TODO 类似a/1 1前面不加实体类前缀,a/b和a-b生成的别名是一样的,a-b可以改成a-b-0
+							//TODO a / b 操作符跟字段有空格会有bug
+							String replace = group.replace("/", "/"+domainSimpleName+".")
+									.replace("+", "+"+domainSimpleName+".")
+									.replace("-", "-"+domainSimpleName+".")
+									.replace("*", "*"+domainSimpleName+".");
+							selectedField = temp.replace("("+group+")", "("+domainSimpleName+"."+replace+")");
 						}
 						hql.append(selectedField)
-							.append(" as ").append(group.replace(".", "__").replace("\r", "").replace("*", "_"))
+							.append(" as ").append(dealSpecialChar(group))
 							.append(",");
 					}else {
-						if (!temp.contains(".")) {
+						//TODO 和上面的sum,count等共用一个方法,sum()括号里面的东西跟这里的是一样的,要共用一个方法
+						//TODO 加减乘除操作
+						if (temp.contains(".")) {
 							String chain = getMaxDepthDomainChain(temp, t);
 							if (chain != null) {
 								domainSelected.add(chain);
 							}
 						}
 						hql.append(domainSimpleName).append(".").
-							append(temp).append(" as ").append(temp.replace(".", "__")).append(",");
+							append(temp).append(" as ").append(dealSpecialChar(temp)).append(",");
 					}
 				}
 				
@@ -1545,6 +1559,10 @@ public class DaoUtil {
 			.append(" ")
 			.append(domainSimpleName);
 		}*/
+		
+		dealSortFieldsJoin(t, desc, domainSelected);
+		
+		dealSortFieldsJoin(t, asc, domainSelected);
 		
 		if (queryMap != null) {
 			for(String temp:queryMap.keySet()){
@@ -1575,13 +1593,13 @@ public class DaoUtil {
 		hql.append(" where  1=1 ");
 		
 		
-		appendHqlWhere(domainSimpleName, hql, queryMap);
+		hql = appendHqlWhere(domainSimpleName, hql, queryMap);
 		
 		if (groupBy != null && groupBy.length > 0) {
 			int i = 0;
 			hql.append(" group by ");
 			for (String temp:groupBy) {
-				hql.append(" ").append(temp).append(" ");
+				hql.append(" ").append(domainSimpleName).append(".").append(temp).append(" ");
 				if (++i < groupBy.length) {
 					hql.append(",");
 				}
@@ -1596,12 +1614,56 @@ public class DaoUtil {
 		return hql;
 	}
 	
+	/**
+	 * 排序字段含有关联实体类时hibernate生成的sql 默认inner join 关联表的,得在select后指明left join...
+	 * @param t
+	 * @param desc
+	 * @param domainSelected
+	 */
+	private static <T> void dealSortFieldsJoin(Class<T> t, List<String> desc, Set<String> domainSelected) {
+		if (desc != null) {
+			for(String temp:desc){
+				if (temp.contains(".")) {
+					String chain = getMaxDepthDomainChain(temp, t);
+					if (chain != null) {
+						domainSelected.add(chain);
+					}
+				}
+			}
+		}
+	}
+	private static String dealSpecialChar(String group) {
+		return group.replace(".", "__").replace("\r", "").replace("*", "_").replace("/", "_").replace("-", "_").replace("+", "_");
+	}
+	
 	private static String getMaxDepthDomainChain(String chain,Class<?> clazz){
+		return getMaxDepthDomainChain(clazz, getNoSelectIndexFieldName(chain));
+	}
+	
+	private static String getMaxDepthDomainChain(Class<?> clazz,String chain){
+		if (StringUtil.isStringEmpty(chain)) {
+			return null;
+		}
 		ReflectResult chainField = ReflectUtil.getChainField(clazz, chain);
-		if (chainField != null && BaseDatabaseDomain.class.isAssignableFrom(chainField.getField().getType())) {
+		boolean isId = false;
+		if (chainField != null && BaseDatabaseDomain.class.isAssignableFrom(chainField.getTarget())) {
+			if (!(isId = chainField.getField().getAnnotation(Id.class) != null)) {
+				Method iDmethod = DomainUtil.getIDmethod((Class<? extends BaseDomain>) chainField.getTarget());
+				if (iDmethod != null) {
+					String fieldName = chainField.getField().getName();
+					isId = StringUtil.getFieldGetterName(fieldName).equals(iDmethod.getName()) 
+							|| StringUtil.getFieldIsMethodName(fieldName).equals(iDmethod.getName());
+				}
+			}
+		}
+		if (isId && chain.contains(".")) {
+			chain = chain.substring(0, chain.lastIndexOf("."));
+		}
+		
+		if (!isId && chainField != null && BaseDatabaseDomain.class.isAssignableFrom(chainField.getField().getType())) {
 			return chain;
 		}else if (chain.contains(".")) {
-			return getMaxDepthDomainChain(chain.substring(0, chain.lastIndexOf(".")), clazz);
+			return getMaxDepthDomainChain(clazz, chain.substring(0, chain.lastIndexOf(".")));
 		}
 		return null;
 	}
@@ -1704,10 +1766,7 @@ public class DaoUtil {
 				}else {
 					hql.append(", ");
 				}
-				hql.append(domainSimpleName);
-				hql.append(".");
-				hql.append(name);
-				hql.append(" desc");
+				hql.append(domainSimpleName).append(".").append(name).append(" desc");
 			}
 		}
 		if (asc != null && !asc.isEmpty()) {
@@ -1718,10 +1777,7 @@ public class DaoUtil {
 				}else {
 					hql.append(", ");
 				}
-				hql.append(domainSimpleName);
-				hql.append(".");
-				hql.append(name);
-				hql.append(" asc");
+				hql.append(domainSimpleName).append(".").append(name).append(" asc");
 			}
 		}
 		return hql;
@@ -1731,7 +1787,7 @@ public class DaoUtil {
 	 * 根据配置关闭session
 	 */
 	private static void closeSession(){
-		managTransaction(true);
+		managTransaction(null);
 		if (HibernateUtil.getColseSession() && shouldCommitNow()) {
 			managTransaction();
 			HibernateUtil.closeSession();
@@ -1910,6 +1966,20 @@ public class DaoUtil {
 			}
 		}
 		return 0;
+	}
+	
+	/**
+	 * 获取没有查询后缀的fieldName
+	 * @param fieldName 查询字段(没有查询后缀也一样可以传过来,不会抛异常,这设计的比较巧妙,可以自己看源码研究
+	 * 		<code>{@link steed.hibernatemaster.util.DaoUtil#isSelectIndex}</code>
+	 * @return
+	 */
+	public static String getNoSelectIndexFieldName(String fieldName){
+		int selectIndex = isSelectIndex(fieldName);
+		if (selectIndex == 0) {
+			return fieldName;
+		}
+		return fieldName.substring(0,fieldName.length() - selectIndex);
 	}
 	
 	/**

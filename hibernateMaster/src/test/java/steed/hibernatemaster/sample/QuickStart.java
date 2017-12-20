@@ -4,13 +4,14 @@ package steed.hibernatemaster.sample;
 import org.junit.Test;
 
 import steed.hibernatemaster.sample.domain.user.User;
+import steed.hibernatemaster.test.SteedTest;
 
 /**
  * 快速入门.
  * @author 战马
  *
  */
-public class QuickStart {
+public class QuickStart extends SteedTest{
 	
 	/**
 	 * 运行之后会保存一个niceName为'战马'的user实体类.

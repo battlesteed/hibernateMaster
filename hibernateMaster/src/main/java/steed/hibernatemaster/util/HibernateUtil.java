@@ -86,8 +86,8 @@ public class HibernateUtil{
 	
 	/**
 	 * 注意,通过该方法获取的session,若之前未调用daoutil的开启事务方法,则返回的session是未开启事务的
-	 * 需要手动开启和提交事务,这个事务并不受框架控制,若要框架控制事务,请用DaoUtil#getSession()
-	 * 或调用该方法后,手动调用DaoUtil#beginTransaction()
+	 * 需要手动开启和提交事务,这个事务并不受框架控制,若要框架控制事务,请用<code> {@link DaoUtil#getSession() } </code>
+	 * 或调用该方法后,手动调用<code> {@link DaoUtil#beginTransaction() } </code>
 	 * 
 	 * 
 	 * @see DaoUtil#getSession()

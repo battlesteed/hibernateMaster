@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 import steed.hibernatemaster.domain.BaseRelationalDatabaseDomain;
 
@@ -19,6 +20,12 @@ public class Student extends BaseRelationalDatabaseDomain{
 	 * 入学日期
 	 */
 	private Date inDate;
+	
+	/**
+	 * 所属班级
+	 */
+	private Clazz clazz;
+	
 	@Id
 	public String getStudentNumber() {
 		return studentNumber;
@@ -43,6 +50,13 @@ public class Student extends BaseRelationalDatabaseDomain{
 	}
 	public void setInDate(Date inDate) {
 		this.inDate = inDate;
+	}
+	@ManyToOne
+	public Clazz getClazz() {
+		return clazz;
+	}
+	public void setClazz(Clazz clazz) {
+		this.clazz = clazz;
 	}
 	
 }

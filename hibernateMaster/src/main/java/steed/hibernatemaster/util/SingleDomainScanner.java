@@ -10,6 +10,7 @@ import steed.hibernatemaster.Config;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseRelationalDatabaseDomain;
 import steed.hibernatemaster.domain.DomainScanner;
+import steed.util.base.BaseUtil;
 import steed.util.base.PathUtil;
 import steed.util.file.FileUtil;
 

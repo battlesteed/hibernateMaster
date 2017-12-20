@@ -272,7 +272,7 @@ public class DomainUtil{
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private static Field getIDfield(Class<? extends BaseDomain> clazz) {
+	public static Field getIDfield(Class<? extends BaseDomain> clazz) {
 		if (clazz.getAnnotation(IdClass.class) != null) {
 			StringBuffer sb = new StringBuffer("按照约定含有");
 			sb.append(IdClass.class.getName());
@@ -295,7 +295,7 @@ public class DomainUtil{
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static Method getIDmethod(Class<? extends BaseDomain> clazz) {
+	public static Method getIDmethod(Class<? extends BaseDomain> clazz) {
 		if (clazz.getAnnotation(IdClass.class) != null) {
 			try {
 				return clazz.getDeclaredMethod("getDomainID");
@@ -392,9 +392,9 @@ public class DomainUtil{
 	 * 	否则调用BaseUtil.isObjEmpty判断字段是否为空
 	 * @see BaseUtil#isObjEmpty
 	 * @return 
-	 * @return filled
+	 * @return fill中不为空的字段跟filled中值不一样的字段
 	 */
-	public static <T> void fillDomain(T filled,T fill,Collection<String> fieldsNotSkip,boolean strictlyMode){
+	public static <T> List<DifferenceField> fillDomain(T filled,T fill,Collection<String> fieldsNotSkip,boolean strictlyMode){
 		List<DifferenceField> differenceField = getDifferenceField(filled, fill, fieldsNotSkip, strictlyMode);
 		for (DifferenceField temp:differenceField) {
 			try {
@@ -403,6 +403,7 @@ public class DomainUtil{
 				steed.util.logging.LoggerFactory.getLogger().info("设置字段出错",e);
 			}
 		}
+		return differenceField;
 	}
 	
 	private static void fuzzyQueryInitialize(String prefix,BaseDomain obj,boolean skipId,String ...fieldsSkip){

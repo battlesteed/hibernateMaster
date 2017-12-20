@@ -29,7 +29,12 @@ public class SimpleHqlGenerator implements HqlGenerator{
 		if (CollectionsUtil.isCollectionsEmpty(map)) {
 			return hql;
 		}
+		hql.append(" ");
 		appendPersonalWhere(domainSimpleName, hql, map);
+		if (hql.indexOf(" domain.") > -1) {
+			hql = new StringBuffer(hql.toString().replace(" domain.", " "+domainSimpleName+"."));
+		}
+		hql.append(" ");
 		List<String> removedEntry = new ArrayList<String>();
 		Map<String, Object> put = new HashMap<>();
 		for(Entry<String, Object> e:map.entrySet()){
@@ -57,7 +62,7 @@ public class SimpleHqlGenerator implements HqlGenerator{
 	}
 
 	/**
-	 * append 单个 where 条件,一般不需要重新该方法
+	 * append 单个 where 条件
 	 * @param domainSimpleName
 	 * @param hql
 	 * @param query

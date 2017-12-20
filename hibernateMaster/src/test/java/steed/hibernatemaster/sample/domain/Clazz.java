@@ -20,7 +20,7 @@ public class Clazz extends BaseRelationalDatabaseDomain{
 	private Long id;
 	private String name;
 	@Id
-	@GenericGenerator(name="gen1",strategy="native")
+	@GenericGenerator(name="gen1",strategy="assigned")
 	@GeneratedValue(generator="gen1")
 	public Long getId() {
 		return id;
