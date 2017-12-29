@@ -976,7 +976,7 @@ public class DaoUtil {
 		return (List<T>) listAllCustomField(t, constraint, desc, asc);
 	}
 	/**
-	 * 获取所有实体类指定的字段
+	 * 获取实体类指定的字段
 	 * @param constraint 查询参数
 	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
 	 * @return
@@ -985,7 +985,7 @@ public class DaoUtil {
 		return listAllCustomField(DaoUtil.putField2Map(constraint), constraint.getClass(), selectedFields);
 	}
 	/**
-	 * 获取所有实体类指定的字段
+	 * 获取实体类指定的字段
 	 * @param t
 	 * @param constraint 查询参数
 	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
@@ -995,7 +995,7 @@ public class DaoUtil {
 		return listAllCustomField(t, constraint, null, null, selectedFields);
 	}
 	/**
-	 * 获取所有实体类指定的字段
+	 * 获取实体类指定的字段
 	 * @param t
 	 * @param constraint 查询参数
 	 * @param desc
@@ -1007,7 +1007,7 @@ public class DaoUtil {
 		return listAllCustomField(t, constraint, desc, asc, null, selectedFields);
 	}
 	/**
-	 * 获取所有实体类指定的字段
+	 * 获取实体类指定的字段
 	 * @param t
 	 * @param constraint 查询参数
 	 * @param desc

@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
 import steed.hibernatemaster.sample.domain.Clazz;
 import steed.hibernatemaster.sample.domain.Student;
 import steed.hibernatemaster.util.DaoUtil;
@@ -20,7 +18,7 @@ public class TestReferenceDomainJoinType extends SteedTest{
 		clazz.setName("class0");
 		constraint.setClazz(clazz);
 		List<Object> listAllCustomField = DaoUtil.listAllCustomField(constraint, "clazz.id");
-		assert(listAllCustomField.size() == GenTestData.classSize);
+		assert(listAllCustomField.size() == GenTestData.classSize*GenTestData.schoolCount);
 	}
 	
 	@Test
@@ -30,7 +28,7 @@ public class TestReferenceDomainJoinType extends SteedTest{
 		clazz.setName("class1");
 		constraint.setClazz(clazz);
 		List<Object> listAllCustomField = DaoUtil.listAllCustomField(constraint, "clazz.id","clazz.name");
-		assert(listAllCustomField.size() == GenTestData.classCount*GenTestData.classSize);
+		assert(listAllCustomField.size() == GenTestData.schoolCount*GenTestData.classSize);
 	}
 	
 	@Test
@@ -40,15 +38,15 @@ public class TestReferenceDomainJoinType extends SteedTest{
 		clazz.setName("class1");
 		constraint.setClazz(clazz);
 		List<Object> listAllCustomField = DaoUtil.listAllCustomField(constraint, "clazz.id","clazz.name");
-		assert(listAllCustomField.size() == GenTestData.classSize);
+		assert(listAllCustomField.size() == GenTestData.classSize*GenTestData.schoolCount);
 	}
 	
 	@Test
 	public void testJoinType3(){
 		QueryBuilder builder = new QueryBuilder();
-		builder.addIn("clazz.id", new Long[]{0L,1L});
+		builder.addIn("clazz.name", new String[]{"class0","class1"});
 		List<Object> listAllCustomField = DaoUtil.listAllCustomField(Student.class, builder.getQueryMap(), null, null, "id");
-		assert(listAllCustomField.size() == GenTestData.classSize*2);
+		assert(listAllCustomField.size() == GenTestData.classSize*2*GenTestData.schoolCount);
 	}
 	
 }

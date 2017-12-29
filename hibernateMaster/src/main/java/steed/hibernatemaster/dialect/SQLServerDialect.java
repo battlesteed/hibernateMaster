@@ -1,12 +1,11 @@
-package steed.hibernatemaster.util;
+package steed.hibernatemaster.dialect;
 
 import java.sql.Types;
 
-import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.type.StandardBasicTypes;
 
-public class MySQLServerDialect extends SQLServerDialect{
-	public MySQLServerDialect()
+public class SQLServerDialect extends org.hibernate.dialect.SQLServerDialect{
+	public SQLServerDialect()
 	 {
 	     super();
 	     registerHibernateType(1, "string");     

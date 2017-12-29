@@ -6,10 +6,10 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import steed.hibernatemaster.domain.BaseRelationalDatabaseDomain;
+import steed.hibernatemaster.domain.UUIDDomain;
 
 @Entity
-public class Student extends BaseRelationalDatabaseDomain{
+public class Student extends UUIDDomain{
 	/**
 	 * 学号
 	 */
@@ -26,7 +26,6 @@ public class Student extends BaseRelationalDatabaseDomain{
 	 */
 	private Clazz clazz;
 	
-	@Id
 	public String getStudentNumber() {
 		return studentNumber;
 	}
