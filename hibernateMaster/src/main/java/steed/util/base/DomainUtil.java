@@ -364,7 +364,8 @@ public class DomainUtil{
 				}
 				if (!isNull || fieldsNotSkip.contains(f.getName())) {
 					Object oldField = getFieldValue(oldObject, f);
-					if (newField != null && !newField.equals(oldField)) {
+					if ((newField == null && oldField != null )||
+							( newField != null && !newField.equals(oldField))) {
 						differenceFields.add(new DifferenceField(f.getName(), newObj.getClass(), newField, oldField,f));
 					}
 				}
