@@ -41,7 +41,7 @@ import steed.util.base.StringUtil;
 import steed.util.reflect.ReflectResult;
 import steed.util.reflect.ReflectUtil;
 /**
- * 实现0sql和0hql伟大构想的dao工具类，用该类即可满足绝大多数数据库操作
+ * 实现0sql和0hql伟大构想的dao工具类，用该类即可满足绝大多数数据库操作<br>
 _______________#########_______________________<br>
 ______________############_____________________<br>
 ______________#############____________________<br>
@@ -106,7 +106,8 @@ public class DaoUtil {
 	private static final String[] exceptionReasons = {"主键重复","主键未指定"};
 	private static final Exception[] exceptions = {};*/
 	
-	/***********#异常提示专用************/
+	/*-------#异常提示专用************/
+	
 	public static Exception getExceptiontype() {
 		return exception.get();
 	}
@@ -155,10 +156,10 @@ public class DaoUtil {
 	/**
 	 * 立即事务开始，框架可能配置了多个数据库操作使用同一事务然后统一提交
 	 * 如某些操作可能要马上提交事务或者跟其他数据库操作使用不同的事务，可使用该方法
-	 * 用法:<br />
-	 *  <code> ImmediatelyTransactionData immediatelyTransactionData = DaoUtil.immediatelyTransactionBegin();<br />
-	 *  //TODO 这里做其他数据库操作<br />
-	 *	DaoUtil.immediatelyTransactionEnd(immediatelyTransactionData);<br />
+	 * 用法:<br>
+	 *  <code> ImmediatelyTransactionData immediatelyTransactionData = DaoUtil.immediatelyTransactionBegin();<br>
+	 *  //TODO 这里做其他数据库操作<br>
+	 *	DaoUtil.immediatelyTransactionEnd(immediatelyTransactionData);<br>
 	 *  </code>
 	 *	
 	 * @see #immediatelyTransactionEnd
@@ -204,6 +205,7 @@ public class DaoUtil {
 		DaoUtil.autoManagTransaction.set(selfManagTransaction);;
 	}
 	/***************************增删查改开始******************************/
+	
 	/**
 	 */
 	public static <T> Page<T> listObj(int pageSize,int currentPage, Class<? extends BaseRelationalDatabaseDomain> t){
@@ -226,15 +228,17 @@ public class DaoUtil {
 		}
 	}
 	/**
-	 * 查询t对应的表中所有记录的主键
-	 * @param t
-	 * @return
+	 * 查询target对应的表中所有记录的主键
+	 * 
+	 * @param target 要查询的实体类
+	 * 
+	 * @return 查出来的主键
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<Serializable> listAllObjKey(Class<? extends BaseRelationalDatabaseDomain> t){
+	public static <T> List<Serializable> listAllObjKey(Class<? extends BaseRelationalDatabaseDomain> target){
 		try {
-			String name = t.getName();
-			String keyName = DomainUtil.getDomainIDName(t);
+			String name = target.getName();
+			String keyName = DomainUtil.getDomainIDName(target);
 			String hql = "select "+keyName+" from " + name;
 			Query query = getSession().createQuery(hql);
 			return query.list();
@@ -268,18 +272,20 @@ public class DaoUtil {
 	
 	/**
 	 * 查询所有id在ids里面的实体类
-	 * @param t
+	 * 
+	 * @param target 要查询的实体类
 	 * @param ids 实体类id，英文逗号分割
-	 * @return
+	 * 
+	 * @return 查询到的记录
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> listByKeys(Class<? extends BaseRelationalDatabaseDomain> t,String[] ids){
+	public static <T> List<T> listByKeys(Class<? extends BaseRelationalDatabaseDomain> target,String[] ids){
 		try {
 			if (ids == null || ids.length == 0) {
 				return new ArrayList<>();
 			}
 			Map<String, Object> map = new HashMap<String, Object>();
-			Class<? extends Serializable> idClass = DomainUtil.getDomainIDClass(t);
+			Class<? extends Serializable> idClass = DomainUtil.getDomainIDClass(target);
 			Serializable[] serializables;
 			if (idClass == String.class) {
 				serializables = ids;
@@ -289,8 +295,8 @@ public class DaoUtil {
 					serializables[i] = (Serializable) ReflectUtil.convertFromString(idClass, ids[i]);
 				}
 			}
-			map.put(DomainUtil.getDomainIDName(t)+"_not_join", serializables);
-			return (List<T>) listAllObj(t, map, null, null);
+			map.put(DomainUtil.getDomainIDName(target)+"_not_join", serializables);
+			return (List<T>) listAllObj(target, map, null, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -585,6 +591,7 @@ public class DaoUtil {
 	
 	/**
 	 * 以obj为查询条件删除数据库记录
+	 * 
 	 * @param obj 查询条件
 	 * @return 删除的记录数（失败返回-1）
 	 */
@@ -596,12 +603,15 @@ public class DaoUtil {
 	
 	/**
 	 * 以query为查询条件删除数据库记录
+	 * 
+	 * @param where 查询条件
+	 * 
 	 * @return 删除的记录数（失败返回-1）
 	 */
-	public static int deleteByQuery(Class<? extends BaseRelationalDatabaseDomain> clazz,Map<String, Object> queryCondition){
+	public static int deleteByQuery(Class<? extends BaseRelationalDatabaseDomain> clazz,Map<String, Object> where){
 		try {
 			beginTransaction();
-			Query query = createQuery(queryCondition, getDeleteHql(clazz, queryCondition));
+			Query query = createQuery(where, getDeleteHql(clazz, where));
 			int count = query.executeUpdate();
 			if(managTransaction(true)){
 				return count;
@@ -619,17 +629,20 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 级联删除,不推荐,应该重写实体类delete方法实现级联删除
-	 * @param obj
-	 * @return
+	 * 级联删除,不推荐,应该重写实体类delete方法实现级联删除,
+	 * 已经过时,推荐通过重写实体类的delete方法来实现级联删除
+	 * 
+	 * @param domain 目标实体类
+	 * 
+	 * @return 是否删除成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
 	 */
 	@Deprecated
-	public static boolean cascadeDelete(BaseRelationalDatabaseDomain obj,List<Class<?>> domainSkip){
+	public static boolean cascadeDelete(BaseRelationalDatabaseDomain domain,List<Class<?>> domainSkip){
 		beginTransaction();
 		if (domainSkip == null) {
 			domainSkip = new ArrayList<Class<?>>();
 		}
-		boolean delete = deleteConneced(obj,Integer.MAX_VALUE,domainSkip);
+		boolean delete = deleteConneced(domain,Integer.MAX_VALUE,domainSkip);
 		managTransaction(delete);
 		return delete;
 	}
@@ -1544,11 +1557,11 @@ public class DaoUtil {
 	 * 
 	 * @see #updateNotNullField(BaseRelationalDatabaseDomain, List, boolean)
 	 */
-	public static boolean update(BaseRelationalDatabaseDomain domani){
+	public static boolean update(BaseRelationalDatabaseDomain domain){
 		try {
 			Session session = getSession();
 			beginTransaction();
-			session.update(domani);
+			session.update(domain);
 			return managTransaction(true);
 		} catch (Exception e) {
 			setException(e);

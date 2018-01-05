@@ -48,6 +48,8 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	/**
 	 * 不为null就initialize,避免子类getXXX().initializeAll()时
 	 * 先要判断getXXX()是否为null
+	 * 
+	 * @param domain 要initializeAll的实体类
 	 */
 	protected void domainInitializeAll(BaseRelationalDatabaseDomain domain){
 		if (domain != null) {
@@ -56,8 +58,10 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	/**
 	 * initialize set中的domain
+	 * 
+	 * @param set 要initializeAll的set
 	 */
-	protected void domainInitializeSetAll(Set<? extends BaseRelationalDatabaseDomain> set){
+	protected void domainInitializeSetAll(Collection<? extends BaseRelationalDatabaseDomain> set){
 		if (set != null) {
 			for(BaseRelationalDatabaseDomain temp:set){
 				temp.initializeAll();
@@ -187,6 +191,8 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	/**
 	 * hibernate代理Collection转java内置Collection
 	 * 一般用在序列化之前,防止反序列化时没有session导致抛异常
+	 * 
+	 * @return java内置Collection
 	 */
 	@SuppressWarnings("unchecked")
 	public BaseRelationalDatabaseDomain hibernateProxCollection2javaCollection(){

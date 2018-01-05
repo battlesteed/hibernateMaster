@@ -4,8 +4,7 @@ import javax.persistence.MappedSuperclass;
 
 /**
  * 假删除实体类
- * @author 战马
- * @email battle_steed@163.com
+ * @author 战马 battle_steed@163.com
  */
 @MappedSuperclass
 public abstract class FakeDeleteDomain extends BaseDatabaseDomain{

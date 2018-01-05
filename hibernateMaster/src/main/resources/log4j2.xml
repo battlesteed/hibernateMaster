@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="error">
+    <!--先定义所有的appender-->
+    <appenders>
+        <!--这个输出控制台的配置-->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            <!--这个都知道是输出日志的格式-->
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
+        </Console>
+
+        <!--这个会打印出所有的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="all" fileName="classpath:/steed_all.log"
+                     filePattern="classpath:/$${date:yyyy-MM}/steed_all-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <SizeBasedTriggeringPolicy size="1MB"/>
+        </RollingFile>
+        
+        <RollingFile name="trace" fileName="classpath:/steed_trace.log"
+                     filePattern="classpath:/$${date:yyyy-MM}/steed_trace-%d{MM-dd-yyyy}-%i.log.gz">
+                     <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <SizeBasedTriggeringPolicy size="1MB"/>
+        </RollingFile>
+        <RollingFile name="debug" fileName="classpath:/steed_debug.log"
+                     filePattern="classpath:/$${date:yyyy-MM}/steed_debug-%d{MM-dd-yyyy}-%i.log.gz">
+                      <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <SizeBasedTriggeringPolicy size="1MB"/>
+        </RollingFile>
+        
+        <RollingFile name="info" fileName="classpath:/steed_info.log"
+                     filePattern="classpath:/$${date:yyyy-MM}/steed_info-%d{MM-dd-yyyy}-%i.log.gz">
+                      <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <SizeBasedTriggeringPolicy size="1MB"/>
+        </RollingFile>
+        <RollingFile name="warn" fileName="classpath:/steed_warn.log"
+                     filePattern="classpath:/$${date:yyyy-MM}/steed_warn-%d{MM-dd-yyyy}-%i.log.gz">
+                      <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <SizeBasedTriggeringPolicy size="1MB"/>
+        </RollingFile>
+        <RollingFile name="error" fileName="classpath:/steed_error.log"
+                     filePattern="classpath:/$${date:yyyy-MM}/steed_error-%d{MM-dd-yyyy}-%i.log.gz">
+                      <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <SizeBasedTriggeringPolicy size="1MB"/>
+        </RollingFile>
+        <RollingFile name="fatal" fileName="classpath:/steed_fatal.log"
+                     filePattern="classpath:/$${date:yyyy-MM}/steed_fatal-%d{MM-dd-yyyy}-%i.log.gz">
+                      <ThresholdFilter level="fatal" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <SizeBasedTriggeringPolicy size="1MB"/>
+        </RollingFile>
+        
+        <RollingFile name="steedWebFrameWork4web" fileName="classpath:/steedWebFrameWork4web.log"
+                     filePattern="classpath:/$${date:yyyy-MM}/steedWebFrameWork4web-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout charset="UTF-8" pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n"/>
+            <SizeBasedTriggeringPolicy size="1MB"/>
+        </RollingFile>
+        
+    </appenders>
+    <!--然后定义logger，只有定义了logger并引入的appender，appender才会生效-->
+    <loggers>
+        <!--建立一个默认的root的logger-->
+        <root level="info">
+            <appender-ref ref="Console"/>
+            <appender-ref ref="all"/>
+            <appender-ref ref="trace"/>
+            <appender-ref ref="debug"/>
+            <appender-ref ref="info"/>
+            <appender-ref ref="warn"/>
+            <appender-ref ref="error"/>
+            <appender-ref ref="fatal"/>
+        </root>
+        <!-- steedWebFramework日志 -->
+        <logger name="steed" level="trace" additivity="true">
+            <appender-ref ref="steedWebFrameWork4web"/>
+        </logger>
+        
+        <logger name="allLog" level="trace" additivity="true">
+            <appender-ref ref="all"/>
+        </logger>
+        
+        <logger name="org.hibernate" level="warn" additivity="true">
+        	 <appender-ref ref="Console"/>
+        </logger>
+        <logger name="org.hibernate.engine" level="info" additivity="true">
+        	 <appender-ref ref="Console"/>
+        </logger>
+        
+    </loggers>
+</configuration>
