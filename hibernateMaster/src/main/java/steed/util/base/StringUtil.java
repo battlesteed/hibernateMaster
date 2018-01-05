@@ -53,9 +53,7 @@ public class StringUtil {
 	}
 	/**
 	 * 根据全路径获取文件名
-	 * @param str
-	 * @param begin
-	 * @param end
+	 * @param path 路径
 	 * @return
 	 */
 	public static String getFileName(String path){
@@ -151,7 +149,7 @@ public class StringUtil {
 	}
 	
 	/**
-	 * 转义str中的<>&"'\,防止跨站脚本攻击
+	 * 转义str中的&lt;&gt;&amp;"'\,防止跨站脚本攻击
 	 * @return 转义后的str
 	 */
 	public static String transferrCharacter(String str){
@@ -247,7 +245,7 @@ public class StringUtil {
 	
 	/**
 	 * 按系统编码获取string
-	 * @param str
+	 * @param bytes 
 	 * @return
 	 */
 	public static String getSystemCharacterSetString(byte[] bytes){

@@ -110,9 +110,12 @@ public class DaoUtil {
 	public static Exception getExceptiontype() {
 		return exception.get();
 	}
-	public static void setException(Exception exception) {
+	public static void setException(Exception exception,boolean rollbackTransaction) {
 		DaoUtil.exception.set(exception);
 		steed.util.logging.LoggerFactory.getLogger().error("数据库操作发生异常",exception);
+	}
+	public static void setException(Exception exception) {
+		setException(exception, false);
 	}
 	public static Transaction getCurrentTransaction() {
 		return currentTransaction.get();
@@ -151,14 +154,15 @@ public class DaoUtil {
 	
 	/**
 	 * 立即事务开始，框架可能配置了多个数据库操作使用同一事务然后统一提交
-	 * 如某些操作可能要马上提交事务，可使用该方法
-	 * 用法<br />
-	 *  ImmediatelyTransactionData immediatelyTransactionData = DaoUtil.immediatelyTransactionBegin();<br />
+	 * 如某些操作可能要马上提交事务或者跟其他数据库操作使用不同的事务，可使用该方法
+	 * 用法:<br />
+	 *  <code> ImmediatelyTransactionData immediatelyTransactionData = DaoUtil.immediatelyTransactionBegin();<br />
 	 *  //TODO 这里做其他数据库操作<br />
 	 *	DaoUtil.immediatelyTransactionEnd(immediatelyTransactionData);<br />
+	 *  </code>
 	 *	
 	 * @see #immediatelyTransactionEnd
-	 * @return 
+	 * @return 调用该方法之前的事务数据,用于<code>{@link #immediatelyTransactionEnd(ImmediatelyTransactionData)}</code>恢复之前的事务.
 	 */
 	public static ImmediatelyTransactionData immediatelyTransactionBegin(){
 		steed.util.logging.LoggerFactory.getLogger().debug("立即事务开始");
@@ -177,9 +181,12 @@ public class DaoUtil {
 	/**
 	 * 立即事务结束,调用该方法之前请先调用<code>{@link #managTransaction()}</code> 提交立即事务,否则
 	 * immediatelyTransactionBegin和immediatelyTransactionEnd之间做的数据库操作不会生效
+	 * 
+	 * @param immediatelyTransactionData <code>{@link #immediatelyTransactionBegin()}</code>返回的值
+	 * 
 	 * @see #immediatelyTransactionBegin
 	 * @see #managTransaction()
-	 * @param immediatelyTransactionData
+	 * 
 	 */
 	public static void immediatelyTransactionEnd(ImmediatelyTransactionData immediatelyTransactionData){
 		HibernateUtil.closeSession();
@@ -297,7 +304,7 @@ public class DaoUtil {
 	 * ,你可能需要另外一个方法updateListOneByOne(List list)
 	 * @see #updateListOneByOne
 	 * @param list
-	 * @return
+	 * @return 是否update成功(若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
 	 */
 	public static boolean updateList(List<? extends BaseRelationalDatabaseDomain> list){
 		Session session = null;
@@ -630,13 +637,17 @@ public class DaoUtil {
 	
 	/**
 	 * 删除数据库记录
-	 * @return
+	 * 
+	 * @param clazz 要删除的实体类
+	 * @param id 实体类id
+	 * 
+	 * @return 是否删除成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
 	 */
-	public static boolean delete(Class<? extends BaseRelationalDatabaseDomain> clazz,Serializable key){
+	public static boolean delete(Class<? extends BaseRelationalDatabaseDomain> clazz,Serializable id){
 		BaseRelationalDatabaseDomain newInstance;
 		try {
 			newInstance = clazz.newInstance();
-			DomainUtil.setDomainId(newInstance, key);
+			DomainUtil.setDomainId(newInstance, id);
 			return delete(newInstance);
 		} catch (InstantiationException | IllegalAccessException e) {
 			steed.util.logging.LoggerFactory.getLogger().error(clazz+"实例化失败！！",e);
@@ -646,8 +657,8 @@ public class DaoUtil {
 	
 	/**
 	 * 通过id删除实体类方法,不会会自动把ids转换成实体类id类型,比如实体类id为Long,ids不可以传string
-	 * @param clazz
-	 * @param ids
+	 * @param clazz 要删除的实体类
+	 * @param ids 实体类id,注意,若实体类id为Long类型,这里就只能传Long类型的参数
 	 * @return 删除的记录数（失败返回-1）
 	 * 
 	 * @see #smartDeleteByIds(Class, String...)
@@ -659,8 +670,8 @@ public class DaoUtil {
 	}
 	/**
 	 * 聪明的通过id删除实体类方法,会自动把ids转换成实体类id类型,比如实体类id为Long,ids一样可以传string
-	 * @param clazz
-	 * @param ids
+	 * @param clazz 要删除的实体类
+	 * @param ids 实体类id,实体类id为Long类型,这里会自动把String转换为Long
 	 * @return 删除的记录数（失败返回-1）
 	 */
 	public static int smartDeleteByIds(Class<? extends BaseRelationalDatabaseDomain> clazz,String... ids){
@@ -677,20 +688,20 @@ public class DaoUtil {
 		return deleteByIds(clazz, serializables);
 	}
 	/**
-	 * 根据obj的id删除对应的数据库记录
-	 * @param obj
-	 * @return
+	 * 根据domain的id删除对应的数据库记录
+	 * @param domain 要删除的实体类,调用该方法之前必须保证domain的id不为null
+	 * @return 是否删除成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
 	 */
-	public static boolean delete(BaseRelationalDatabaseDomain obj){
+	public static boolean delete(BaseRelationalDatabaseDomain domain){
 		Session session = null;
 		try {
 			session = getSession();
 			beginTransaction();
-			session.delete(obj);
+			session.delete(domain);
 			return managTransaction(true);
 		} catch(NonUniqueObjectException e1){
 			try {
-				session.delete(smartGet(obj));
+				session.delete(smartGet(domain));
 				return managTransaction(true);
 			} catch (Exception e) {
 				setException(e);
@@ -752,9 +763,7 @@ public class DaoUtil {
 							}
 						}
 					}
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
+				} catch (IllegalArgumentException | IllegalAccessException e) {
 					e.printStackTrace();
 				}
 			}
@@ -776,25 +785,17 @@ public class DaoUtil {
 		}
 	}
 	
-	/*private static boolean isContainReferenceAnnotation(Field f,Class<?> clazz){
-		List<Annotation> annotations = ReflectUtil.getAnnotations(clazz, f);
-		if (annotations.contains(OneToOne.class)) {
-			return true;
-		}else if(annotations.contains(on.class)){
-			
-		}
-	}*/
-	
-	
 	/**
-	 * 
-	 * @param t
-	 * @param currentPage
-	 * @param pageSize
+	 * 分页查询实体类
+	 * @param t 查询的实体类
+	 * @param pageSize 分页大小
+	 * @param currentPage 当前页码
 	 * @param desc 需要降序排列的字段 可以为null
 	 * @param asc 需要升序排列的字段 可以为null
 	 * @param queryRecordCount 是否查询总记录数
-	 * @return
+	 * @return 查询结果(page)
+	 * 
+	 * @see #faging(int, int, Query)
 	 */
 	public static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,List<String> desc,List<String> asc,boolean queryRecordCount){
 		try {
@@ -812,7 +813,7 @@ public class DaoUtil {
 			Page<T> page = setPage(currentPage, recordCount, pageSize, list);
 			return page;
 		} catch (Exception e) {
-			e.printStackTrace();
+			setException(e);
 			return null;
 		}finally{
 			closeSession();
@@ -820,82 +821,111 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * @param t
-	 * @param currentPage
-	 * @param pageSize
+	 * 分页查询实体类
+	 * @param t 查询的实体类
+	 * @param pageSize 分页大小
+	 * @param currentPage 当前页码
 	 * @param desc 需要降序排列的字段 可以为null
 	 * @param asc 需要升序排列的字段 可以为null
-	 * @return
+	 * @return 查询结果(page)
 	 * 
+	 * @see Page
 	 * @see #listObj(Class, int, int, List, List, boolean)
+	 * @see #faging(int, int, Query)
 	 */
 	public static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,List<String> desc,List<String> asc){
 		return listObj(t, pageSize, currentPage, desc, asc, true);
 	}
 	
+	/**
+	 * 查询所有实体类
+	 * @param t 查询的实体类
+	 * @param desc 需要降序排列的字段 不需要请传null
+	 * @param asc 需要升序排列的字段 不需要请传null
+	 * @return 查询到的所有记录
+	 * 
+	 * @see Page
+	 * @see #listObj(Class, int, int, List, List, boolean)
+	 */
 	public static <T extends BaseRelationalDatabaseDomain> List<T> listAllObj(Class<T> t,List<String> desc,List<String> asc){
 		return listAllObj(t, null, desc, asc);
 	}
 	
+	/**
+	 * 查询所有实体类
+	 * @param t 查询的实体类
+	 * @return 查询到的所有记录
+	 * 
+	 * @see #listObj(Class, int, int, List, List, boolean)
+	 */
 	public static <T extends BaseRelationalDatabaseDomain> List<T> listAllObj(Class<T> t){
-		/*try {
-			Query query = createQuery(null, getSelectHql(t, null, null, null));
-			List list = query.list();
-			return list;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}finally{
-			closeSession();
-		}*/
 		return listAllObj(t, null, null, null);
 	}
 	
-	public static <T> T listOne(T t){
-		return listOne(t,null,null);
+	/**
+	 * 查询单个实体类
+	 * 
+	 * @param where 查询条件
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
+	 */
+	public static <T> T listOne(T where){
+		return listOne(where,null,null);
 	}
 	
+	/**
+	 * 查询单个实体类
+	 * 
+	 * @param target 要查询的实体类
+	 * @param where 查询条件
+	 * @param desc 需要降序排列的字段 不需要请传null
+	 * @param asc 需要升序排列的字段 不需要请传null
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
+	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T listOne(Class<T> t,Map<String, Object> queryMap,List<String> desc,List<String> asc){
+	public static <T> T listOne(Class<T> target,Map<String, Object> where,List<String> desc,List<String> asc){
 		try {
-			StringBuffer hql = getSelectHql(t, queryMap, desc, asc);
+			StringBuffer hql = getSelectHql(target, where, desc, asc);
 			
-			Query query = createQuery(queryMap,hql);
+			Query query = createQuery(where,hql);
 			faging(1, 1, query);
 			return (T) query.uniqueResult();
 		} catch (Exception e) {
-			e.printStackTrace();
+			setException(e);
 			return null;
 		}finally{
 			closeSession();
 		}
 	}
 	
+	/**
+	 * 查询单个实体类
+	 * 
+	 * @param where 查询条件
+	 * @param desc 需要降序排列的字段 不需要请传null
+	 * @param asc 需要升序排列的字段 不需要请传null
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
+	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T listOne(T t,List<String> desc,List<String> asc){
-		return (T) listOne(t.getClass(), putField2Map(t), desc, asc);
+	public static <T> T listOne(T where,List<String> desc,List<String> asc){
+		return (T) listOne(where.getClass(), putField2Map(where), desc, asc);
 	}
 	
 	/**
-	 * 比如说，文章里有个用户实体类，
+	 * 例如:文章里有个用户实体类，
 	 * 但是前台传过来的只有用户的id，我想获取用户的其他信息就要查数据库，
-	 * 调用该方法会把baseDomain关联的所有BaseRelationalDatabaseDomain查出来
-	 * @param baseDomain
+	 * 调用该方法会把target关联的所有BaseRelationalDatabaseDomain查出来,无需手工查询
+	 * @param target 要填充关联实体类的实体类对象
 	 */
-	public static void getRefrenceById(BaseDomain baseDomain){
-		for (Field f:baseDomain.getClass().getDeclaredFields()) {
+	public static void getRefrenceById(BaseDomain target){
+		for (Field f:target.getClass().getDeclaredFields()) {
 			f.setAccessible(true);
 			Object temp;
 			try {
-				temp = f.get(baseDomain);
+				temp = f.get(target);
 				if (temp != null & temp instanceof BaseRelationalDatabaseDomain) {
-					f.set(baseDomain, smartGet((BaseRelationalDatabaseDomain)temp));
+					f.set(target, smartGet((BaseRelationalDatabaseDomain)temp));
 				}
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-				throw new RuntimeException(e);
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
+			} catch (IllegalArgumentException | IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -904,45 +934,69 @@ public class DaoUtil {
 	
 	
 	/**
-	 * 获取所有查询对象
-	 * @param <T>
-	 * @param t 查询对象参数
-	 * @return
+	 * 获取所有符合查询条件的记录
+	 * 
+	 * @param where 查询条件
+	 * @param desc 需要降序排列的字段 不需要请传null
+	 * @param asc 需要升序排列的字段 不需要请传null
+	 * 
+	 * @return 符合查询条件的所有记录
 	 */
-	public static <T> List<T> listAllObj(T t,List<String> desc,List<String> asc){
+	public static <T> List<T> listAllObj(T where,List<String> desc,List<String> asc){
 		@SuppressWarnings("unchecked")
-		Class<T> clazz = (Class<T>) t.getClass();
+		Class<T> clazz = (Class<T>) where.getClass();
 		Map<String, Object> map = new HashMap<String, Object>();
-		putField2Map(t, map, "");
+		putField2Map(where, map, "");
 		return listAllObj(clazz, map,desc,asc);
 	}
+	
 	/**
-	 * 获取所有查询对象
-	 * @param <T>
-	 * @param t 查询对象参数
-	 * @return
+	 * 获取所有符合查询条件的记录
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param where 查询条件
+	 * @return 符合查询条件的所有记录
 	 */
-	public static <T> List<T> listAllObj(T t){
-		return listAllObj(t,null,null);
+	public static <T> List<T> listAllObj(T where){
+		return listAllObj(where,null,null);
 	}
 	
 	/**
-	 * 用obj做查询条件查询的结果集是否为空
-	 * @param obj 查询条件
-	 * @return
+	 * 获取所有符合查询条件的记录
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param target 要查询的实体类
+	 * @param where 查询条件
+	 * @param desc 需要降序排列的字段 不需要请传null
+	 * @param asc 需要升序排列的字段 不需要请传null
+	 * 
+	 * @return 符合查询条件的所有记录
 	 */
-	public static boolean isResultNull(BaseRelationalDatabaseDomain obj){
-		return isResultNull(obj.getClass(), DaoUtil.putField2Map(obj));
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> listAllObj(Class<T> target,Map<String, Object> where,List<String> desc,List<String> asc){
+		return (List<T>) listAllCustomField(target, where, desc, asc);
 	}
 	
 	/**
-	 * 用obj做查询条件查询的结果集是否为空
-	 * @param obj 查询条件
-	 * @return
+	 * 用where做查询条件查询的数据库是否存在对应的记录
+	 * @param where 查询条件
+	 * @return 结果是否存在
 	 */
-	public static boolean isResultNull(Class<?> clazz,Map<String, Object> where){
+	public static boolean isResultNull(BaseRelationalDatabaseDomain where){
+		return isResultNull(where.getClass(), DaoUtil.putField2Map(where));
+	}
+	
+	/**
+	 * 用where做查询条件查询的数据库是否存在对应的记录
+	 * @param target 要查询的实体类
+	 * @param where 查询条件
+	 * @return 结果是否存在
+	 */
+	public static boolean isResultNull(Class<?> target,Map<String, Object> where){
 		try {
-			Query query = getSession().createQuery(getCountHql(getSelectHql(clazz, where, null, null)).toString());
+			Query query = getSession().createQuery(getCountHql(getSelectHql(target, where, null, null)).toString());
 			setMapParam(where, query);
 			faging(1, 1, query);
 			return ((Long) query.uniqueResult()) == 0;
@@ -956,70 +1010,84 @@ public class DaoUtil {
 	
 	/**
 	 * 获取记录数
-	 * @param query
-	 * @return
+	 * @param where 查询条件
+	 * @return 记录数
 	 */
-	public static long getCount(BaseRelationalDatabaseDomain query){
-		Class<? extends BaseRelationalDatabaseDomain> t = query.getClass();
+	public static long getCount(BaseRelationalDatabaseDomain where){
+		Class<? extends BaseRelationalDatabaseDomain> t = where.getClass();
 		Map<String, Object> map = new HashMap<String, Object>();
-		putField2Map(query, map, "");
+		putField2Map(where, map, "");
 		return getCount(t, map);
 	}
+	
 	/**
-	 * 获取所有查询对象
-	 * @param t
-	 * @param constraint 查询参数
-	 * @return
+	 * 查询实体类指定的字段
+	 * @param where 查询条件
+	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @return 符合查询条件的所有记录(List),当selectedFields长度为0时,返回List&lt;target&gt;<br>
+	 * 		当selectedFields长度只有1时,返回List&lt;selectedField&gt;<br>
+	 * 		当selectedFields长度&gt;1时,返回List&lt;Map&lt;selectedField,value&gt;&gt;<br>
+	 */
+	public static <T> List<T> listAllCustomField(BaseDomain where,String... selectedFields){
+		return listAllCustomField(DaoUtil.putField2Map(where), where.getClass(), selectedFields);
+	}
+	/**
+	 * 查询实体类指定的字段
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param where 查询条件
+	 * @param target 要查询的实体类
+	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
+	 * 
+	 * @return 符合查询条件的所有记录(List),当selectedFields长度为0时,返回List&lt;target&gt;<br>
+	 * 		当selectedFields长度只有1时,返回List&lt;selectedField&gt;<br>
+	 * 		当selectedFields长度&gt;1时,返回List&lt;Map&lt;selectedField,value&gt;&gt;<br>
+	 */
+	public static <T> List<T> listAllCustomField(Map<String, Object> where,Class<?> target,String... selectedFields){
+		return listAllCustomField(target, where, null, null, selectedFields);
+	}
+	/**
+	 * 查询实体类指定的字段
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param target 要查询的实体类
+	 * @param where 查询条件
+	 * @param desc 需要降序排列的字段 不需要请传null
+	 * @param asc 需要升序排列的字段 不需要请传null
+	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
+	 * 
+	 * @return 符合查询条件的所有记录(List),当selectedFields长度为0时,返回List&lt;target&gt;<br>
+	 * 		当selectedFields长度只有1时,返回List&lt;selectedField&gt;<br>
+	 * 		当selectedFields长度&gt;1时,返回List&lt;Map&lt;selectedField,value&gt;&gt;<br>
+	 */
+	public static <T> List<T> listAllCustomField(Class<?> target,Map<String, Object> where,List<String> desc,List<String> asc,String... selectedFields){
+		return listAllCustomField(target, where, desc, asc, null, selectedFields);
+	}
+	/**
+	 * 查询实体类指定的字段
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param target 要查询的实体类
+	 * @param where 查询条件
+	 * @param desc 需要降序排列的字段 不需要请传null
+	 * @param asc 需要升序排列的字段 不需要请传null
+	 * @param groupBy hql group by部分语句,不需要请传null
+	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
+	 * 
+	 * @return 符合查询条件的所有记录(List),当selectedFields长度为0时,返回List&lt;target&gt;<br>
+	 * 		当selectedFields长度只有1时,返回List&lt;selectedField&gt;<br>
+	 * 		当selectedFields长度&gt;1时,返回List&lt;Map&lt;selectedField,value&gt;&gt;<br>
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> listAllObj(Class<T> t,Map<String, Object> constraint,List<String> desc,List<String> asc){
-		return (List<T>) listAllCustomField(t, constraint, desc, asc);
-	}
-	/**
-	 * 获取实体类指定的字段
-	 * @param constraint 查询参数
-	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
-	 * @return
-	 */
-	public static <T> List<T> listAllCustomField(BaseDomain constraint,String... selectedFields){
-		return listAllCustomField(DaoUtil.putField2Map(constraint), constraint.getClass(), selectedFields);
-	}
-	/**
-	 * 获取实体类指定的字段
-	 * @param t
-	 * @param constraint 查询参数
-	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
-	 * @return
-	 */
-	public static <T> List<T> listAllCustomField(Map<String, Object> constraint,Class<?> t,String... selectedFields){
-		return listAllCustomField(t, constraint, null, null, selectedFields);
-	}
-	/**
-	 * 获取实体类指定的字段
-	 * @param t
-	 * @param constraint 查询参数
-	 * @param desc
-	 * @param asc
-	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
-	 * @return
-	 */
-	public static <T> List<T> listAllCustomField(Class<?> t,Map<String, Object> constraint,List<String> desc,List<String> asc,String... selectedFields){
-		return listAllCustomField(t, constraint, desc, asc, null, selectedFields);
-	}
-	/**
-	 * 获取实体类指定的字段
-	 * @param t
-	 * @param constraint 查询参数
-	 * @param desc
-	 * @param asc
-	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> List<T> listAllCustomField(Class<?> t,Map<String, Object> constraint,List<String> desc,List<String> asc,String[] groupBy,String... selectedFields){
+	public static <T> List<T> listAllCustomField(Class<?> target,Map<String, Object> where,List<String> desc,List<String> asc,String[] groupBy,String... selectedFields){
 		try {
-			Query query = getSession().createQuery(getSelectHql(t, constraint, desc, asc,groupBy,selectedFields).toString());
-			setMapParam(constraint, query);
+			Query query = getSession().createQuery(getSelectHql(target, where, desc, asc,groupBy,selectedFields).toString());
+			setMapParam(where, query);
 			return query.list();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1028,60 +1096,83 @@ public class DaoUtil {
 			closeSession();
 		}
 	}
+	
 	/**
-	 * 获取该查询条件能查到的记录数
-	 * @param t
-	 * @param map 查询数据
-	 * @return
+	 * 获取符合查询条件的记录数
+	 * @param target 要查询的实体类
+	 * @param where 查询条件
+	 * @return 符合查询条件的记录数
 	 */
-	public static long getCount(Class<? extends BaseRelationalDatabaseDomain> t,Map<String, Object> map){
+	public static long getCount(Class<? extends BaseRelationalDatabaseDomain> target,Map<String, Object> where){
 		try {
-			Query query = getSession().createQuery(getCountHql(getSelectHql(t, map, null, null)).toString());
-			setMapParam(map, query);
+			Query query = getSession().createQuery(getCountHql(getSelectHql(target, where, null, null)).toString());
+			setMapParam(where, query);
 			return (Long) query.uniqueResult();
 		} catch (Exception e) {
-			e.printStackTrace();
+			setException(e);
 			return -1;
 		}finally{
 			closeSession();
 		}
 	}
+	
+	/**
+	 * 分页查询实体类
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param pageSize 分页大小
+	 * @param currentPage 当前页码
+	 * @param where 查询条件
+	 * @param desc 需要降序排列的字段 可以为null
+	 * @param asc 需要升序排列的字段 可以为null
+	 * @return 查询结果(page)
+	 * 
+	 * @see #faging(int, int, Query)
+	 */
 	@SuppressWarnings("unchecked")
-	public static <T> Page<T> listObj(int pageSize,int currentPage,T obj,List<String> desc,List<String> asc){
-		Class<T> t = (Class<T>) obj.getClass();
+	public static <T> Page<T> listObj(int pageSize,int currentPage,T where,List<String> desc,List<String> asc){
+		Class<T> t = (Class<T>) where.getClass();
 		Map<String, Object> map = new HashMap<String, Object>();
-		putField2Map(obj, map, "");
+		putField2Map(where, map, "");
 		return listObj(t,pageSize,currentPage,map,desc,asc) ;
 	}
 	/**
 	 * 随机取size条记录
-	 * @param size
-	 * @param obj
-	 * @return
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param size 记录数
+	 * @param where 查询条件
+	 * @return 符合查询条件的记录
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> randomlistObj(int size,T obj){
-		Class<T> t = (Class<T>) obj.getClass();
+	public static <T> List<T> randomlistObj(int size,T where){
+		Class<T> t = (Class<T>) where.getClass();
 		Map<String, Object> map = new HashMap<String, Object>();
-		putField2Map(obj, map, "");
+		putField2Map(where, map, "");
 		return randomlistObj(t, size, map);
 	}
 	
 	/**
 	 * 随机取size条记录
-	 * @param t
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param target 要查询的实体类
 	 * @param size 记录数
-	 * @param map 查询条件
-	 * @return
+	 * @param where 查询条件
+	 * 
+	 * @return 查询到的记录
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> randomlistObj(Class<T> t,int size,Map<String, Object> map){
+	public static <T> List<T> randomlistObj(Class<T> target,int size,Map<String, Object> where){
 		try {
 			List<String> randList = new ArrayList<String>(1);
 			randList.add("RAND()");
-			StringBuffer hql = getSelectHql(t, map, null, null);
+			StringBuffer hql = getSelectHql(target, where, null, null);
 			hql.append(" order by RAND()");
-			Query query = createQuery(map,hql);
+			Query query = createQuery(where,hql);
 			faging(size,1, query);
 			return query.list();
 		} catch (Exception e) {
@@ -1091,33 +1182,59 @@ public class DaoUtil {
 			closeSession();
 		}
 	}
-	public static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,Map<String, Object> map,List<String> desc,List<String> asc,boolean queryRecordCount){
-		return listCustomField(t, pageSize, currentPage, map, desc, asc, queryRecordCount);
+	
+	/**
+	 * 查询target里面指定的字段
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param target 要查询的实体类
+	 * @param pageSize 分页大小
+	 * @param currentPage 当前页码
+	 * @param where 查询条件
+	 * @param desc 需要降序排列的字段 可以为null
+	 * @param asc 需要升序排列的字段 可以为null
+	 * @param queryRecordCount 是否查询总记录数(记录很多时查询较费时间),若传false,则返回的page实体类的记录数为Long.MAX_VALUE,<br>
+	 * 			前端可做无限分页
+	 * 
+	 * @return 当前页的记录
+	 */
+	public static <T> Page<T> listObj(Class<T> target,int pageSize,int currentPage,Map<String, Object> where,List<String> desc,List<String> asc,boolean queryRecordCount){
+		return listCustomField(target, pageSize, currentPage, where, desc, asc, queryRecordCount);
 	}
 	public static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,Map<String, Object> map,List<String> desc,List<String> asc){
 		return listObj(t, pageSize, currentPage, map, desc, asc, true);
 	}
 	
 	/**
-	 * 查询t里面指定的字段
-	 * @param t 要查询的类
-	 * @param pageSize
-	 * @param currentPage
-	 * @param constraint 查询条件
-	 * @param desc
-	 * @param asc
+	 * 查询target里面指定的字段
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param target 要查询的实体类
+	 * @param pageSize 分页大小
+	 * @param currentPage 当前页码
+	 * @param where 查询条件
+	 * @param desc 需要降序排列的字段 可以为null
+	 * @param asc 需要升序排列的字段 可以为null
 	 * @param queryRecordCount 是否查询总记录数(记录很多时查询较费时间),若传false,则返回的page实体类的记录数为Long.MAX_VALUE,<br>
 	 * 			前端可做无限分页
 	 * @param selectField 要查询的字段,若不传,则查询该类所有字段,page里面放的是实体类,否则放的是map,不过map里面的key的'.'会被替换成'__'<br>
 	 * 			(这个是可变参数,没有请不传,切忌传null!)
-	 * @return
+	 * 
+	 * @return  符合查询条件的当前页记录(page里面放的是List),当selectedFields长度为0时,page里面的数据为List&lt;target&gt;<br>
+	 * 		当selectedFields长度只有1时,page里面的数据为List&lt;selectedField&gt;<br>
+	 * 		当selectedFields长度&gt;1时,page里面的数据为List&lt;Map&lt;selectedField,value&gt;&gt;<br>
 	 */
-	public static <T> Page<T> listCustomField(Class<?> t,int pageSize,int currentPage,Map<String, Object> constraint,
+	public static <T> Page<T> listCustomField(Class<?> target,int pageSize,int currentPage,Map<String, Object> where,
 			List<String> desc,List<String> asc,boolean queryRecordCount,String... selectField){
-		return listCustomField(t, pageSize, currentPage, constraint, desc, asc, queryRecordCount, null, selectField);
+		return listCustomField(target, pageSize, currentPage, where, desc, asc, queryRecordCount, null, selectField);
 	}
 	/**
-	 * 查询t里面指定的字段
+	 * 查询target里面指定的字段
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
 	 * @param t 要查询的类
 	 * @param pageSize
 	 * @param currentPage
@@ -1154,20 +1271,49 @@ public class DaoUtil {
 		}
 	}
 	
+	/**
+	 * 根据实体类id加载实体类
+	 * 
+	 * @param <T> 要加载的实体类
+	 * 
+	 * @param domain 要查询的实体类,调用该方法之前必须保证domain的id不为null
+	 * 
+	 * @return 查询到的实体类的代理对象(记录不存则返回null)
+	 * 
+	 * @see DaoUtil#get(Class, Serializable)
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends BaseRelationalDatabaseDomain> T smartLoad(T domain){
 		return (T) load(domain.getClass(), DomainUtil.getDomainId(domain));
 	}
+	
 	/**
-	 * 聪明的get方法
+	 * 根据实体类id查询实体类
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param domain 要查询的实体类,调用该方法之前必须保证domain的id不为null
+	 * 
+	 * @return 查询到的记录(记录不存在则返回null)
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends BaseRelationalDatabaseDomain> T smartGet(T domain){
 		return (T) get(domain.getClass(), DomainUtil.getDomainId(domain));
 	}
-	public static <T extends BaseRelationalDatabaseDomain> T get(Class<T> t,Serializable key){
+	
+	/**
+	 * 根据实体类id查询实体类
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param clazz 要查询的实体类
+	 * @param id 实体类id
+	 * 
+	 * @return 查询到的记录(记录不存在则返回null)
+	 */
+	public static <T extends BaseRelationalDatabaseDomain> T get(Class<T> clazz,Serializable id){
 		try {
-			T t2 = (T) getSession().get(t, key);
+			T t2 = (T) getSession().get(clazz, id);
 			return t2;
 		} catch (Exception e) {
 			setException(e);
@@ -1193,11 +1339,20 @@ public class DaoUtil {
 	}
 	
 	
-	
-	public static <T extends BaseRelationalDatabaseDomain> T load(Class<T> t,Serializable key){
+	/**
+	 * 根据实体类id加载实体类
+	 * 
+	 * @param <T> 要加载的实体类
+	 * 
+	 * @param clazz 要加载的实体类
+	 * @param id 实体类id
+	 * 
+	 * @return 查询到的实体类的代理对象(记录不存则返回null)
+	 */
+	public static <T extends BaseRelationalDatabaseDomain> T load(Class<T> clazz,Serializable id){
 		try {
 			Session session = getSession();
-			return session.load(t, key);
+			return session.load(clazz, id);
 		} catch (Exception e) {
 			setException(e);
 			return null;
@@ -1247,7 +1402,8 @@ public class DaoUtil {
 			currentTransaction.set(HibernateUtil.getSession().beginTransaction());
 		}
 	}
-	public static Transaction getTransaction(){
+	
+	private static Transaction getTransaction(){
 		return currentTransaction.get();
 	}
 	
@@ -1323,11 +1479,18 @@ public class DaoUtil {
 		currentTransaction.remove();
 	}
 	
-	public static boolean save(BaseRelationalDatabaseDomain obj){
+	/**
+	 * 保存实体类
+	 * 
+	 * @param domain
+	 * 
+	 * @return 是否保存成功 (即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
+	 */
+	public static boolean save(BaseRelationalDatabaseDomain domain){
 		try {
 			Session session = getSession();
 			beginTransaction();
-			session.save(obj);
+			session.save(domain);
 			return managTransaction(true);
 		} catch (Exception e) {
 			setException(e);
@@ -1338,40 +1501,54 @@ public class DaoUtil {
 	}
 	/**
 	 * update实体类中不为空的字段
-	 * @param obj
-	 * @param updateEvenNull 即使为空也更新到数据库中的字段
-	 * @return
+	 * 
+	 * @param domain 要update的实体类
+	 * @param updateEvenNull 即使为空也update到数据库中的字段,没有请传null
+	 * 
+	 * @return 是否更新成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
 	 */
-	public static boolean updateNotNullField(BaseRelationalDatabaseDomain obj,List<String> updateEvenNull){
-		return updateNotNullField(obj, updateEvenNull, false);
+	public static boolean updateNotNullField(BaseRelationalDatabaseDomain domain,List<String> updateEvenNull){
+		return updateNotNullField(domain, updateEvenNull, false);
 	}
 	/**
 	 * update实体类中不为空的字段
-	 * @param obj
-	 * @param updateEvenNull 即使为空也更新到数据库中的字段
+	 * 
+	 * @param domain 要update的实体类
+	 * @param updateEvenNull 即使为空也update到数据库中的字段,没有请传null
 	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空，
 	 * 	否则调用BaseUtil.isObjEmpty判断字段是否为空
+	 * 
+	 * @return 是否更新成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
+	 * 
 	 * @see BaseUtil#isObjEmpty
 	 * @see DomainUtil#fillDomain
-	 * @return
 	 */
-	public static boolean updateNotNullField(BaseRelationalDatabaseDomain obj,List<String> updateEvenNull,boolean strictlyMode){
-		BaseRelationalDatabaseDomain smartGet = smartGet(obj);
-		DomainUtil.fillDomain(smartGet, obj,updateEvenNull,strictlyMode);
+	public static boolean updateNotNullField(BaseRelationalDatabaseDomain domain,List<String> updateEvenNull,boolean strictlyMode){
+		BaseRelationalDatabaseDomain smartGet = smartGet(domain);
+		DomainUtil.fillDomain(smartGet, domain,updateEvenNull,strictlyMode);
 		return smartGet.update();
 	}
 	
-	public static boolean updateNotNullFieldByHql(BaseRelationalDatabaseDomain obj,List<String> updateEvenNull,boolean strictlyMode){
+	/*public static boolean updateNotNullFieldByHql(BaseRelationalDatabaseDomain obj,List<String> updateEvenNull,boolean strictlyMode){
 		BaseRelationalDatabaseDomain smartGet = smartGet(obj);
 		DomainUtil.fillDomain(smartGet, obj,updateEvenNull,strictlyMode);
 		return smartGet.update();
-	}
+	}*/
 	
-	public static boolean update(BaseRelationalDatabaseDomain obj){
+	/**
+	 * update实体类中不为空的字段
+	 * 
+	 * @param domain 要update的实体类
+	 * 
+	 * @return 是否更新成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
+	 * 
+	 * @see #updateNotNullField(BaseRelationalDatabaseDomain, List, boolean)
+	 */
+	public static boolean update(BaseRelationalDatabaseDomain domani){
 		try {
 			Session session = getSession();
 			beginTransaction();
-			session.update(obj);
+			session.update(domani);
 			return managTransaction(true);
 		} catch (Exception e) {
 			setException(e);
@@ -1383,9 +1560,11 @@ public class DaoUtil {
 	
 	/**
 	 * 不要求list里面所有对象一起update成功或失败,update单位是单个对象,
-	 * 你可能需要另外一个方法updateList(List list)
+	 * 你可能需要另外一个方法updateList(List list),若事务失败了,数据库操作一样会失败,所以该返回值只做参考用
+	 * 
 	 * @see #updateList
-	 * @param list
+	 * @param list 要update的对象
+	 * 
 	 * @return update失败的对象数
 	 */
 	public static int updateListOneByOne(List<? extends BaseRelationalDatabaseDomain> list){
@@ -1408,7 +1587,8 @@ public class DaoUtil {
 	 * 获取更新用的hql
 	 * 除了t其它均可为null
 	 * @param t 实体类
-	 * @param map 查询数据
+	 * @param queryCondition where条件
+	 * @param updated 要更新的'字段-&gt;值'
 	 * @return 拼好的hql
 	 */
 	public static <T> StringBuffer getUpdateHql(Class<T> t,
@@ -1640,6 +1820,7 @@ public class DaoUtil {
 		return getMaxDepthDomainChain(clazz, getNoSelectIndexFieldName(chain));
 	}
 	
+	@SuppressWarnings("unchecked")
 	private static String getMaxDepthDomainChain(Class<?> clazz,String chain){
 		if (StringUtil.isStringEmpty(chain)) {
 			return null;
@@ -1749,9 +1930,9 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 组装hql的order by 部分
-	 * @param hql
-	 * @param desc
+	 * 组装hql的order和order by 部分
+	 * @param hql 要组装的hql
+	 * @param desc 
 	 * @param asc
 	 * @param domainSimpleName
 	 * @return
@@ -1849,7 +2030,6 @@ public class DaoUtil {
 	}
 	/**
 	 * 把obj中非空字段放到map
-	 * @return
 	 */
 	public static void putField2Map(Object obj,Map<String, Object> map,String prefixName) {
 		putField2Map(obj, map, prefixName, true);
@@ -1871,7 +2051,6 @@ public class DaoUtil {
 		
 		/**
 		 * 
-		 * @param obj 要put到map的对象
 		 * @param map obj字段容器,用来生成hql或sqlwhere部分的查询条件
 		 * @param prefixName 前缀,当put user里面的school时,prefixName="user.",原理比较复杂,具体可以看源码
 		 * @param getFieldByGetter 是否用Getter方法来获取字段值,若传false,则用field.get直接获取字段值
@@ -1988,10 +2167,11 @@ public class DaoUtil {
 	 * 
 	 * 组装map参数到hql的where部分
 	 * 
-	 * @see #personalHqlGeneratorKey
-	 * @param domainSimpleName
+	 * @param domainSimpleName 
 	 * @param hql
 	 * @param map
+	 * 
+	 * @see HqlGenerator
 	 */
 	public static StringBuffer appendHqlWhere(String domainSimpleName, StringBuffer hql,
 			Map<String, Object> map) {
@@ -2009,7 +2189,11 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 组装update类型的hql中set部分
+	 * 组装update类型的hql中set部分语句
+	 * 
+	 * @param hql 要组装的hql
+	 * @param domainSimpleName 实体类简称
+	 * @param updated 要更新的字段
 	 */
 	private static void appendHqlUpdateSet(StringBuffer hql,String domainSimpleName,Map<String, Object> updated){
 		for (String temp:updated.keySet()) {
@@ -2024,14 +2208,13 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 获取总记录
-	 * @param map 可以为null
-	 * @param domainName
-	 * @param hql 普通查询hql,会自动转换成查询记录总数的hql
-	 * @return
+	 * 获取记录数
+	 * @param where 查询条件
+	 * @param selectHql 普通的select hql,会自动转换成查询记录数的hql
+	 * @return 记录数
 	 */
-	private static long getRecordCount(Map<String, Object> map,StringBuffer hql) {
-		Query query = createQuery(map, getCountHql(hql));
+	private static long getRecordCount(Map<String, Object> where,StringBuffer selectHql) {
+		Query query = createQuery(where, getCountHql(selectHql));
 		try {
 			return (Long) query.uniqueResult();
 		} catch (NonUniqueResultException e) {
@@ -2043,11 +2226,11 @@ public class DaoUtil {
 
 	/**
 	 * 设置page的大小，当前页等
-	 * @param currentPage
-	 * @param recordCount
-	 * @param pageSize
-	 * @param list
-	 * @return
+	 * @param currentPage 当前页码,从1开始
+	 * @param recordCount 总记录数
+	 * @param pageSize 分页大小
+	 * @param list 分页数据
+	 * @return 设置好分页数据的Page对象
 	 */
 	private static <T> Page<T> setPage(int currentPage, Long recordCount,
 			int pageSize, List<T> list) {
@@ -2060,8 +2243,8 @@ public class DaoUtil {
 	}
 	/**
 	 * 把map中的查询数据设置到query
-	 * @param map
-	 * @param query
+	 * @param map map
+	 * @param query query
 	 */
 	private static void setMapParam(Map<String, ? extends Object> map, Query query) {
 		if (CollectionsUtil.isCollectionsEmpty(map)) {
@@ -2091,15 +2274,20 @@ public class DaoUtil {
 
 	/**
 	 * 设置query分页
-	 * @param currentPage
+	 * @param pageSize 分页大小
+	 * @param currentPage 当前页面,从1开始
 	 * @param query
-	 * @return
 	 */
 	public static void faging(int pageSize,int currentPage, Query query) {
 		query.setFirstResult((currentPage-1)*pageSize);
 		query.setMaxResults(pageSize);
 	}
 	
+	/**
+	 * 事务数据
+	 * @author 战马
+	 *
+	 */
 	public static class ImmediatelyTransactionData{
 		Transaction currentTransaction;
 		Boolean autoManagTransaction;

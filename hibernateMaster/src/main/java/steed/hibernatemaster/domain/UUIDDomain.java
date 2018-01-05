@@ -21,6 +21,7 @@ import steed.util.base.StringUtil;
  */
 @MappedSuperclass
 public abstract class UUIDDomain extends BaseRelationalDatabaseDomain{
+	private static final long serialVersionUID = 8998431532284882361L;
 	protected String id;
 
 	@Id

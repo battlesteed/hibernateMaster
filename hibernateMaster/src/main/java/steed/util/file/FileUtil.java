@@ -53,7 +53,7 @@ public class FileUtil {
 	
 	/**
 	 * 获取文件后缀
-	 * @param fileName
+	 * @param file
 	 * @return
 	 */
 	public static String getFileSuffix(File file){

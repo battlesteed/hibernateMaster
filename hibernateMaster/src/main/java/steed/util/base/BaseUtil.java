@@ -29,10 +29,10 @@ public class BaseUtil {
 		return null == obj;
 	}
 	/**
-	 * 打印 prefix + "------>" + String.valueOf(o)
+	 * 打印 prefix + "------&gt;" + String.valueOf(o)
 	 * @param o
 	 * @param prefix 前缀
-	 * @return prefix + "------>" + String.valueOf(o)
+	 * @return prefix + "------&gt;" + String.valueOf(o)
 	 */
 	public static String out(String prefix,Object o){
 		String x = prefix + "------>" + o;

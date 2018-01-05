@@ -9,7 +9,6 @@ public class BaseTest extends SteedTest{
 	
 	@Test
 	public void testSave(){
-		genData();
 		Clazz clazz = new Clazz();
 		clazz.setId("testSaveClass");
 		DaoUtil.deleteByQuery(clazz);

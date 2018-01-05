@@ -2,7 +2,7 @@ package steed.hibernatemaster.test;
 
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.Assert;
 
 import steed.hibernatemaster.sample.domain.Clazz;
 import steed.hibernatemaster.sample.domain.School;
@@ -16,14 +16,18 @@ public class GenTestData {
 	public final static int classCount = 10;
 	public final static int schoolCount = 2;
 	
-	@Test
+	public static void main(String[] args){
+//		utis
+		new GenTestData().genData();
+	}
+
 	public void genData(){
 		TestEfficiency testEfficiency = new TestEfficiency();
 		testEfficiency.begin();
 		ImmediatelyTransactionData immediatelyTransactionBegin = DaoUtil.immediatelyTransactionBegin();
-		assert(DaoUtil.deleteByQuery(new Student()) != -1);
-		assert(DaoUtil.deleteByQuery(new Clazz()) != -1);
-		assert(DaoUtil.deleteByQuery(new School()) != -1);
+		Assert.assertTrue(DaoUtil.deleteByQuery(new Student()) != -1);
+		Assert.assertTrue(DaoUtil.deleteByQuery(new Clazz()) != -1);
+		Assert.assertTrue(DaoUtil.deleteByQuery(new School()) != -1);
 		DaoUtil.managTransaction();
 		for (int a = 0; a < schoolCount; a++) {
 			School school = new School();
@@ -32,7 +36,7 @@ public class GenTestData {
 			school.save();
 			genClass(school);
 		}
-		assert(DaoUtil.managTransaction());
+		Assert.assertTrue(DaoUtil.managTransaction());
 		DaoUtil.immediatelyTransactionEnd(immediatelyTransactionBegin);
 		testEfficiency.endAndOutUsedTime(String.format("插入%d个学校,每个学校%d个班级,每个班级%d学生,用时", schoolCount,classCount,classSize));
 	}

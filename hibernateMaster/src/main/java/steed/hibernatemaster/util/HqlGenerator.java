@@ -8,7 +8,7 @@ import java.util.Map;
  * 
  * @author 战马
  * Email battle_steed@163.com
- * @see steed.util.dao#HqlGenerator
+ * @see steed.hibernatemaster.util.SimpleHqlGenerator
  */
 public interface HqlGenerator {
 	StringBuffer appendHqlWhere(String domainSimpleName, StringBuffer hql,Map<String, Object> map);

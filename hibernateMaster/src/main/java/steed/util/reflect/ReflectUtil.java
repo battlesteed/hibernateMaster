@@ -395,7 +395,6 @@ public class ReflectUtil {
 	 * @param fieldName 不能带点
 	 * @return
 	 * 
-	 * @see #getFieldChain(Class, String)
 	 * @see #getDeclaredField(Class, String)
 	 */
 	public static Field getField(Class<?> clazz,String fieldName){
@@ -443,7 +442,7 @@ public class ReflectUtil {
 	 * @param fieldName 不能带点
 	 * @return
 	 * 
-	 * @see #getFieldChain(Class, String)
+	 * @see #getChainField(Class, String)
 	 */
 	public static Field getDeclaredField(Class<?> clazz,String fieldName){
 		Class<?> class4Log = clazz;
@@ -481,7 +480,7 @@ public class ReflectUtil {
 	}
 	/**
 	 * 判断该类型是否是数据库基本数据类型
-	 * @param obj
+	 * @param clazz
 	 * @return
 	 */
 	public static boolean isClassBaseData(Class<?> clazz){

@@ -53,7 +53,7 @@ public class SimpleHqlGenerator implements HqlGenerator{
 	 * append 单个自定义 where 条件
 	 * @param domainSimpleName 操作的实体类简称
 	 * @param hql 当前已经生成的部分hql
-	 * @param query 查询条件,比如query参数里面有一个<name,false>的查询条件,
+	 * @param query 查询条件,比如query参数里面有一个&lt;name,false&gt;的查询条件,
 	 * 	然后你生成了domainSimpleName.name is not null 的hql,这个hql是没有:name这个参数的,要把他移除掉,这时候就要调removedEntry.add("name");通知框架把name参数移除掉
 	 * 
 	 */
@@ -66,7 +66,7 @@ public class SimpleHqlGenerator implements HqlGenerator{
 	 * @param domainSimpleName
 	 * @param hql
 	 * @param query
-	 * @param removedEntry 你要移除的查询条件,比如query参数里面有一个<name,false>的查询条件,
+	 * @param removedEntry 你要移除的查询条件,比如query参数里面有一个&lt;name,false&gt;的查询条件,
 	 * 	然后你生成了domainSimpleName.name is not null 的hql,这个hql是没有:name这个参数的,要把他移除掉,这时候就要调removedEntry.add("name");通知框架把name参数移除掉
 	 * @param e
 	 * @param put 你要往
