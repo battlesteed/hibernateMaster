@@ -20,6 +20,8 @@
 
 
 ## 快速入门
+[在线javadoc](http://battle_steed.gitee.io/hibernatemaster/hibernateMaster/doc/)
+
 maven如下添加依赖
 ```
 		<dependency>
@@ -94,3 +96,4 @@ public class QuickStart extends SteedTest{
 }
 
 ```
+
