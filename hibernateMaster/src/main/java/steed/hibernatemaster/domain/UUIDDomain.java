@@ -35,6 +35,7 @@ public abstract class UUIDDomain extends BaseRelationalDatabaseDomain{
 	public void setId(String id) {
 		this.id = id;
 	}
+	
 
 	@Override
 	public boolean save() {

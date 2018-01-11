@@ -253,26 +253,30 @@ public class ReflectUtil {
 		
 		String name = field.getName();
 		String fieldGetterName = StringUtil.getFieldGetterName(name);
-		try {
-			Method declaredMethod = objClass.getDeclaredMethod(fieldGetterName);
-			T annotation2 = declaredMethod.getAnnotation(annotationClass);
-			if (annotation2 != null) {
-				return annotation2;
-			}
-		} catch (NoSuchMethodException | SecurityException e) {
-		} 
+		T methodAnnotation = getMethodAnnotation(annotationClass, objClass, fieldGetterName); 
+		if (methodAnnotation == null) {
+			String fieldIsMethodName = StringUtil.getFieldIsMethodName(name);
+			methodAnnotation = getMethodAnnotation(annotationClass, objClass, fieldIsMethodName);
+		}
 		
-		String fieldIsMethodName = StringUtil.getFieldIsMethodName(name);
+		return methodAnnotation;
+		
+	}
+
+	private static <T extends Annotation> T getMethodAnnotation(Class<T> annotationClass,
+			Class<? extends Object> objClass, String fieldIsMethodName) {
 		try {
-			Method declaredMethod3 = objClass.getDeclaredMethod(fieldIsMethodName);
-			T annotation3 = declaredMethod3.getAnnotation(annotationClass);
-			if (annotation3 != null) {
-				return annotation3;
+			Method declaredMethod3 = getDeclaredMethod(objClass,fieldIsMethodName);
+			if (declaredMethod3 != null) {
+				declaredMethod3.setAccessible(true);
+				T annotation3 = declaredMethod3.getAnnotation(annotationClass);
+				if (annotation3 != null) {
+					return annotation3;
+				}
 			}
-		} catch (NoSuchMethodException | SecurityException e) {
+		} catch (SecurityException e) {
 		}
 		return null;
-		
 	}
 	public static List<Annotation> getAnnotations(Class<? extends Object> objClass,Field field){
 		List<Annotation> list = new ArrayList<>();

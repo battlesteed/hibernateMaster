@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Transient;
 
@@ -97,6 +96,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	
 	@Override
 	public boolean update(){
+		trimEmptyDomain();
 		return DaoUtil.update(this);
 	}
 	
@@ -105,8 +105,58 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 		return DaoUtil.delete(this);
 	}
 	
+	private boolean trimEmptyDomain;
+	
+	
+	/**
+	 * 
+	 * @return 是否需要框架帮忙把id为空字符串的实体类裁剪,防止找不到空字符串的外键,导致保存或更新失败
+	 * 
+	 * @see #trimEmptyDomain()
+	 * @see #setTrimEmptyDomain(boolean)
+	 */
+	@Transient
+	public boolean isTrimEmptyDomain() {
+		return trimEmptyDomain;
+	}
+
+	/**
+	 * 设置是否需要框架帮忙把id为空字符串的实体类裁剪,防止找不到空字符串的外键,导致保存或更新失败
+	 * @see #trimEmptyDomain()
+	 * @see #isTrimEmptyDomain()
+	 */
+	public void setTrimEmptyDomain(boolean trimEmptyDomain) {
+		this.trimEmptyDomain = trimEmptyDomain;
+	}
+
+	/**
+	 * 把id为空字符串的实体类裁剪,防止找不到空字符串的外键,导致保存或更新失败
+	 * @see #trimEmptyDomain()
+	 * @see #setTrimEmptyDomain(boolean)
+	 */
+	protected void trimEmptyDomain(){
+		if (!isTrimEmptyDomain()) {
+			return;
+		}
+		List<Field> notFinalFields = ReflectUtil.getNotFinalFields(this);
+		for (Field temp:notFinalFields) {
+			if (BaseRelationalDatabaseDomain.class.isAssignableFrom(temp.getType())) {
+				try {
+					temp.setAccessible(true);
+					Object obj = temp.get(this);
+					if (obj != null && BaseUtil.isObjEmpty(obj)) {
+						temp.set(this, null);
+					}
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	@Override
 	public boolean save(){
+		trimEmptyDomain();
 		return DaoUtil.save(this);
 	}
 	
@@ -238,3 +288,4 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 }
+

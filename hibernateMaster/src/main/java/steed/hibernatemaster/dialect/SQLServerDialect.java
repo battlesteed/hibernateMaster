@@ -5,8 +5,7 @@ import java.sql.Types;
 import org.hibernate.type.StandardBasicTypes;
 
 public class SQLServerDialect extends org.hibernate.dialect.SQLServerDialect{
-	public SQLServerDialect()
-	 {
+	public SQLServerDialect(){
 	     super();
 	     registerHibernateType(1, "string");     
 	     registerHibernateType(-9, "string");     

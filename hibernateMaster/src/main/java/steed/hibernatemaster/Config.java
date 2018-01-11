@@ -7,10 +7,10 @@ import steed.hibernatemaster.util.SingleFactoryEngine;
 
 public class Config {
 	/**
-	 * 是否是单数据库模式,可以调用steed.hibernatemaster.util.HibernateUtil.switchDatabase
+	 * 是否是单数据库模式,可以调用<code>{@link steed.hibernatemaster.util.HibernateUtil#switchDatabase}</code>
 	 * 切换数据库<br>
 	 * 
-	 * 注:多数据库模式未经过生产环境严格测试,请慎用
+	 * 注:多数据库模式未经过生产环境严格测试(只有一个生产环境在用),不保证稳定性
 	 * 
 	 * @see steed.hibernatemaster.util.HibernateUtil#switchDatabase
 	 */
@@ -20,7 +20,7 @@ public class Config {
 	 */
 	public static boolean devMode = false;
 	/**
-	 * 默认hql生成器(生成where 部分的 hql或sql)
+	 * 默认hql生成器(目前只是生成where 部分的 hql或sql)
 	 */
 	public static HqlGenerator defaultHqlGenerator = new SimpleHqlGenerator();
 	/**

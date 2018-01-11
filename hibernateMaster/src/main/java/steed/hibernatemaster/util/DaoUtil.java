@@ -73,7 +73,7 @@ public class DaoUtil {
 	// 具体的错误提示用
 	private static final ThreadLocal<Exception> exception = new ThreadLocal<>();
 	private static final ThreadLocal<Transaction> currentTransaction = new ThreadLocal<>();
-	public static final String personalHqlGeneratorKey = "personalHqlGenerator";
+	public final static String personalHqlGeneratorKey = "personalHqlGenerator";
 	/**
 	 * 是否自动提交或回滚事务
 	 * 自助事务步骤：
@@ -98,7 +98,7 @@ public class DaoUtil {
 	/**
 	 * 查询条件后缀
 	 */
-	public static final String[] indexSuffix = {"_max_1","_min_1","_like_1","_not_in_1","_not_equal_1","_not_join","_not_null","_not_compile_param",personalHqlGeneratorKey};
+	public final static String[] indexSuffix = {"_max_1","_min_1","_like_1","_not_in_1","_not_equal_1","_not_join","_not_null","_not_compile_param",personalHqlGeneratorKey};
 	/***********\异常提示专用************/
 	
 	/*//TODO 完善异常类型
@@ -108,40 +108,40 @@ public class DaoUtil {
 	
 	/*-------#异常提示专用************/
 	
-	public static Exception getExceptiontype() {
+	public final static Exception getExceptiontype() {
 		return exception.get();
 	}
-	public static void setException(Exception exception,boolean rollbackTransaction) {
+	public final static void setException(Exception exception,boolean rollbackTransaction) {
 		DaoUtil.exception.set(exception);
 		steed.util.logging.LoggerFactory.getLogger().error("数据库操作发生异常",exception);
 	}
-	public static void setException(Exception exception) {
+	public final static void setException(Exception exception) {
 		setException(exception, false);
 	}
-	public static Transaction getCurrentTransaction() {
+	public final static Transaction getCurrentTransaction() {
 		return currentTransaction.get();
 	}
-	public static void setCurrentTransaction(Transaction currentTransaction) {
+	public final static void setCurrentTransaction(Transaction currentTransaction) {
 		DaoUtil.currentTransaction.set(currentTransaction);
 	}
-	public static Boolean getTransactionType() {
+	public final static Boolean getTransactionType() {
 		return transactionType.get();
 	}
-	public static void setTransactionType(Boolean transactionType) {
+	public final static void setTransactionType(Boolean transactionType) {
 		DaoUtil.transactionType.set(transactionType);
 	}
-	public static Boolean getAutoManagTransaction() {
+	public final static Boolean getAutoManagTransaction() {
 		return autoManagTransaction.get();
 	}
 	
 	/*
-	public static void registCRUDListener(Class<?> clazz,CRUDListener<?> listener){
+	public final static void registCRUDListener(Class<?> clazz,CRUDListener<?> listener){
 		CRUDListenerMap.put(clazz, listener);
 	}
-	public static void unRegistCRUDListener(Class<?> clazz){
+	public final static void unRegistCRUDListener(Class<?> clazz){
 		CRUDListenerMap.remove(clazz);
 	}
-	public static <T> CRUDListener<T> getCRUDListener(Class<?> clazz){
+	public final static <T> CRUDListener<T> getCRUDListener(Class<?> clazz){
 		while (clazz != Object.class) {
 			CRUDListener<?> crudListener = CRUDListenerMap.get(clazz);
 			if (crudListener != null) {
@@ -165,7 +165,7 @@ public class DaoUtil {
 	 * @see #immediatelyTransactionEnd
 	 * @return 调用该方法之前的事务数据,用于<code>{@link #immediatelyTransactionEnd(ImmediatelyTransactionData)}</code>恢复之前的事务.
 	 */
-	public static ImmediatelyTransactionData immediatelyTransactionBegin(){
+	public final static ImmediatelyTransactionData immediatelyTransactionBegin(){
 		steed.util.logging.LoggerFactory.getLogger().debug("立即事务开始");
 		Session session = getSession();
 		Transaction currentTransaction = getCurrentTransaction();
@@ -189,7 +189,7 @@ public class DaoUtil {
 	 * @see #managTransaction()
 	 * 
 	 */
-	public static void immediatelyTransactionEnd(ImmediatelyTransactionData immediatelyTransactionData){
+	public final static void immediatelyTransactionEnd(ImmediatelyTransactionData immediatelyTransactionData){
 		HibernateUtil.closeSession();
 		DaoUtil.setTransactionType(immediatelyTransactionData.transactionType);
 		DaoUtil.setCurrentTransaction(immediatelyTransactionData.currentTransaction);
@@ -201,14 +201,14 @@ public class DaoUtil {
 	
 	
 	
-	public static void setAutoManagTransaction(Boolean selfManagTransaction) {
+	public final static void setAutoManagTransaction(Boolean selfManagTransaction) {
 		DaoUtil.autoManagTransaction.set(selfManagTransaction);;
 	}
 	/***************************增删查改开始******************************/
 	
 	/**
 	 */
-	public static <T> Page<T> listObj(int pageSize,int currentPage, Class<? extends BaseRelationalDatabaseDomain> t){
+	public final static <T> Page<T> listObj(int pageSize,int currentPage, Class<? extends BaseRelationalDatabaseDomain> t){
 		try {
 			StringBuffer hql = getSelectHql(t,null,null,null);
 			Long recordCount = getRecordCount(null, hql);
@@ -220,7 +220,6 @@ public class DaoUtil {
 			
 			return setPage(currentPage, recordCount, pageSize, list);
 		} catch (Exception e) {
-			e.printStackTrace();
 			setException(e);
 			return null;
 		}finally{
@@ -235,7 +234,7 @@ public class DaoUtil {
 	 * @return 查出来的主键
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<Serializable> listAllObjKey(Class<? extends BaseRelationalDatabaseDomain> target){
+	public final static <T> List<Serializable> listAllObjKey(Class<? extends BaseRelationalDatabaseDomain> target){
 		try {
 			String name = target.getName();
 			String keyName = DomainUtil.getDomainIDName(target);
@@ -244,14 +243,13 @@ public class DaoUtil {
 			return query.list();
 		} catch (Exception e) {
 			setException(e);
-			e.printStackTrace();
 			return null;
 		}finally{
 			closeSession();
 		}
 	}
 	
-	public static boolean saveList(List<? extends BaseRelationalDatabaseDomain> list){
+	public final static boolean saveList(List<? extends BaseRelationalDatabaseDomain> list){
 		Session session = null;
 		try {
 			session = getSession();
@@ -262,7 +260,6 @@ public class DaoUtil {
 			return managTransaction(true);
 		} catch (Exception e) {
 			setException(e);
-			e.printStackTrace();
 			return managTransaction(false);
 		}finally{
 			closeSession();
@@ -279,7 +276,7 @@ public class DaoUtil {
 	 * @return 查询到的记录
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> listByKeys(Class<? extends BaseRelationalDatabaseDomain> target,String[] ids){
+	public final static <T> List<T> listByKeys(Class<? extends BaseRelationalDatabaseDomain> target,String[] ids){
 		try {
 			if (ids == null || ids.length == 0) {
 				return new ArrayList<>();
@@ -298,7 +295,7 @@ public class DaoUtil {
 			map.put(DomainUtil.getDomainIDName(target)+"_not_join", serializables);
 			return (List<T>) listAllObj(target, map, null, null);
 		} catch (Exception e) {
-			e.printStackTrace();
+			setException(e);
 			return null;
 		}finally{
 			closeSession();
@@ -312,7 +309,7 @@ public class DaoUtil {
 	 * @param list
 	 * @return 是否update成功(若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
 	 */
-	public static boolean updateList(List<? extends BaseRelationalDatabaseDomain> list){
+	public final static boolean updateList(List<? extends BaseRelationalDatabaseDomain> list){
 		Session session = null;
 		try {
 			session = getSession();
@@ -322,7 +319,6 @@ public class DaoUtil {
 			}
 			return managTransaction(true);
 		} catch (Exception e) {
-			e.printStackTrace();
 			setException(e);
 			return managTransaction(false);
 		}finally{
@@ -339,7 +335,7 @@ public class DaoUtil {
 	 * 
 	 * @return update失败的对象数
 	 */
-	public static int updateListNotNullFieldOneByOne(List<? extends BaseRelationalDatabaseDomain> list,List<String> updateEvenNull){
+	public final static int updateListNotNullFieldOneByOne(List<? extends BaseRelationalDatabaseDomain> list,List<String> updateEvenNull){
 		int failed = 0;
 		for (Object o:list) {
 			if (!updateNotNullField((BaseRelationalDatabaseDomain) o, updateEvenNull)) {
@@ -349,7 +345,7 @@ public class DaoUtil {
 		return failed;
 	}
 	
-	public static void evict(Object obj){
+	public final static void evict(Object obj){
 		getSession().evict(obj);
 		closeSession();
 	}
@@ -358,7 +354,7 @@ public class DaoUtil {
 	 * @param obj
 	 * @return
 	 */
-	public static boolean saveOrUpdate(BaseRelationalDatabaseDomain obj){
+	public final static boolean saveOrUpdate(BaseRelationalDatabaseDomain obj){
 		Session session = null;
 		try {
 			session = getSession();
@@ -376,7 +372,6 @@ public class DaoUtil {
 			}
 			return managTransaction(true);
 		} catch (Exception e) {
-			e.printStackTrace();
 			setException(e);
 			return managTransaction(false);
 		}finally{
@@ -384,15 +379,15 @@ public class DaoUtil {
 		}
 	}
 	
-	public static int executeUpdateBySql(String hql,Map<String,? extends Object> map){
+	public final static int executeUpdateBySql(String hql,Map<String,? extends Object> map){
 		return executeUpdate(hql, map, 1);
 	}
 	
-	public static int executeUpdate(String hql,Map<String,? extends Object> map){
+	public final static int executeUpdate(String hql,Map<String,? extends Object> map){
 		return executeUpdate(hql, map, 0);
 	}
 	
-	public static Object getUniqueResult(String hql,String domainSimpleName,
+	public final static Object getUniqueResult(String hql,String domainSimpleName,
 			Map<String,Object> map){
 		try {
 			StringBuffer sb = new StringBuffer(hql);
@@ -405,7 +400,6 @@ public class DaoUtil {
 			}
 			return createQuery.uniqueResult();
 		} catch (Exception e) {
-			e.printStackTrace();
 			setException(e);
 			return null;
 		}finally{
@@ -420,7 +414,7 @@ public class DaoUtil {
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
-	public static List getQueryResult(String hql,String domainSimpleName,
+	public final static List getQueryResult(String hql,String domainSimpleName,
 			Map<String,Object> map){
 		try {
 			StringBuffer sb = new StringBuffer(hql);
@@ -436,14 +430,13 @@ public class DaoUtil {
 			//return createQuery.list();
 		} catch (Exception e) {
 			setException(e);
-			e.printStackTrace();
 			return null;
 		}finally{
 			closeSession();
 		}
 	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static Page getQueryResult(String hql,String domainSimpleName,
+	public final static Page getQueryResult(String hql,String domainSimpleName,
 			Map<String,Object> map,int pageSize,int currentPage){
 		try {
 			StringBuffer sb = new StringBuffer(hql);
@@ -462,7 +455,6 @@ public class DaoUtil {
 			return setPage(currentPage, recordCount, pageSize, createQuery.list());
 			//return createQuery.list();
 		} catch (Exception e) {
-			e.printStackTrace();
 			setException(e);
 			return null;
 		}finally{
@@ -471,7 +463,7 @@ public class DaoUtil {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static List getQueryResultBysql(String sql,Map<String,? extends Object> param){
+	public final static List getQueryResultBysql(String sql,Map<String,? extends Object> param){
 		try {
 			Query createQuery = getSession().createSQLQuery(sql);
 			if (param != null) {
@@ -479,7 +471,6 @@ public class DaoUtil {
 			}
 			return createQuery.list();
 		} catch (Exception e) {
-			e.printStackTrace();
 			setException(e);
 			return null;
 		}finally{
@@ -487,7 +478,7 @@ public class DaoUtil {
 		}
 	}
 	@SuppressWarnings("rawtypes")
-	public static List getQueryResult(String hql,Map<String,? extends Object> map,int pageSize,int currentPage){
+	public final static List getQueryResult(String hql,Map<String,? extends Object> map,int pageSize,int currentPage){
 		try {
 			Query createQuery = getSession().createQuery(hql);
 			if (map != null) {
@@ -496,7 +487,6 @@ public class DaoUtil {
 			faging(pageSize, currentPage, createQuery);
 			return createQuery.list();
 		} catch (Exception e) {
-			e.printStackTrace();
 			setException(e);
 			return null;
 		}finally{
@@ -504,7 +494,7 @@ public class DaoUtil {
 		}
 	}
 	@SuppressWarnings("rawtypes")
-	public static List getQueryResult(String hql,Map<String,? extends Object> map){
+	public final static List getQueryResult(String hql,Map<String,? extends Object> map){
 		try {
 			Query createQuery = getSession().createQuery(hql);
 			if (map != null) {
@@ -513,7 +503,6 @@ public class DaoUtil {
 			return createQuery.list();
 		} catch (Exception e) {
 			setException(e);
-			e.printStackTrace();
 			return null;
 		}finally{
 			closeSession();
@@ -538,7 +527,6 @@ public class DaoUtil {
 			managTransaction(true);
 			return executeUpdate;
 		} catch (Exception e) {
-			e.printStackTrace();
 			setException(e);
 			managTransaction(false);
 			return -1;
@@ -553,7 +541,7 @@ public class DaoUtil {
 	 * @param updated 存放更新的 字段---值
 	 * @return 更新的记录数，失败返回-1
 	 */
-	public static int updateByQuery(BaseDomain queryCondition,Map<String, Object> updated){
+	public final static int updateByQuery(BaseDomain queryCondition,Map<String, Object> updated){
 		return updateByQuery(queryCondition.getClass(), putField2Map(queryCondition), updated);
 	}
 	
@@ -563,7 +551,7 @@ public class DaoUtil {
 	 * @param updated 存放更新的字段-值
 	 * @return 更新的记录数，失败返回-1
 	 */
-	public static int updateByQuery(Class<?> clazz,Map<String, Object> queryCondition,Map<String, Object> updated){
+	public final static int updateByQuery(Class<?> clazz,Map<String, Object> queryCondition,Map<String, Object> updated){
 		try {
 			beginTransaction();
 			
@@ -580,7 +568,6 @@ public class DaoUtil {
 				return -1;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			setException(e);
 			managTransaction(false);
 			return -1;
@@ -595,7 +582,7 @@ public class DaoUtil {
 	 * @param obj 查询条件
 	 * @return 删除的记录数（失败返回-1）
 	 */
-	public static int deleteByQuery(BaseRelationalDatabaseDomain obj){
+	public final static int deleteByQuery(BaseRelationalDatabaseDomain obj){
 		Map<String, Object> queryCondition = new HashMap<String, Object>();
 		putField2Map(obj, queryCondition, "");
 		return deleteByQuery(obj.getClass(), queryCondition);
@@ -608,7 +595,7 @@ public class DaoUtil {
 	 * 
 	 * @return 删除的记录数（失败返回-1）
 	 */
-	public static int deleteByQuery(Class<? extends BaseRelationalDatabaseDomain> clazz,Map<String, Object> where){
+	public final static int deleteByQuery(Class<? extends BaseRelationalDatabaseDomain> clazz,Map<String, Object> where){
 		try {
 			beginTransaction();
 			Query query = createQuery(where, getDeleteHql(clazz, where));
@@ -619,7 +606,6 @@ public class DaoUtil {
 				return -1;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			managTransaction(false);
 			setException(e);
 			return -1;
@@ -637,7 +623,7 @@ public class DaoUtil {
 	 * @return 是否删除成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
 	 */
 	@Deprecated
-	public static boolean cascadeDelete(BaseRelationalDatabaseDomain domain,List<Class<?>> domainSkip){
+	public final static boolean cascadeDelete(BaseRelationalDatabaseDomain domain,List<Class<?>> domainSkip){
 		beginTransaction();
 		if (domainSkip == null) {
 			domainSkip = new ArrayList<Class<?>>();
@@ -656,7 +642,7 @@ public class DaoUtil {
 	 * 
 	 * @return 是否删除成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
 	 */
-	public static boolean delete(Class<? extends BaseRelationalDatabaseDomain> clazz,Serializable id){
+	public final static boolean delete(Class<? extends BaseRelationalDatabaseDomain> clazz,Serializable id){
 		BaseRelationalDatabaseDomain newInstance;
 		try {
 			newInstance = clazz.newInstance();
@@ -676,7 +662,7 @@ public class DaoUtil {
 	 * 
 	 * @see #smartDeleteByIds(Class, String...)
 	 */
-	public static int deleteByIds(Class<? extends BaseRelationalDatabaseDomain> clazz,Serializable... ids){
+	public final static int deleteByIds(Class<? extends BaseRelationalDatabaseDomain> clazz,Serializable... ids){
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put(DomainUtil.getDomainIDName(clazz)+"_not_join", ids);
 		return deleteByQuery(clazz, map);
@@ -687,7 +673,7 @@ public class DaoUtil {
 	 * @param ids 实体类id,实体类id为Long类型,这里会自动把String转换为Long
 	 * @return 删除的记录数（失败返回-1）
 	 */
-	public static int smartDeleteByIds(Class<? extends BaseRelationalDatabaseDomain> clazz,String... ids){
+	public final static int smartDeleteByIds(Class<? extends BaseRelationalDatabaseDomain> clazz,String... ids){
 		Class<? extends Serializable> idClass = DomainUtil.getDomainIDClass(clazz);
 		Serializable[] serializables;
 		if (idClass == String.class) {
@@ -705,7 +691,7 @@ public class DaoUtil {
 	 * @param domain 要删除的实体类,调用该方法之前必须保证domain的id不为null
 	 * @return 是否删除成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
 	 */
-	public static boolean delete(BaseRelationalDatabaseDomain domain){
+	public final static boolean delete(BaseRelationalDatabaseDomain domain){
 		Session session = null;
 		try {
 			session = getSession();
@@ -810,7 +796,7 @@ public class DaoUtil {
 	 * 
 	 * @see #faging(int, int, Query)
 	 */
-	public static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,List<String> desc,List<String> asc,boolean queryRecordCount){
+	public final static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,List<String> desc,List<String> asc,boolean queryRecordCount){
 		try {
 			StringBuffer hql = getSelectHql(t, null, desc, asc);
 			Long recordCount = Long.MAX_VALUE;
@@ -846,7 +832,7 @@ public class DaoUtil {
 	 * @see #listObj(Class, int, int, List, List, boolean)
 	 * @see #faging(int, int, Query)
 	 */
-	public static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,List<String> desc,List<String> asc){
+	public final static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,List<String> desc,List<String> asc){
 		return listObj(t, pageSize, currentPage, desc, asc, true);
 	}
 	
@@ -860,7 +846,7 @@ public class DaoUtil {
 	 * @see Page
 	 * @see #listObj(Class, int, int, List, List, boolean)
 	 */
-	public static <T extends BaseRelationalDatabaseDomain> List<T> listAllObj(Class<T> t,List<String> desc,List<String> asc){
+	public final static <T extends BaseRelationalDatabaseDomain> List<T> listAllObj(Class<T> t,List<String> desc,List<String> asc){
 		return listAllObj(t, null, desc, asc);
 	}
 	
@@ -871,7 +857,7 @@ public class DaoUtil {
 	 * 
 	 * @see #listObj(Class, int, int, List, List, boolean)
 	 */
-	public static <T extends BaseRelationalDatabaseDomain> List<T> listAllObj(Class<T> t){
+	public final static <T extends BaseRelationalDatabaseDomain> List<T> listAllObj(Class<T> t){
 		return listAllObj(t, null, null, null);
 	}
 	
@@ -881,7 +867,7 @@ public class DaoUtil {
 	 * @param where 查询条件
 	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
 	 */
-	public static <T> T listOne(T where){
+	public final static <T> T listOne(T where){
 		return listOne(where,null,null);
 	}
 	
@@ -895,7 +881,7 @@ public class DaoUtil {
 	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T listOne(Class<T> target,Map<String, Object> where,List<String> desc,List<String> asc){
+	public final static <T> T listOne(Class<T> target,Map<String, Object> where,List<String> desc,List<String> asc){
 		try {
 			StringBuffer hql = getSelectHql(target, where, desc, asc);
 			
@@ -919,7 +905,7 @@ public class DaoUtil {
 	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T listOne(T where,List<String> desc,List<String> asc){
+	public final static <T> T listOne(T where,List<String> desc,List<String> asc){
 		return (T) listOne(where.getClass(), putField2Map(where), desc, asc);
 	}
 	
@@ -929,7 +915,7 @@ public class DaoUtil {
 	 * 调用该方法会把target关联的所有BaseRelationalDatabaseDomain查出来,无需手工查询
 	 * @param target 要填充关联实体类的实体类对象
 	 */
-	public static void getRefrenceById(BaseDomain target){
+	public final static void getRefrenceById(BaseDomain target){
 		for (Field f:target.getClass().getDeclaredFields()) {
 			f.setAccessible(true);
 			Object temp;
@@ -955,7 +941,7 @@ public class DaoUtil {
 	 * 
 	 * @return 符合查询条件的所有记录
 	 */
-	public static <T> List<T> listAllObj(T where,List<String> desc,List<String> asc){
+	public final static <T> List<T> listAllObj(T where,List<String> desc,List<String> asc){
 		@SuppressWarnings("unchecked")
 		Class<T> clazz = (Class<T>) where.getClass();
 		Map<String, Object> map = new HashMap<String, Object>();
@@ -971,7 +957,7 @@ public class DaoUtil {
 	 * @param where 查询条件
 	 * @return 符合查询条件的所有记录
 	 */
-	public static <T> List<T> listAllObj(T where){
+	public final static <T> List<T> listAllObj(T where){
 		return listAllObj(where,null,null);
 	}
 	
@@ -988,7 +974,7 @@ public class DaoUtil {
 	 * @return 符合查询条件的所有记录
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> listAllObj(Class<T> target,Map<String, Object> where,List<String> desc,List<String> asc){
+	public final static <T> List<T> listAllObj(Class<T> target,Map<String, Object> where,List<String> desc,List<String> asc){
 		return (List<T>) listAllCustomField(target, where, desc, asc);
 	}
 	
@@ -997,7 +983,7 @@ public class DaoUtil {
 	 * @param where 查询条件
 	 * @return 结果是否存在
 	 */
-	public static boolean isResultNull(BaseRelationalDatabaseDomain where){
+	public final static boolean isResultNull(BaseRelationalDatabaseDomain where){
 		return isResultNull(where.getClass(), DaoUtil.putField2Map(where));
 	}
 	
@@ -1007,7 +993,7 @@ public class DaoUtil {
 	 * @param where 查询条件
 	 * @return 结果是否存在
 	 */
-	public static boolean isResultNull(Class<?> target,Map<String, Object> where){
+	public final static boolean isResultNull(Class<?> target,Map<String, Object> where){
 		try {
 			Query query = getSession().createQuery(getCountHql(getSelectHql(target, where, null, null)).toString());
 			setMapParam(where, query);
@@ -1026,7 +1012,7 @@ public class DaoUtil {
 	 * @param where 查询条件
 	 * @return 记录数
 	 */
-	public static long getCount(BaseRelationalDatabaseDomain where){
+	public final static long getCount(BaseRelationalDatabaseDomain where){
 		Class<? extends BaseRelationalDatabaseDomain> t = where.getClass();
 		Map<String, Object> map = new HashMap<String, Object>();
 		putField2Map(where, map, "");
@@ -1043,7 +1029,7 @@ public class DaoUtil {
 	 * 		当selectedFields长度只有1时,返回List&lt;selectedField&gt;<br>
 	 * 		当selectedFields长度&gt;1时,返回List&lt;Map&lt;selectedField,value&gt;&gt;<br>
 	 */
-	public static <T> List<T> listAllCustomField(BaseDomain where,String... selectedFields){
+	public final static <T> List<T> listAllCustomField(BaseDomain where,String... selectedFields){
 		return listAllCustomField(DaoUtil.putField2Map(where), where.getClass(), selectedFields);
 	}
 	/**
@@ -1059,7 +1045,7 @@ public class DaoUtil {
 	 * 		当selectedFields长度只有1时,返回List&lt;selectedField&gt;<br>
 	 * 		当selectedFields长度&gt;1时,返回List&lt;Map&lt;selectedField,value&gt;&gt;<br>
 	 */
-	public static <T> List<T> listAllCustomField(Map<String, Object> where,Class<?> target,String... selectedFields){
+	public final static <T> List<T> listAllCustomField(Map<String, Object> where,Class<?> target,String... selectedFields){
 		return listAllCustomField(target, where, null, null, selectedFields);
 	}
 	/**
@@ -1077,7 +1063,7 @@ public class DaoUtil {
 	 * 		当selectedFields长度只有1时,返回List&lt;selectedField&gt;<br>
 	 * 		当selectedFields长度&gt;1时,返回List&lt;Map&lt;selectedField,value&gt;&gt;<br>
 	 */
-	public static <T> List<T> listAllCustomField(Class<?> target,Map<String, Object> where,List<String> desc,List<String> asc,String... selectedFields){
+	public final static <T> List<T> listAllCustomField(Class<?> target,Map<String, Object> where,List<String> desc,List<String> asc,String... selectedFields){
 		return listAllCustomField(target, where, desc, asc, null, selectedFields);
 	}
 	/**
@@ -1097,7 +1083,7 @@ public class DaoUtil {
 	 * 		当selectedFields长度&gt;1时,返回List&lt;Map&lt;selectedField,value&gt;&gt;<br>
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> listAllCustomField(Class<?> target,Map<String, Object> where,List<String> desc,List<String> asc,String[] groupBy,String... selectedFields){
+	public final static <T> List<T> listAllCustomField(Class<?> target,Map<String, Object> where,List<String> desc,List<String> asc,String[] groupBy,String... selectedFields){
 		try {
 			Query query = getSession().createQuery(getSelectHql(target, where, desc, asc,groupBy,selectedFields).toString());
 			setMapParam(where, query);
@@ -1116,7 +1102,7 @@ public class DaoUtil {
 	 * @param where 查询条件
 	 * @return 符合查询条件的记录数
 	 */
-	public static long getCount(Class<? extends BaseRelationalDatabaseDomain> target,Map<String, Object> where){
+	public final static long getCount(Class<? extends BaseRelationalDatabaseDomain> target,Map<String, Object> where){
 		try {
 			Query query = getSession().createQuery(getCountHql(getSelectHql(target, where, null, null)).toString());
 			setMapParam(where, query);
@@ -1144,7 +1130,7 @@ public class DaoUtil {
 	 * @see #faging(int, int, Query)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> Page<T> listObj(int pageSize,int currentPage,T where,List<String> desc,List<String> asc){
+	public final static <T> Page<T> listObj(int pageSize,int currentPage,T where,List<String> desc,List<String> asc){
 		Class<T> t = (Class<T>) where.getClass();
 		Map<String, Object> map = new HashMap<String, Object>();
 		putField2Map(where, map, "");
@@ -1160,7 +1146,7 @@ public class DaoUtil {
 	 * @return 符合查询条件的记录
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> randomlistObj(int size,T where){
+	public final static <T> List<T> randomlistObj(int size,T where){
 		Class<T> t = (Class<T>) where.getClass();
 		Map<String, Object> map = new HashMap<String, Object>();
 		putField2Map(where, map, "");
@@ -1179,7 +1165,7 @@ public class DaoUtil {
 	 * @return 查询到的记录
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> List<T> randomlistObj(Class<T> target,int size,Map<String, Object> where){
+	public final static <T> List<T> randomlistObj(Class<T> target,int size,Map<String, Object> where){
 		try {
 			List<String> randList = new ArrayList<String>(1);
 			randList.add("RAND()");
@@ -1189,7 +1175,7 @@ public class DaoUtil {
 			faging(size,1, query);
 			return query.list();
 		} catch (Exception e) {
-			e.printStackTrace();
+			setException(e);
 			return null;
 		}finally{
 			closeSession();
@@ -1212,10 +1198,10 @@ public class DaoUtil {
 	 * 
 	 * @return 当前页的记录
 	 */
-	public static <T> Page<T> listObj(Class<T> target,int pageSize,int currentPage,Map<String, Object> where,List<String> desc,List<String> asc,boolean queryRecordCount){
+	public final static <T> Page<T> listObj(Class<T> target,int pageSize,int currentPage,Map<String, Object> where,List<String> desc,List<String> asc,boolean queryRecordCount){
 		return listCustomField(target, pageSize, currentPage, where, desc, asc, queryRecordCount);
 	}
-	public static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,Map<String, Object> map,List<String> desc,List<String> asc){
+	public final static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,Map<String, Object> map,List<String> desc,List<String> asc){
 		return listObj(t, pageSize, currentPage, map, desc, asc, true);
 	}
 	
@@ -1239,7 +1225,7 @@ public class DaoUtil {
 	 * 		当selectedFields长度只有1时,page里面的数据为List&lt;selectedField&gt;<br>
 	 * 		当selectedFields长度&gt;1时,page里面的数据为List&lt;Map&lt;selectedField,value&gt;&gt;<br>
 	 */
-	public static <T> Page<T> listCustomField(Class<?> target,int pageSize,int currentPage,Map<String, Object> where,
+	public final static <T> Page<T> listCustomField(Class<?> target,int pageSize,int currentPage,Map<String, Object> where,
 			List<String> desc,List<String> asc,boolean queryRecordCount,String... selectField){
 		return listCustomField(target, pageSize, currentPage, where, desc, asc, queryRecordCount, null, selectField);
 	}
@@ -1260,7 +1246,7 @@ public class DaoUtil {
 	 * 			(这个是可变参数,没有请不传,切忌传null!)
 	 * @return
 	 */
-	public static <T> Page<T> listCustomField(Class<?> t,int pageSize,int currentPage,Map<String, Object> constraint,
+	public final static <T> Page<T> listCustomField(Class<?> t,int pageSize,int currentPage,Map<String, Object> constraint,
 			List<String> desc,List<String> asc,boolean queryRecordCount,String[] groupBy,String... selectField){
 		try {
 			StringBuffer hql = getSelectHql(t, constraint, desc, asc, groupBy, selectField);
@@ -1277,7 +1263,7 @@ public class DaoUtil {
 			
 			return setPage(currentPage, recordCount, pageSize, list);
 		} catch (Exception e) {
-			e.printStackTrace();
+			setException(e);
 			return null;
 		}finally{
 			closeSession();
@@ -1296,7 +1282,7 @@ public class DaoUtil {
 	 * @see DaoUtil#get(Class, Serializable)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends BaseRelationalDatabaseDomain> T smartLoad(T domain){
+	public final static <T extends BaseRelationalDatabaseDomain> T smartLoad(T domain){
 		return (T) load(domain.getClass(), DomainUtil.getDomainId(domain));
 	}
 	
@@ -1310,7 +1296,7 @@ public class DaoUtil {
 	 * @return 查询到的记录(记录不存在则返回null)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends BaseRelationalDatabaseDomain> T smartGet(T domain){
+	public final static <T extends BaseRelationalDatabaseDomain> T smartGet(T domain){
 		return (T) get(domain.getClass(), DomainUtil.getDomainId(domain));
 	}
 	
@@ -1324,7 +1310,7 @@ public class DaoUtil {
 	 * 
 	 * @return 查询到的记录(记录不存在则返回null)
 	 */
-	public static <T extends BaseRelationalDatabaseDomain> T get(Class<T> clazz,Serializable id){
+	public final static <T extends BaseRelationalDatabaseDomain> T get(Class<T> clazz,Serializable id){
 		try {
 			T t2 = (T) getSession().get(clazz, id);
 			return t2;
@@ -1336,7 +1322,7 @@ public class DaoUtil {
 		}
 	}
 	
-	public static <T extends BaseRelationalDatabaseDomain> List<T> getList(Class<T> t,Serializable[] keys){
+	public final static <T extends BaseRelationalDatabaseDomain> List<T> getList(Class<T> t,Serializable[] keys){
 		try {
 			List<T> list = new ArrayList<T>();
 			for (Serializable s:keys) {
@@ -1362,7 +1348,7 @@ public class DaoUtil {
 	 * 
 	 * @return 查询到的实体类的代理对象(记录不存则返回null)
 	 */
-	public static <T extends BaseRelationalDatabaseDomain> T load(Class<T> clazz,Serializable id){
+	public final static <T extends BaseRelationalDatabaseDomain> T load(Class<T> clazz,Serializable id){
 		try {
 			Session session = getSession();
 			return session.load(clazz, id);
@@ -1408,7 +1394,7 @@ public class DaoUtil {
 	/**
 	 * 开启事务
 	 */
-	public static void beginTransaction(){
+	public final static void beginTransaction(){
 		if (currentTransaction.get() == null) {
 			steed.util.logging.LoggerFactory.getLogger().debug("开启事务.....");
 //			transactionType.set(true);
@@ -1427,7 +1413,7 @@ public class DaoUtil {
 	 * @see #commitTransaction
 	 * @return 事务是成功提交还是回滚
 	 */
-	public static boolean managTransaction(){
+	public final static boolean managTransaction(){
 		Boolean boolean1 = transactionType.get();
 		try {
 			if (boolean1 == null) {
@@ -1459,7 +1445,7 @@ public class DaoUtil {
 	/**
 	 * 释放资源
 	 */
-	public static void relese(){
+	public final static void relese(){
 		transactionType.remove();
 		autoManagTransaction.remove();
 		currentTransaction.remove();
@@ -1470,7 +1456,7 @@ public class DaoUtil {
 	 * 提交事务,不推荐直接调用该方法提交事务,推荐用下面这个方法让系统判断是提交事务还是回滚事务.
 	 * @see #managTransaction
 	 */
-	public static void commitTransaction(){
+	public final static void commitTransaction(){
 		Transaction transaction = getTransaction();
 		if (transaction != null) {
 			transaction.commit();
@@ -1483,7 +1469,7 @@ public class DaoUtil {
 	 * 回滚事务
 	 * @see #managTransaction()
 	 */
-	public static void rollbackTransaction(){
+	public final static void rollbackTransaction(){
 		Transaction transaction = getTransaction();
 		if (transaction != null) {
 			transaction.rollback();
@@ -1499,7 +1485,7 @@ public class DaoUtil {
 	 * 
 	 * @return 是否保存成功 (即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
 	 */
-	public static boolean save(BaseRelationalDatabaseDomain domain){
+	public final static boolean save(BaseRelationalDatabaseDomain domain){
 		try {
 			Session session = getSession();
 			beginTransaction();
@@ -1520,7 +1506,7 @@ public class DaoUtil {
 	 * 
 	 * @return 是否更新成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
 	 */
-	public static boolean updateNotNullField(BaseRelationalDatabaseDomain domain,List<String> updateEvenNull){
+	public final static boolean updateNotNullField(BaseRelationalDatabaseDomain domain,List<String> updateEvenNull){
 		return updateNotNullField(domain, updateEvenNull, false);
 	}
 	/**
@@ -1536,13 +1522,13 @@ public class DaoUtil {
 	 * @see BaseUtil#isObjEmpty
 	 * @see DomainUtil#fillDomain
 	 */
-	public static boolean updateNotNullField(BaseRelationalDatabaseDomain domain,List<String> updateEvenNull,boolean strictlyMode){
+	public final static boolean updateNotNullField(BaseRelationalDatabaseDomain domain,List<String> updateEvenNull,boolean strictlyMode){
 		BaseRelationalDatabaseDomain smartGet = smartGet(domain);
 		DomainUtil.fillDomain(smartGet, domain,updateEvenNull,strictlyMode);
 		return smartGet.update();
 	}
 	
-	/*public static boolean updateNotNullFieldByHql(BaseRelationalDatabaseDomain obj,List<String> updateEvenNull,boolean strictlyMode){
+	/*public final static boolean updateNotNullFieldByHql(BaseRelationalDatabaseDomain obj,List<String> updateEvenNull,boolean strictlyMode){
 		BaseRelationalDatabaseDomain smartGet = smartGet(obj);
 		DomainUtil.fillDomain(smartGet, obj,updateEvenNull,strictlyMode);
 		return smartGet.update();
@@ -1557,7 +1543,7 @@ public class DaoUtil {
 	 * 
 	 * @see #updateNotNullField(BaseRelationalDatabaseDomain, List, boolean)
 	 */
-	public static boolean update(BaseRelationalDatabaseDomain domain){
+	public final static boolean update(BaseRelationalDatabaseDomain domain){
 		try {
 			Session session = getSession();
 			beginTransaction();
@@ -1580,7 +1566,7 @@ public class DaoUtil {
 	 * 
 	 * @return update失败的对象数
 	 */
-	public static int updateListOneByOne(List<? extends BaseRelationalDatabaseDomain> list){
+	public final static int updateListOneByOne(List<? extends BaseRelationalDatabaseDomain> list){
 		int failed = 0;
 		for (BaseRelationalDatabaseDomain o:list) {
 			if (!update(o)) {
@@ -1604,7 +1590,7 @@ public class DaoUtil {
 	 * @param updated 要更新的'字段-&gt;值'
 	 * @return 拼好的hql
 	 */
-	public static <T> StringBuffer getUpdateHql(Class<T> t,
+	public final static <T> StringBuffer getUpdateHql(Class<T> t,
 			Map<String, Object> queryCondition,Map<String, Object> updated) {
 		String fullClassName = t.getName();
 		StringBuffer hql = new StringBuffer();
@@ -1631,7 +1617,7 @@ public class DaoUtil {
 	 * @param map 查询数据
 	 * @return 拼好的hql
 	 */
-	public static StringBuffer getDeleteHql(Class<? extends BaseRelationalDatabaseDomain> t,Map<String, Object> map) {
+	public final static StringBuffer getDeleteHql(Class<? extends BaseRelationalDatabaseDomain> t,Map<String, Object> map) {
 		return getHql(t, map, null, null,"delete");
 	}
 	
@@ -1644,7 +1630,7 @@ public class DaoUtil {
 	 * @param asc 升序排列字段
 	 * @return 拼好的hql
 	 */
-	public static <T> StringBuffer getSelectHql(Class<T> t,Map<String, Object> map,List<String> desc,List<String> asc,String... selectedFields) {
+	public final static <T> StringBuffer getSelectHql(Class<T> t,Map<String, Object> map,List<String> desc,List<String> asc,String... selectedFields) {
 		return getHql(t, map, desc, asc,"select",null,selectedFields);
 	}
 	
@@ -1657,7 +1643,7 @@ public class DaoUtil {
 	 * @param asc 升序排列字段
 	 * @return 拼好的hql
 	 */
-	public static <T> StringBuffer getSelectHql(Class<T> t,Map<String, Object> map,List<String> desc,List<String> asc,String[] groupBy,String... selectedFields) {
+	public final static <T> StringBuffer getSelectHql(Class<T> t,Map<String, Object> map,List<String> desc,List<String> asc,String[] groupBy,String... selectedFields) {
 		return getHql(t, map, desc, asc,"select",groupBy, selectedFields);
 	}
 	/**
@@ -1671,7 +1657,7 @@ public class DaoUtil {
 	 * @param prefix hql前面部分目前只支持"select"或"delete"
 	 * @return 拼好的hql
 	 */
-	public static <T> StringBuffer getHql(Class<T> t, Map<String, Object> queryMap,List<String> desc,
+	public final static <T> StringBuffer getHql(Class<T> t, Map<String, Object> queryMap,List<String> desc,
 			List<String> asc,String prefix,String... selectedFields) {
 		return getHql(t, queryMap, desc, asc, prefix, null,selectedFields);
 	}
@@ -1687,7 +1673,7 @@ public class DaoUtil {
 	 * @param groupBy hql group by 的字段
 	 * @return 拼好的hql
 	 */
-	public static <T> StringBuffer getHql(Class<T> t, Map<String, Object> queryMap,List<String> desc,
+	public final static <T> StringBuffer getHql(Class<T> t, Map<String, Object> queryMap,List<String> desc,
 			List<String> asc,String prefix,String[] groupBy,String... selectedFields) {
 		String fullClassName = t.getName();
 		StringBuffer hql = new StringBuffer();
@@ -1869,7 +1855,7 @@ public class DaoUtil {
 	 * @param asc 需要升序排列的字段
 	 * @return 生成的hql
 	 */
-	public static StringBuffer getSelectHql(BaseRelationalDatabaseDomain domain,List<String> desc,List<String> asc) {
+	public final static StringBuffer getSelectHql(BaseRelationalDatabaseDomain domain,List<String> desc,List<String> asc) {
 		Class<?> clazz = domain.getClass();
 		Map<String, Object> map = new HashMap<String, Object>();
 		putField2Map(domain, map, "");
@@ -1881,7 +1867,7 @@ public class DaoUtil {
 	 * @param hql
 	 * @return
 	 */
-	public static StringBuffer getCountHql(StringBuffer hql) {
+	public final static StringBuffer getCountHql(StringBuffer hql) {
 		return changeSelectHql(hql, "count(*)");
 	}
 	/**
@@ -1889,7 +1875,7 @@ public class DaoUtil {
 	 * @param hql
 	 * @return
 	 */
-	public static StringBuffer changeSelectHql(StringBuffer hql,String selectedField) {
+	public final static StringBuffer changeSelectHql(StringBuffer hql,String selectedField) {
 		//select people_steed_00 inner join people_steed_00.roleSet people_steed_00roleSet from steed.domain.people.People people_steed_00 where 1=1 
 		//and people_steed_00roleSet in (:roleSet) and people_steed_00roleSet not in (:roleSet_not_in_1)
 		StringBuffer countHql = new StringBuffer(hql);
@@ -1913,7 +1899,7 @@ public class DaoUtil {
 	 * @see #beginTransaction
 	 * @return
 	 */
-	public static Query createQuery(Map<String, Object> map,StringBuffer hql) {
+	public final static Query createQuery(Map<String, Object> map,StringBuffer hql) {
 		steed.util.logging.LoggerFactory.getLogger().debug("hql---->"+hql.toString());
 		steed.util.logging.LoggerFactory.getLogger().debug("参数---->"+map);
 		Query query = getSession().createQuery(hql.toString());
@@ -1926,7 +1912,7 @@ public class DaoUtil {
 	 * @param sql
 	 * @return
 	 */
-	public static Query createSQLQuery(Map<String, Object> map,StringBuffer sql) {
+	public final static Query createSQLQuery(Map<String, Object> map,StringBuffer sql) {
 		steed.util.logging.LoggerFactory.getLogger().debug("sql---->"+sql.toString());
 		steed.util.logging.LoggerFactory.getLogger().debug("参数---->"+map);
 		Query query = getSession().createSQLQuery(sql.toString());
@@ -1934,7 +1920,7 @@ public class DaoUtil {
 		return query;
 	}
 	
-	public static Session getSession(){
+	public final static Session getSession(){
 		Session session = HibernateUtil.getSession();
 		if (Config.autoBeginTransaction) {
 			beginTransaction();
@@ -1950,7 +1936,7 @@ public class DaoUtil {
 	 * @param domainSimpleName
 	 * @return
 	 */
-	public static StringBuffer appendHqlOrder(StringBuffer hql,List<String> desc,List<String> asc,String domainSimpleName){
+	public final static StringBuffer appendHqlOrder(StringBuffer hql,List<String> desc,List<String> asc,String domainSimpleName){
 		boolean hasOrderByAppened = false;
 		if (desc != null && !desc.isEmpty()) {
 			for (String name:desc) {
@@ -1990,7 +1976,7 @@ public class DaoUtil {
 	/**
 	 * 无论是否配置了框架管理session,马上关闭session
 	 */
-	public static void closeSessionNow(){
+	public final static void closeSessionNow(){
 		managTransaction();
 		HibernateUtil.closeSession();
 	}
@@ -2009,34 +1995,13 @@ public class DaoUtil {
 		String domainSimpleName = StringUtil.firstChar2LowerCase(StringUtil.getClassSimpleName(fullClassName)+"_steed_00");
 		return domainSimpleName;
 	}
-	
-	/*@SuppressWarnings("unused")
-	private static StringBuffer appendHqlGroupBy(StringBuffer hql,List<String> groupBy,String domainSimpleName){
-		boolean hasOrderByAppened = false;
-		if (!CollectionsUtil.isCollectionsEmpty(groupBy)) {
-			for (String temp:groupBy) {
-				if (!hasOrderByAppened) {
-					hql.append("group by ");
-					hasOrderByAppened = true;
-				}else {
-					hql.append(", and ");
-				}
-				if (domainSimpleName != null) {
-					hql.append(domainSimpleName)
-						.append(".");
-				}
-				hql.append(temp)
-					.append(" ");
-			}
-		}
-		return hql;
-	}*/
+
 	/**
 	 *  把obj中非空字段放到map
 	 * @param obj
 	 * @return map
 	 */
-	public static Map<String, Object> putField2Map(Object obj) {
+	public final static Map<String, Object> putField2Map(Object obj) {
 		Map<String, Object> map = new HashMap<>();
 		putField2Map(obj, map, "");
 		return map;
@@ -2044,12 +2009,12 @@ public class DaoUtil {
 	/**
 	 * 把obj中非空字段放到map
 	 */
-	public static void putField2Map(Object obj,Map<String, Object> map,String prefixName) {
+	public final static void putField2Map(Object obj,Map<String, Object> map,String prefixName) {
 		putField2Map(obj, map, prefixName, true);
 	}
 	
 	/**
-	 * DaoUtil#putField2Map(Object, Map, String, boolean)的拦截器,
+	 * <code>{@link DaoUtil#putField2Map(Object) }</code>的拦截器,
 	 * 实体类可实现该接口,来实现数据权限控制等,例如:
 	 * 一个多公司系统,用户只能看自己公司的数据,那么,设计实体类的时候,就可以
 	 * 让所有要实现"用户只能看自己公司的数据"功能的实体类都继承BaseCompanyDomain,然后
@@ -2085,7 +2050,7 @@ public class DaoUtil {
 	 * 
 	 * @see DaoUtil.PutField2MapIntercepter
 	 */
-	public static void putField2Map(Object obj,Map<String, Object> map,String prefixName,boolean getFieldByGetter) {
+	public final static void putField2Map(Object obj,Map<String, Object> map,String prefixName,boolean getFieldByGetter) {
 		if (obj == null) {
 			return;
 		}
@@ -2151,7 +2116,7 @@ public class DaoUtil {
 	 * @param fieldName 字段名..
 	 * @return 如果不是索引字段返回0,是则返回索引后缀长度...方便subString那到真实字段名
 	 */
-	public static int isSelectIndex(String fieldName){
+	public final static int isSelectIndex(String fieldName){
 		for (String suffix:indexSuffix) {
 			if (fieldName.endsWith(suffix)) {
 				return suffix.length();
@@ -2166,7 +2131,7 @@ public class DaoUtil {
 	 * 		<code>{@link steed.hibernatemaster.util.DaoUtil#isSelectIndex}</code>
 	 * @return
 	 */
-	public static String getNoSelectIndexFieldName(String fieldName){
+	public final static String getNoSelectIndexFieldName(String fieldName){
 		int selectIndex = isSelectIndex(fieldName);
 		if (selectIndex == 0) {
 			return fieldName;
@@ -2186,7 +2151,7 @@ public class DaoUtil {
 	 * 
 	 * @see HqlGenerator
 	 */
-	public static StringBuffer appendHqlWhere(String domainSimpleName, StringBuffer hql,
+	public final static StringBuffer appendHqlWhere(String domainSimpleName, StringBuffer hql,
 			Map<String, Object> map) {
 		if (map == null) {
 			return hql;
@@ -2291,7 +2256,7 @@ public class DaoUtil {
 	 * @param currentPage 当前页面,从1开始
 	 * @param query
 	 */
-	public static void faging(int pageSize,int currentPage, Query query) {
+	public final static void faging(int pageSize,int currentPage, Query query) {
 		query.setFirstResult((currentPage-1)*pageSize);
 		query.setMaxResults(pageSize);
 	}
@@ -2301,7 +2266,7 @@ public class DaoUtil {
 	 * @author 战马
 	 *
 	 */
-	public static class ImmediatelyTransactionData{
+	public final static class ImmediatelyTransactionData{
 		Transaction currentTransaction;
 		Boolean autoManagTransaction;
 		Session session;
