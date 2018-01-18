@@ -20,11 +20,13 @@ public class BaseRelationalDatabaseDomainTest extends SteedTest{
 		School school = new School();
 		clazz.setSchool(school);
 		clazz.save();
+		
 		Assert.assertTrue(!DaoUtil.managTransaction());
 		DaoUtil.closeSessionNow();
 		
 		clazz = ReflectUtil.copyObj(clazz);
 		clazz.setTrimEmptyDomain(true);
+		
 		Assert.assertTrue(clazz.save());
 		Assert.assertTrue(DaoUtil.managTransaction());
 		Assert.assertTrue(DaoUtil.deleteByQuery(clazz) == 1);

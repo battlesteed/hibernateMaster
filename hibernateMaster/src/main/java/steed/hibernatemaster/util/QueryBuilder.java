@@ -6,7 +6,7 @@ import java.util.Map;
 import steed.hibernatemaster.domain.BaseDomain;
 
 public class QueryBuilder {
-	private Map<String,Object> queryMap = new HashMap<>();
+	private Map<String,Object> queryMap;
 	public QueryBuilder(){
 		queryMap = new HashMap<>();
 	}
@@ -54,6 +54,18 @@ public class QueryBuilder {
 	 * @return this
 	 */
 	public QueryBuilder addIn(String key,Object value){
+		queryMap.put(key+"_not_join", value);
+		return this;
+	}
+	
+	/**
+	 * 添加in查询条件 生成的hql将包含 "model.key in( :value )"这个条件
+	 * @param key 字段名
+	 * @param value 值
+	 * @return this
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> QueryBuilder addIn(String key,T... value){
 		queryMap.put(key+"_not_join", value);
 		return this;
 	}

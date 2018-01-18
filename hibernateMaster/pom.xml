@@ -4,7 +4,7 @@
 
 	<groupId>com.github.battlesteed</groupId>
 	<artifactId>hibernateMaster</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<description>hibernateMaster--让数据操作更简单</description>
 
 	<licenses>
@@ -59,7 +59,7 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>5.0.9.Final</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- If using JPA, add: -->
@@ -67,7 +67,7 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>5.0.9.Final</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 
 		<!-- 依赖jar包结束 -->
@@ -80,19 +80,20 @@
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
 			<version>2.6.2</version>
-			<scope>provided</scope>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.21</version>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
 			<version>2.6.2</version>
-			<scope>provided</scope>
+			<scope>runtime</scope>
 		</dependency>
 		<!-- 日志包结束 -->
 
@@ -101,6 +102,7 @@
 			<groupId>com.alibaba</groupId>
 			<artifactId>druid</artifactId>
 			<version>1.1.5</version>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!-- proxool连接池 -->
@@ -112,6 +114,7 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.22</version>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!-- ehcache -->
@@ -119,6 +122,7 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-ehcache</artifactId>
 			<version>5.0.9.Final</version>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!-- 可选jar包结束 -->

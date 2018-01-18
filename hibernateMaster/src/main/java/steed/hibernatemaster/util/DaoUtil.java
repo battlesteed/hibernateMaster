@@ -1691,13 +1691,17 @@ public class DaoUtil {
 					hql.append("new map( ");
 				}
 				for(String temp:selectedFields){
-					Matcher matcher = RegUtil.getPattern(".+\\((.+)\\)").matcher(temp);
+					Matcher matcher = RegUtil.getPattern(".+\\(\\s*(\\S+)\\s*(\\S*)\\s*\\)").matcher(temp);
+//					Matcher matcher = RegUtil.getPattern(".+\\([(.+)|(\\S+\\s+(\\S+)\\s.)]\\)").matcher(temp);
 					if (matcher.find()) {
 						//sum(weight),count(id)之类的
 						// 0    1
 						//temp = temp.replace(matcher.group(1), domainSimpleName+"."+matcher.group(1));
 						String selectedField = temp;
-						String group = matcher.group(1);
+						String group = matcher.group(2);
+						if (StringUtil.isStringEmpty(group)) {
+							group = matcher.group(1);
+						}
 						if (!StringUtil.isStringEmpty(group)
 								&&!StringUtil.isStringEmpty(group.trim())) {
 							//TODO 支持二级及以上实体类加减乘除操作
@@ -1707,20 +1711,16 @@ public class DaoUtil {
 									.replace("+", "+"+domainSimpleName+".")
 									.replace("-", "-"+domainSimpleName+".")
 									.replace("*", "*"+domainSimpleName+".");
-							selectedField = temp.replace("("+group+")", "("+domainSimpleName+"."+replace+")");
+							selectedField = temp.replace(group, domainSimpleName+"."+replace);
 						}
+						addSelectedDomain(t, domainSelected, group);
 						hql.append(selectedField)
 							.append(" as ").append(dealSpecialChar(group))
 							.append(",");
 					}else {
 						//TODO 和上面的sum,count等共用一个方法,sum()括号里面的东西跟这里的是一样的,要共用一个方法
 						//TODO 加减乘除操作
-						if (temp.contains(".")) {
-							String chain = getMaxDepthDomainChain(temp, t);
-							if (chain != null) {
-								domainSelected.add(chain);
-							}
-						}
+						addSelectedDomain(t, domainSelected, temp);
 						hql.append(domainSimpleName).append(".").
 							append(temp).append(" as ").append(dealSpecialChar(temp)).append(",");
 					}
@@ -1791,6 +1791,14 @@ public class DaoUtil {
 		steed.util.logging.LoggerFactory.getLogger().debug("参数------>%s",queryMap==null?null:queryMap.toString());
 		
 		return hql;
+	}
+	private static <T> void addSelectedDomain(Class<T> t, Set<String> domainSelected, String selectedField) {
+		if (selectedField.contains(".")) {
+			String chain = getMaxDepthDomainChain(selectedField, t);
+			if (chain != null) {
+				domainSelected.add(chain);
+			}
+		}
 	}
 	
 	/**
