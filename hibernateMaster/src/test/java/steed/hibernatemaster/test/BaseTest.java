@@ -3,7 +3,6 @@ package steed.hibernatemaster.test;
 import org.junit.Test;
 
 import steed.hibernatemaster.sample.domain.Clazz;
-import steed.hibernatemaster.sample.domain.School;
 import steed.hibernatemaster.util.DaoUtil;
 
 public class BaseTest extends SteedTest{
@@ -16,6 +15,8 @@ public class BaseTest extends SteedTest{
 
 		clazz.setName("testSaveClass");
 		clazz.save();
+		DaoUtil.managTransaction();
+		clazz.delete();
 	}
 	
 }

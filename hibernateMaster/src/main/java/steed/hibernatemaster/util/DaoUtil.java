@@ -214,7 +214,7 @@ public class DaoUtil {
 			Long recordCount = getRecordCount(null, hql);
 			Query query = getSession().createQuery(hql.toString());
 			
-			faging(pageSize,currentPage, query);
+			paging(pageSize,currentPage, query);
 			@SuppressWarnings("unchecked")
 			List<T> list = query.list();
 			
@@ -450,7 +450,7 @@ public class DaoUtil {
 			if (map != null) {
 				setMapParam(map, createQuery);
 			}
-			faging(pageSize, currentPage, createQuery);
+			paging(pageSize, currentPage, createQuery);
 			
 			return setPage(currentPage, recordCount, pageSize, createQuery.list());
 			//return createQuery.list();
@@ -484,7 +484,7 @@ public class DaoUtil {
 			if (map != null) {
 				setMapParam(map, createQuery);
 			}
-			faging(pageSize, currentPage, createQuery);
+			paging(pageSize, currentPage, createQuery);
 			return createQuery.list();
 		} catch (Exception e) {
 			setException(e);
@@ -794,7 +794,7 @@ public class DaoUtil {
 	 * @param queryRecordCount 是否查询总记录数
 	 * @return 查询结果(page)
 	 * 
-	 * @see #faging(int, int, Query)
+	 * @see #paging(int, int, Query)
 	 */
 	public final static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,List<String> desc,List<String> asc,boolean queryRecordCount){
 		try {
@@ -805,7 +805,7 @@ public class DaoUtil {
 			}
 			
 			Query query = createQuery(null, hql);
-			faging(pageSize,currentPage, query);
+			paging(pageSize,currentPage, query);
 			@SuppressWarnings("unchecked")
 			List<T> list = query.list();
 			
@@ -830,7 +830,7 @@ public class DaoUtil {
 	 * 
 	 * @see Page
 	 * @see #listObj(Class, int, int, List, List, boolean)
-	 * @see #faging(int, int, Query)
+	 * @see #paging(int, int, Query)
 	 */
 	public final static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,List<String> desc,List<String> asc){
 		return listObj(t, pageSize, currentPage, desc, asc, true);
@@ -886,7 +886,7 @@ public class DaoUtil {
 			StringBuffer hql = getSelectHql(target, where, desc, asc);
 			
 			Query query = createQuery(where,hql);
-			faging(1, 1, query);
+			paging(1, 1, query);
 			return (T) query.uniqueResult();
 		} catch (Exception e) {
 			setException(e);
@@ -995,10 +995,11 @@ public class DaoUtil {
 	 */
 	public final static boolean isResultNull(Class<?> target,Map<String, Object> where){
 		try {
-			Query query = getSession().createQuery(getCountHql(getSelectHql(target, where, null, null)).toString());
+			Query query = getSession().createQuery(getSelectHql(target, where, null, null,"1").toString());
 			setMapParam(where, query);
-			faging(1, 1, query);
-			return ((Long) query.uniqueResult()) == 0;
+			paging(1, 1, query);
+			
+			return query.uniqueResult() == null;
 		} catch (Exception e) {
 			setException(e);
 			return false;
@@ -1127,7 +1128,7 @@ public class DaoUtil {
 	 * @param asc 需要升序排列的字段 可以为null
 	 * @return 查询结果(page)
 	 * 
-	 * @see #faging(int, int, Query)
+	 * @see #paging(int, int, Query)
 	 */
 	@SuppressWarnings("unchecked")
 	public final static <T> Page<T> listObj(int pageSize,int currentPage,T where,List<String> desc,List<String> asc){
@@ -1172,7 +1173,7 @@ public class DaoUtil {
 			StringBuffer hql = getSelectHql(target, where, null, null);
 			hql.append(" order by RAND()");
 			Query query = createQuery(where,hql);
-			faging(size,1, query);
+			paging(size,1, query);
 			return query.list();
 		} catch (Exception e) {
 			setException(e);
@@ -1257,7 +1258,7 @@ public class DaoUtil {
 			
 			Query query = createQuery(constraint,hql);
 			
-			faging(pageSize,currentPage, query);
+			paging(pageSize,currentPage, query);
 			@SuppressWarnings("unchecked")
 			List<T> list = query.list();
 			
@@ -1691,39 +1692,30 @@ public class DaoUtil {
 					hql.append("new map( ");
 				}
 				for(String temp:selectedFields){
-					Matcher matcher = RegUtil.getPattern(".+\\(\\s*(\\S+)\\s*(\\S*)\\s*\\)").matcher(temp);
-//					Matcher matcher = RegUtil.getPattern(".+\\([(.+)|(\\S+\\s+(\\S+)\\s.)]\\)").matcher(temp);
-					if (matcher.find()) {
+					Pattern pattern = RegUtil.getPattern("^\\s*\\d+\\s*$");
+					if (pattern.matcher(temp).find()) {
+						hql.append(temp).append(",");
+						continue;
+					}
+					
+					String selectedField = praseRealSelectedField(temp);
 						//sum(weight),count(id)之类的
 						// 0    1
 						//temp = temp.replace(matcher.group(1), domainSimpleName+"."+matcher.group(1));
-						String selectedField = temp;
-						String group = matcher.group(2);
-						if (StringUtil.isStringEmpty(group)) {
-							group = matcher.group(1);
-						}
-						if (!StringUtil.isStringEmpty(group)
-								&&!StringUtil.isStringEmpty(group.trim())) {
 							//TODO 支持二级及以上实体类加减乘除操作
 							//TODO 类似a/1 1前面不加实体类前缀,a/b和a-b生成的别名是一样的,a-b可以改成a-b-0
-							//TODO a / b 操作符跟字段有空格会有bug
-							String replace = group.replace("/", "/"+domainSimpleName+".")
-									.replace("+", "+"+domainSimpleName+".")
-									.replace("-", "-"+domainSimpleName+".")
-									.replace("*", "*"+domainSimpleName+".");
-							selectedField = temp.replace(group, domainSimpleName+"."+replace);
-						}
-						addSelectedDomain(t, domainSelected, group);
-						hql.append(selectedField)
-							.append(" as ").append(dealSpecialChar(group))
-							.append(",");
-					}else {
-						//TODO 和上面的sum,count等共用一个方法,sum()括号里面的东西跟这里的是一样的,要共用一个方法
-						//TODO 加减乘除操作
-						addSelectedDomain(t, domainSelected, temp);
-						hql.append(domainSimpleName).append(".").
-							append(temp).append(" as ").append(dealSpecialChar(temp)).append(",");
-					}
+					String replace = selectedField.replace("/", "/"+domainSimpleName+".")
+							.replace("+", "+"+domainSimpleName+".")
+							.replace("-", "-"+domainSimpleName+".")
+							.replace("*", "*"+domainSimpleName+".");
+							
+					String dealedSelectedField = temp.replace(selectedField, domainSimpleName+"."+replace).replace(" ", "");
+							
+					addSelectedDomain(t, domainSelected, selectedField);
+					
+					hql.append(dealedSelectedField)
+						.append(" as ").append(dealSpecialChar(selectedField))
+						.append(",");
 				}
 				
 				hql.deleteCharAt(hql.length()-1);
@@ -1791,6 +1783,29 @@ public class DaoUtil {
 		steed.util.logging.LoggerFactory.getLogger().debug("参数------>%s",queryMap==null?null:queryMap.toString());
 		
 		return hql;
+	}
+	
+	/**
+	 * 解析要真正要select的字段(去除count(),sum()等)
+	 * 
+	 * @param originalField 要查询的字段
+	 * @return
+	 */
+	private static String praseRealSelectedField(String originalField) {
+		Matcher matcher = RegUtil.getPattern(".+\\((.+)\\)").matcher(originalField);
+//					Matcher matcher = RegUtil.getPattern(".+\\([(.+)|(\\S+\\s+(\\S+)\\s.)]\\)").matcher(temp);
+		String selectedField = originalField;
+		if (matcher.find()) {
+			selectedField = matcher.group(1);
+		}
+		Matcher fieldMatcher = RegUtil.getPattern("\\s*(\\S+)\\s*(\\S*)\\s*").matcher(selectedField);
+		if (fieldMatcher.find()) {
+			selectedField = fieldMatcher.group(2);
+		}
+		if (StringUtil.isStringEmpty(selectedField)) {
+			selectedField = fieldMatcher.group(1);
+		}
+		return selectedField;
 	}
 	private static <T> void addSelectedDomain(Class<T> t, Set<String> domainSelected, String selectedField) {
 		if (selectedField.contains(".")) {
@@ -2264,7 +2279,7 @@ public class DaoUtil {
 	 * @param currentPage 当前页面,从1开始
 	 * @param query
 	 */
-	public final static void faging(int pageSize,int currentPage, Query query) {
+	public final static void paging(int pageSize,int currentPage, Query query) {
 		query.setFirstResult((currentPage-1)*pageSize);
 		query.setMaxResults(pageSize);
 	}

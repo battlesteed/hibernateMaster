@@ -29,15 +29,12 @@ public class SingleDomainScanner implements DomainScanner{
 		String classesPath = PathUtil.getClassesPath();
 		
 		List<File> allFile = new ArrayList<>();
-//		List<File> allFile = new FileUtil().getAllFile(classesPath,null);
-//		if (Config.devMode) {
 		allFile.addAll(new FileUtil().getAllFile(classesPath,null));
 		if (classesPath.contains("test-classes")) {
 			allFile.addAll(new FileUtil().getAllFile(classesPath.replaceFirst("test-classes", "classes"),null));
 		}else {
 			allFile.addAll(new FileUtil().getAllFile(classesPath.replaceFirst("classes", "test-classes"),null));
 		}
-//		}
 		
 		for (File f:allFile) {
 			String absolutePath = f.getAbsolutePath();
