@@ -23,6 +23,11 @@ public class ListCustomFieldTest {
 		assert(listAllCustomField.size() == 1);
 		Object object = listAllCustomField.get(0);
 		assert(((Long)object) == GenTestData.schoolCount);
+		List<Object> clazzIDs = DaoUtil.listAllCustomField(student, "distinct clazz.id ");
+		
+		assert(clazzIDs.size() == GenTestData.schoolCount);
+		
+		
 //		DaoUtil.getSession().createQuery("select count(distinct clazz ) as clazzss from steed.hibernatem aster.sample.domain.Student student_steed_00 where  1=1 ").list();
 	}
 	
