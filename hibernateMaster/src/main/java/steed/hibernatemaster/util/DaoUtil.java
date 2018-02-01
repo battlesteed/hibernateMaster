@@ -1710,7 +1710,7 @@ public class DaoUtil {
 							.replace("-", "-"+domainSimpleName+".")
 							.replace("*", "*"+domainSimpleName+".");
 							
-					String dealedSelectedField = temp.replace(selectedField, domainSimpleName+"."+replace).replace(" ", "");
+					String dealedSelectedField = temp.replace(selectedField, domainSimpleName+"."+replace);
 							
 					addSelectedDomain(t, domainSelected, selectedField);
 					
@@ -1806,6 +1806,7 @@ public class DaoUtil {
 		if (StringUtil.isStringEmpty(selectedField)) {
 			selectedField = fieldMatcher.group(1);
 		}
+		
 		return selectedField;
 	}
 	private static <T> void addSelectedDomain(Class<T> t, Set<String> domainSelected, String selectedField) {
