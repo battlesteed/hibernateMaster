@@ -1708,7 +1708,7 @@ public class DaoUtil {
 					String replace = selectedField.replace("/", "/"+domainSimpleName+".")
 							.replace("+", "+"+domainSimpleName+".")
 							.replace("-", "-"+domainSimpleName+".")
-							.replace("*", "*"+domainSimpleName+".");
+							.replace("*", "*"+domainSimpleName+".").replace(" ", "");
 							
 					String dealedSelectedField = temp.replace(selectedField, domainSimpleName+"."+replace);
 							
