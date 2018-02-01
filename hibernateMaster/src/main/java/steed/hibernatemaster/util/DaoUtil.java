@@ -961,6 +961,7 @@ public class DaoUtil {
 		return listAllObj(where,null,null);
 	}
 	
+	
 	/**
 	 * 获取所有符合查询条件的记录
 	 * 
