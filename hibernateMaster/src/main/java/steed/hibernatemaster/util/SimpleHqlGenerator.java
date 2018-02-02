@@ -38,7 +38,7 @@ public class SimpleHqlGenerator implements HqlGenerator{
 		List<String> removedEntry = new ArrayList<String>();
 		Map<String, Object> put = new HashMap<>();
 		for(Entry<String, Object> e:map.entrySet()){
-			if (hql.indexOf(":"+e.getKey().replace(".", "__")) >= 0) {
+			if (hql.indexOf(":"+e.getKey().replace(".", "__")+" ") >= 0) {
 				continue;
 			}
 			appendSingleWhereCondition(domainSimpleName, hql, removedEntry, map, e,put);

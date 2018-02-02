@@ -4,7 +4,7 @@
 
 	<groupId>com.github.battlesteed</groupId>
 	<artifactId>hibernateMaster</artifactId>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<description>hibernateMaster--让数据操作更简单</description>
 
 	<licenses>
