@@ -1787,7 +1787,7 @@ public class DaoUtil {
 		
 		appendHqlOrder(hql, desc, asc, domainSimpleName);
 		
-		if (queryMap.get(personalHqlGeneratorKey) != null) {
+		if (queryMap != null && queryMap.get(personalHqlGeneratorKey) != null) {
 			((HqlGenerator)queryMap.get(personalHqlGeneratorKey)).afterHqlGenered(domainSimpleName, hql, queryMap);
 		}
 		
