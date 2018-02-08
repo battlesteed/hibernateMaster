@@ -66,7 +66,7 @@ _____#####________####______#####_____###______<br>
 ______#####_______###________###______#________<br>
 ________##_______####________####______________<br>
                                      	葱官赐福   百无禁忌
- * @author 战马
+ * @author 战马 battle_steed@163.com
  */
 public class DaoUtil {
 	private static final ThreadLocal<Boolean> transactionType = new ThreadLocal<>();
@@ -95,10 +95,17 @@ public class DaoUtil {
 	private DaoUtil() {
 	}
 
+	public static final String orGroup = "_OrGroup";
+	public static final String andGroup = "_AndGroup";
+	public static final String rawHqlPart = "_raw_hql_part";
+	
 	/**
 	 * 查询条件后缀
 	 */
-	public final static String[] indexSuffix = {"_max_1","_min_1","_like_1","_not_in_1","_not_equal_1","_not_join","_not_null","_not_compile_param",personalHqlGeneratorKey};
+	public final static String[] indexSuffix = {"_max_1","_min_1","_like_1","_not_in_1","_not_equal_1",
+			"_not_join","_not_null","_not_compile_param",personalHqlGeneratorKey,
+			"_greaterThan","_lessThan",rawHqlPart,orGroup};
+	
 	/***********\异常提示专用************/
 	
 	/*//TODO 完善异常类型
@@ -1780,6 +1787,10 @@ public class DaoUtil {
 		
 		appendHqlOrder(hql, desc, asc, domainSimpleName);
 		
+		if (queryMap.get(personalHqlGeneratorKey) != null) {
+			((HqlGenerator)queryMap.get(personalHqlGeneratorKey)).afterHqlGenered(domainSimpleName, hql, queryMap);
+		}
+		
 		steed.util.logging.LoggerFactory.getLogger().debug("hql------>%s",hql.toString());
 		steed.util.logging.LoggerFactory.getLogger().debug("参数------>%s",queryMap==null?null:queryMap.toString());
 		
@@ -2014,7 +2025,7 @@ public class DaoUtil {
 	/**
 	 * 获取domain的简称用作查询时的别名
 	 * @param fullClassName 全类名
-	 * @return
+	 * @return domain的简称
 	 */
 	private static String getDomainSimpleName(String fullClassName) {
 		String domainSimpleName = StringUtil.firstChar2LowerCase(StringUtil.getClassSimpleName(fullClassName)+"_steed_00");
@@ -2139,11 +2150,15 @@ public class DaoUtil {
 	/**
 	 * 是否属于查找索引字段
 	 * @param fieldName 字段名..
-	 * @return 如果不是索引字段返回0,是则返回索引后缀长度...方便subString那到真实字段名
+	 * @return 如果不是索引字段返回0,是则返回索引后缀长度...方便subString拿到真实字段名
 	 */
 	public final static int isSelectIndex(String fieldName){
 		for (String suffix:indexSuffix) {
 			if (fieldName.endsWith(suffix)) {
+				if (suffix.equals(orGroup)) {
+					int lastIndexOf = fieldName.replace(orGroup, "").lastIndexOf("_");
+					return fieldName.length()-lastIndexOf;
+				}
 				return suffix.length();
 			}
 		}
@@ -2170,25 +2185,25 @@ public class DaoUtil {
 	 * 
 	 * 组装map参数到hql的where部分
 	 * 
-	 * @param domainSimpleName 
-	 * @param hql
-	 * @param map
+	 * @param domainSimpleName 类简称
+	 * @param hql 要append的hql
+	 * @param where where查询条件
 	 * 
 	 * @see HqlGenerator
 	 */
 	public final static StringBuffer appendHqlWhere(String domainSimpleName, StringBuffer hql,
-			Map<String, Object> map) {
-		if (map == null) {
+			Map<String, Object> where) {
+		if (where == null) {
 			return hql;
 		}
-		Object object = map.get(personalHqlGeneratorKey);
+		Object object = where.get(personalHqlGeneratorKey);
 		if (object != null && object instanceof HqlGenerator) {
-			map.remove(personalHqlGeneratorKey);
-			StringBuffer appendHqlWhere = ((HqlGenerator)object).appendHqlWhere(domainSimpleName, hql, map);
-			map.put(personalHqlGeneratorKey, object);
+			where.remove(personalHqlGeneratorKey);
+			StringBuffer appendHqlWhere = ((HqlGenerator)object).appendHqlWhere(domainSimpleName, hql, where);
+			where.put(personalHqlGeneratorKey, object);
 			return appendHqlWhere;
 		}
-		return Config.defaultHqlGenerator.appendHqlWhere(domainSimpleName, hql, map);
+		return Config.defaultHqlGenerator.appendHqlWhere(domainSimpleName, hql, where);
 	}
 	
 	/**

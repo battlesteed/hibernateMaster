@@ -15,8 +15,18 @@ public class Clazz extends UUIDDomain{
 	
 	private School school;
 	
+	/**
+	 * 学生数量
+	 */
+	private Integer studentCount;
 	
 	
+	public Integer getStudentCount() {
+		return studentCount;
+	}
+	public void setStudentCount(Integer studentCount) {
+		this.studentCount = studentCount;
+	}
 	public String getName() {
 		return name;
 	}

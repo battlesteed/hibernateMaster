@@ -12,4 +12,8 @@ import java.util.Map;
  */
 public interface HqlGenerator {
 	StringBuffer appendHqlWhere(String domainSimpleName, StringBuffer hql,Map<String, Object> map);
+	
+	default StringBuffer afterHqlGenered(String domainSimpleName, StringBuffer hql,Map<String, Object> map){
+		return hql;
+	};
 }

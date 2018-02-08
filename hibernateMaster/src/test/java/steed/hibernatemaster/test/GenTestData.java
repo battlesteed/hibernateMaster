@@ -46,13 +46,14 @@ public class GenTestData {
 			Clazz clazz = new Clazz();
 			clazz.setName("class"+i);
 			clazz.setSchool(school);
+			clazz.setStudentCount(classSize);
 			clazz.save();
 			genStudent(i, clazz);
 		}
 	}
 
 	private void genStudent(int i, Clazz clazz) {
-		for (int j = 0; j < classSize; j++) {
+		for (int j = 0; j < clazz.getStudentCount(); j++) {
 			Student student = new Student();
 			student.setClazz(clazz);
 			student.setInDate(new Date());

@@ -3,16 +3,58 @@ package steed.hibernatemaster.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
 
 public class QueryBuilder {
 	private Map<String,Object> queryMap;
+	
+	private Class<? extends BaseDatabaseDomain> target;
+	
+	private String[] groupBy;
+	
+	private String[] selectedField;
+	
 	public QueryBuilder(){
 		queryMap = new HashMap<>();
 	}
+	
 	public QueryBuilder(BaseDomain domain){
 		queryMap = DaoUtil.putField2Map(domain);
 	}
+	public QueryBuilder(BaseDatabaseDomain domain){
+		queryMap = DaoUtil.putField2Map(domain);
+		target = domain.getClass();
+	}
+	
+	/**
+	 * 设置hql的groupBy部分
+	 * 
+	 * @param groupBy
+	 */
+	private void setGroupBy(String... groupBy) {
+		this.groupBy = groupBy;
+	}
+	
+	/**
+	 * 设置要select的字段
+	 * 
+	 * @param selectedField
+	 */
+	private void setSelectedField(String... selectedField) {
+		this.selectedField = selectedField;
+	}
+
+	/***
+	 * 设置要查询的实体类
+	 * 
+	 * @return this
+	 */
+	private QueryBuilder setTarget(Class<? extends BaseDatabaseDomain> target){
+		this.target = target;
+		return this;
+	}
+	
 	
 	/**
 	 * 添加普通查询条件, 生成的hql将包含 "model.key = :value "这个条件
@@ -35,6 +77,7 @@ public class QueryBuilder {
 		queryMap.put(key+"_not_equal_1", value);
 		return this;
 	}
+	
 	/**
 	 * 添加自定义的hql生成器
 	 * 
@@ -47,17 +90,28 @@ public class QueryBuilder {
 		return this;
 	}
 	
-	/**
+	/*
 	 * 添加in查询条件 生成的hql将包含 "model.key in( :value )"这个条件
 	 * @param key 字段名
 	 * @param value 值
 	 * @return this
-	 */
+	 *
 	public QueryBuilder addIn(String key,Object value){
 		queryMap.put(key+"_not_join", value);
 		return this;
-	}
+	}*/
 	
+	/**
+	 * 添加not in查询条件 生成的hql将包含 "model.key not in( :value )"这个条件
+	 * @param key 字段名
+	 * @param value 值
+	 * @return this
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> QueryBuilder addNotIn(String key,T... value){
+		queryMap.put(key+"_not_in_1", value);
+		return this;
+	}
 	/**
 	 * 添加in查询条件 生成的hql将包含 "model.key in( :value )"这个条件
 	 * @param key 字段名
@@ -83,20 +137,78 @@ public class QueryBuilder {
 	}
 	
 	/**
-	 * 添加小于查询条件 生成的hql将包含 "model.key &lt;= :value "这个条件
+	 * 添加小于查询条件 生成的hql将包含 "model.key &lt; :value "这个条件
 	 * @param key 字段名
 	 * @param value 值
 	 * @return this
+	 * 
+	 * @see #addLessThan(String, Object)
+	 */
+	public QueryBuilder addLessThanNoEqual(String key,Object value){
+		queryMap.put(key+"_lessThan", value);
+		return this;
+	}
+	
+	/**
+	 * 添加大于查询条件 生成的hql将包含 "model.key &gt; :value "这个条件
+	 * @param key 字段名
+	 * @param value 值
+	 * @return this
+	 * 
+	 * @see #addMoreThan(String, Object)
+	 */
+	public QueryBuilder addMoreThanNoEqual(String key,Object value){
+		queryMap.put(key+"_greaterThan", value);
+		return this;
+	}
+	/**
+	 * 添加原生的hql where部分,不会被框架转义,处理等(除了外'domain.'会被替换成'实体类简称.'),生成的hql将包含 'where 其它where条件 and + rawHqlPart'这个条件
+	 * 
+	 * @param rawHqlPart 如," (domain.name like '%admin' or domain.phone = '10086')",
+	 * 			生成的hql将包含 'where 其它where条件 and rawHqlPart' 这个条件
+	 * 
+	 * @return this
+	 */
+	public QueryBuilder addRawHqlPart(String rawHqlPart){
+		queryMap.put(DaoUtil.rawHqlPart, rawHqlPart);
+		return this;
+	}
+	
+	/**
+	 * 添加hql where 部分or分组查询条件,例如调了addOrGroup("group1","name","admin");
+	 * 	addOrGroup("group1","name","battlesteed");addOrGroup("ab","phone","10086");
+	 * 
+	 * 生成的hql将包括where 其它查询条件 and (domain.phone = 10086) and (domain.name = battlesteed or domain.name = admin) 
+	 * 
+	 * @param groupId 同一个分组id的查询添加将会放到同一个()里面
+	 * @param key 字段名
+	 * @param value 值
+	 * @return
+	 */
+	private QueryBuilder addGroup(String groupId,String key,Object value){
+		queryMap.put(key+"_"+groupId+DaoUtil.orGroup, value);
+		return this;
+	}
+	
+	/**
+	 * 添加小于或等于查询条件 生成的hql将包含 "model.key &lt;= :value "这个条件
+	 * @param key 字段名
+	 * @param value 值
+	 * @return this
+	 * 
+	 * @see #addLessThanNoEqual(String, Object)
 	 */
 	public QueryBuilder addLessThan(String key,Object value){
 		queryMap.put(key+"_max_1", value);
 		return this;
 	}
 	/**
-	 * 添加大于于查询条件 生成的hql将包含 "model.key &gt;= :value "这个条件
+	 * 添加大于或等于查询条件 生成的hql将包含 "model.key &gt;= :value "这个条件
 	 * @param key 字段名
 	 * @param value 值
 	 * @return this
+	 * 
+	 * @see #addMoreThanNoEqual(String, Object)
 	 */
 	public QueryBuilder addMoreThan(String key,Object value){
 		queryMap.put(key+"_min_1", value);
@@ -107,8 +219,19 @@ public class QueryBuilder {
 	 * 获取查询条件map
 	 * 
 	 * @return DaoUtil中的查询(where)条件
+	 * 
+	 * @see #getWhere()
 	 */
+	@Deprecated
 	public Map<String, Object> getQueryMap() {
+		return queryMap;
+	}
+	/**
+	 * 获取查询条件map
+	 * 
+	 * @return DaoUtil中的查询(where)条件
+	 */
+	public Map<String, Object> getWhere() {
 		return queryMap;
 	}
 	

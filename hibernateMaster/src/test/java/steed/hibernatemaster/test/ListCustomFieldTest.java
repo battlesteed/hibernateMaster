@@ -1,14 +1,13 @@
 package steed.hibernatemaster.test;
 
 import java.util.List;
-import java.util.regex.Matcher;
 
 import org.junit.Test;
 
 import steed.hibernatemaster.sample.domain.Clazz;
 import steed.hibernatemaster.sample.domain.Student;
 import steed.hibernatemaster.util.DaoUtil;
-import steed.util.base.RegUtil;
+import steed.util.base.BaseUtil;
 
 public class ListCustomFieldTest {
 	
@@ -32,10 +31,9 @@ public class ListCustomFieldTest {
 	}
 	
 	@Test
-	public void testReg(){
-		Matcher matcher = RegUtil.getPattern(".+\\(\\s*(\\S+)\\s*(\\S*)\\s*\\)").matcher("count(distinct clazz)");
-		assert(matcher.find());
-		assert("distinct".equals(matcher.group(1)));
-		assert("clazz".equals(matcher.group(2)));
+	public void testSum(){
+		List<Object> listAllCustomField = DaoUtil.listAllCustomField(new Clazz(), "sum(studentCount)","sum(studentCount)");
+		BaseUtil.out(listAllCustomField.get(0));
 	}
+	
 }

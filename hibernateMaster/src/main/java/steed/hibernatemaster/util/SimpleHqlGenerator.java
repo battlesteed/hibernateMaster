@@ -38,7 +38,7 @@ public class SimpleHqlGenerator implements HqlGenerator{
 		List<String> removedEntry = new ArrayList<String>();
 		Map<String, Object> put = new HashMap<>();
 		for(Entry<String, Object> e:map.entrySet()){
-			if (hql.indexOf(":"+e.getKey().replace(".", "__")+" ") >= 0) {
+			if (hql.indexOf(":"+dealDot(e.getKey())+" ") >= 0) {
 				continue;
 			}
 			appendSingleWhereCondition(domainSimpleName, hql, removedEntry, map, e,put);
@@ -103,7 +103,7 @@ public class SimpleHqlGenerator implements HqlGenerator{
 				hql.append(" in (");
 			}
 			hql.append(":");
-			hql.append(key.replace(".", "__"));
+			hql.append(dealDot(key));
 			hql.append(") ");
 		}else if(key.endsWith("_not_join")){
 			hql.append("and ");
@@ -111,31 +111,45 @@ public class SimpleHqlGenerator implements HqlGenerator{
 			hql.append(".");
 			hql.append(key.replace("_not_join", ""));
 			hql.append(" in (:");
-			hql.append(key.replace(".", "__"));
+			hql.append(dealDot(key));
 			hql.append(") ");
+		}else  if(key.endsWith(DaoUtil.rawHqlPart)){
+			hql.append("and ");
+			hql.append(e.getValue());
+			removedEntry.add(key);
 		}else {
 			hql.append("and ");
 			hql.append(domainSimpleName);
 			hql.append(".");
-			if (key.endsWith("_max_1")) {
+			if (key.endsWith("_lessThan")) {
+				hql.append(key.replace("_lessThan", ""));
+				hql.append("< :");
+				hql.append(dealDot(key));
+				hql.append(" ");
+			}else if (key.endsWith("_greaterThan")) {
+				hql.append(key.replace("_greaterThan", ""));
+				hql.append("> :");
+				hql.append(dealDot(key));
+				hql.append(" ");
+			}else if (key.endsWith("_max_1")) {
 				hql.append(key.replace("_max_1", ""));
 				hql.append("<=:");
-				hql.append(key.replace(".", "__"));
+				hql.append(dealDot(key));
 				hql.append(" ");
 			}else if (key.endsWith("_min_1")) {
 				hql.append(key.replace("_min_1", ""));
 				hql.append(">=:");
-				hql.append(key.replace(".", "__"));
+				hql.append(dealDot(key));
 				hql.append(" ");
 			}else if (key.endsWith("_like_1")) {
 				hql.append(key.replace("_like_1", ""));
 				hql.append(" like :");
-				hql.append(key.replace(".", "__"));
+				hql.append(dealDot(key));
 				hql.append(" ");
 			}else if(key.endsWith("_not_equal_1")){
 				hql.append(key.replace("_not_equal_1", ""));
 				hql.append(" != :");
-				hql.append(key.replace(".", "__"));
+				hql.append(dealDot(key));
 				hql.append(" ");
 			}else if(key.endsWith("_not_null")){
 				hql.append(key.replace("_not_null", ""));
@@ -159,13 +173,16 @@ public class SimpleHqlGenerator implements HqlGenerator{
 						&& ((String) e.getValue()).contains("%")) {
 					hql.append(" like :");
 				}else {
-					hql.append(" =:");
+					hql.append(" = :");
 				}
-				hql.append(key.replace(".", "__"));
+				hql.append(dealDot(key));
 				hql.append(" ");
 			}
 			
 		}
+	}
+	private String dealDot(String key) {
+		return key.replace(".", "__");
 	}
 
 }
