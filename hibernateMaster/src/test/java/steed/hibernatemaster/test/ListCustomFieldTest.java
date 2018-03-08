@@ -5,6 +5,7 @@ import java.util.List;
 import org.junit.Test;
 
 import steed.hibernatemaster.sample.domain.Clazz;
+import steed.hibernatemaster.sample.domain.School;
 import steed.hibernatemaster.sample.domain.Student;
 import steed.hibernatemaster.util.DaoUtil;
 import steed.util.base.BaseUtil;
@@ -28,6 +29,17 @@ public class ListCustomFieldTest {
 		
 		
 //		DaoUtil.getSession().createQuery("select count(distinct clazz ) as clazzss from steed.hibernatem aster.sample.domain.Student student_steed_00 where  1=1 ").list();
+	}
+	@Test
+	public void testNullMap(){
+		DaoUtil.listAllCustomField(School.class, null, null, null);
+	}
+	@Test
+	public void testListOneField(){
+		List<Object> listAllCustomField = DaoUtil.listAllCustomField(School.class, null, null, null,"id");
+		for(Object temp:listAllCustomField){
+			assert(temp instanceof String);
+		}
 	}
 	
 	@Test

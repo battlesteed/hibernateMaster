@@ -27,6 +27,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	
 	private static final long serialVersionUID = -3084039108845387366L;
 	protected HqlGenerator personalHqlGenerator;
+	private transient boolean trimEmptyDomain;
 	
 	@Transient
 	public HqlGenerator getPersonalHqlGenerator() {
@@ -104,9 +105,6 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	public boolean delete(){
 		return DaoUtil.delete(this);
 	}
-	
-	private boolean trimEmptyDomain;
-	
 	
 	/**
 	 * 

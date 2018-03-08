@@ -4,7 +4,7 @@
 
 	<groupId>com.github.battlesteed</groupId>
 	<artifactId>hibernateMaster</artifactId>
-	<version>1.0.7</version>
+	<version>1.0.9</version>
 	<description>hibernateMaster--让数据操作更简单</description>
 
 	<licenses>
@@ -81,6 +81,7 @@
 			<artifactId>log4j-core</artifactId>
 			<version>2.6.2</version>
 			<scope>compile</scope>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
@@ -88,12 +89,14 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.21</version>
 			<scope>compile</scope>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
 			<version>2.6.2</version>
 			<scope>compile</scope>
+			<optional>true</optional>
 		</dependency>
 		<!-- 日志包结束 -->
 
@@ -103,6 +106,7 @@
 			<artifactId>druid</artifactId>
 			<version>1.1.5</version>
 			<scope>compile</scope>
+			<optional>true</optional>
 		</dependency>
 
 		<!-- proxool连接池 -->
@@ -115,6 +119,7 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.22</version>
 			<scope>compile</scope>
+			<optional>true</optional>
 		</dependency>
 
 		<!-- ehcache -->
@@ -123,6 +128,7 @@
 			<artifactId>hibernate-ehcache</artifactId>
 			<version>5.0.9.Final</version>
 			<scope>compile</scope>
+			<optional>true</optional>
 		</dependency>
 
 		<!-- 可选jar包结束 -->
@@ -132,6 +138,7 @@
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 			<scope>test</scope>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 	  <build>
@@ -181,7 +188,7 @@
           <encoding>UTF-8</encoding>
         </configuration>  
       </plugin>  
-      <plugin>
+     <plugin>
    <groupId>org.apache.maven.plugins</groupId>
    <artifactId>maven-javadoc-plugin</artifactId>
    <version>2.9.1</version>

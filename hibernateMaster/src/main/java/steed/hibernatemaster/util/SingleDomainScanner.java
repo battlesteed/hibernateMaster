@@ -52,7 +52,7 @@ public class SingleDomainScanner implements DomainScanner{
 					}
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				
 			}catch (Error e) {
 				e.printStackTrace();
 			}

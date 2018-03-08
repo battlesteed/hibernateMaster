@@ -24,7 +24,7 @@ public class SingleFactoryEngine implements FactoryEngine{
 //			SessionFactory factory2 = configuration.buildSessionFactory(builder.build());
 			
 			
-			StandardServiceRegistry standardRegistry = new   StandardServiceRegistryBuilder()
+			StandardServiceRegistry standardRegistry = new StandardServiceRegistryBuilder()
 				    .configure(configFile)
 				    .build();
 

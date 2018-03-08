@@ -1,5 +1,6 @@
 package steed.hibernatemaster.util;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ public class QueryBuilder {
 	public QueryBuilder(BaseDomain domain){
 		queryMap = DaoUtil.putField2Map(domain);
 	}
+	
 	public QueryBuilder(BaseDatabaseDomain domain){
 		queryMap = DaoUtil.putField2Map(domain);
 		target = domain.getClass();
@@ -39,7 +41,7 @@ public class QueryBuilder {
 	/**
 	 * 设置要select的字段
 	 * 
-	 * @param selectedField
+	 * @param selectedField 
 	 */
 	private void setSelectedField(String... selectedField) {
 		this.selectedField = selectedField;
@@ -118,8 +120,7 @@ public class QueryBuilder {
 	 * @param value 值
 	 * @return this
 	 */
-	@SuppressWarnings("unchecked")
-	public <T> QueryBuilder addIn(String key,T... value){
+	public <T> QueryBuilder addIn(String key,Object value){
 		queryMap.put(key+"_not_join", value);
 		return this;
 	}

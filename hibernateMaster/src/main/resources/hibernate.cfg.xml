@@ -26,12 +26,18 @@
 		 --><!-- /c3p0连接池 -->
 		 
 		<!-- #druid连接池 详细属性配置见https://github.com/alibaba/druid/wiki/DruidDataSource%E9%85%8D%E7%BD%AE%E5%B1%9E%E6%80%A7%E5%88%97%E8%A1%A8 -->
+		
+		<property name="username">steed</property>
+        <property name="password">gHU0ZKU%ftckjAoXfdZS8Jzr#7qg3IYo</property>
+        <property name="url">jdbc:mysql://119.23.9.167:3307,119.23.42.103:3307,120.79.66.96:3307/hibernateMaster?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
+        <property name="hibernate.dialect">steed.hibernatemaster.dialect.MySQLNDBCluster7Dialect</property>
+		
         
-        <property name="username">root</property>
+      <!--   <property name="username">root</property>
         <property name="password">root</property>
         <property name="url">jdbc:mysql://localhost:3307/hibernateMaster?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-        
+      -->   
         <property name="hibernate.connection.provider_class">com.alibaba.druid.support.hibernate.DruidConnectionProvider</property>
         <property name="validationQuery">select 1</property>
         <property name="testWhileIdle">true</property>

@@ -134,9 +134,10 @@ public class HibernateUtil{
 			return sessionFactory;
 		}
 	}
+	
 	/**
 	 * 切换数据库
-	 * @param configFile
+	 * @param configFile hibernate配置文件名
 	 */
 	public static void switchDatabase(String configFile){
 		currentDatabase.set(configFile);
