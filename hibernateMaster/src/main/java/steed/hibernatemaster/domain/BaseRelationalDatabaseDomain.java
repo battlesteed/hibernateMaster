@@ -5,13 +5,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Transient;
+import javax.validation.Configuration;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
 
 import org.hibernate.Hibernate;
 import org.hibernate.collection.internal.PersistentList;
 import org.hibernate.collection.internal.PersistentSet;
 
+import steed.hibernatemaster.Config;
+import steed.hibernatemaster.exception.ValidateException;
 import steed.hibernatemaster.util.DaoUtil;
 import steed.hibernatemaster.util.HqlGenerator;
 import steed.util.base.BaseUtil;
@@ -28,6 +35,14 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	private static final long serialVersionUID = -3084039108845387366L;
 	protected HqlGenerator personalHqlGenerator;
 	private transient boolean trimEmptyDomain;
+	
+	protected final static Validator validator;
+	
+	static{
+		Configuration<?> configure = Validation.byDefaultProvider().configure();
+    	configure.addProperty("hibernate.validator.fail_fast", "true");
+    	validator = configure.buildValidatorFactory().getValidator();
+	}
 	
 	@Transient
 	public HqlGenerator getPersonalHqlGenerator() {
@@ -84,6 +99,34 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 		initialize();
 	}
 	
+	protected boolean validate(){
+		Set<ConstraintViolation<BaseRelationalDatabaseDomain>> validate = validator.validate(this);
+		
+		if (Config.devMode) {
+			for (ConstraintViolation<BaseRelationalDatabaseDomain> temp:validate) {
+				LoggerFactory.getLogger().debug("校验失败:"+temp.getMessage());
+			}
+		}
+		
+		boolean empty = validate.isEmpty();
+		if (!empty) {
+			throw getException(validate.iterator().next().getMessage());
+		}
+		
+		return empty;
+	}
+	
+	protected RuntimeException getException(String errorMessage){
+		try {
+			//若在战马web框架运行,则抛
+			Class<?> forName = Class.forName("steed.exception.runtime.MessageRuntimeException");
+			return (RuntimeException) forName.getConstructor(String.class).newInstance(errorMessage);
+		} catch (Exception e) {
+		} 
+		return new ValidateException(errorMessage);
+	}
+	
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BaseDatabaseDomain> T smartGet(){
@@ -97,6 +140,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	
 	@Override
 	public boolean update(){
+		validate();
 		trimEmptyDomain();
 		return DaoUtil.update(this);
 	}
@@ -155,6 +199,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	@Override
 	public boolean save(){
 		trimEmptyDomain();
+		validate();
 		return DaoUtil.save(this);
 	}
 	

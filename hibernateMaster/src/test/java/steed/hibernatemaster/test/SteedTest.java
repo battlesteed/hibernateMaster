@@ -16,6 +16,7 @@ public class SteedTest {
 	@BeforeClass
 	public static void init(){
 		Config.autoCommitTransaction = false;
+		Config.devMode = true;
 	}
 	
 	@Before

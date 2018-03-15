@@ -10,7 +10,11 @@ import steed.hibernatemaster.sample.domain.Student;
 import steed.hibernatemaster.util.DaoUtil;
 import steed.hibernatemaster.util.DaoUtil.ImmediatelyTransactionData;
 import steed.util.test.TestEfficiency;
-
+/**
+ * 生成测试数据
+ * @author battlesteed
+ *
+ */
 public class GenTestData {
 	public final static int classSize = 48;
 	public final static int classCount = 10;

@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.validation.Valid;
 
 import steed.hibernatemaster.domain.UUIDDomain;
 
@@ -12,6 +13,7 @@ public class Student extends UUIDDomain{
 	/**
 	 * 学号
 	 */
+	@Valid
 	private String studentNumber;
 	private Integer sex;
 	private String name;

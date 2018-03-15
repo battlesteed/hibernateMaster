@@ -2,6 +2,10 @@ package steed.hibernatemaster.sample.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import steed.hibernatemaster.domain.UUIDDomain;
 /**
@@ -11,6 +15,8 @@ import steed.hibernatemaster.domain.UUIDDomain;
  */
 @Entity
 public class Clazz extends UUIDDomain{
+	
+	@NotBlank(message="班级名字必填")
 	private String name;
 	
 	private School school;
@@ -18,6 +24,9 @@ public class Clazz extends UUIDDomain{
 	/**
 	 * 学生数量
 	 */
+	@NotNull(message="学生数量不能为null")
+	@Min(value=5,message="学生数量不能小于5")
+	@Max(100)
 	private Integer studentCount;
 	
 	
