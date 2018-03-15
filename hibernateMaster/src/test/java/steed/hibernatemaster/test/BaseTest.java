@@ -14,6 +14,7 @@ public class BaseTest extends SteedTest{
 		DaoUtil.deleteByQuery(clazz);
 
 		clazz.setName("testSaveClass");
+		clazz.setStudentCount(16);
 		clazz.save();
 		DaoUtil.managTransaction();
 		clazz.delete();

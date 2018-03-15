@@ -19,6 +19,7 @@ public class BaseRelationalDatabaseDomainTest extends SteedTest{
 		clazz.setName("testTrimEmptyDomain");
 		School school = new School();
 		clazz.setSchool(school);
+		clazz.setStudentCount(20);
 		clazz.save();
 		
 		Assert.assertTrue(!DaoUtil.managTransaction());
