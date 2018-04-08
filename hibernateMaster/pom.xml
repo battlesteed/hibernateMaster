@@ -4,7 +4,7 @@
 
 	<groupId>com.github.battlesteed</groupId>
 	<artifactId>hibernateMaster</artifactId>
-	<version>1.0.10</version>
+	<version>1.0.12-SNAPSHOT</version>
 	<description>hibernateMaster--让数据操作更简单</description>
 
 	<licenses>
@@ -72,7 +72,6 @@
 
 		<!-- 依赖jar包结束 -->
 
-		<!-- 可选jar包开始 -->
 
 		<!-- 日志包开始 -->
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
@@ -161,7 +160,13 @@
 		</dependency>
 		
 
-		<!-- 可选jar包结束 -->
+		<!-- 引入sharding-jdbc核心模块 -->
+		<dependency>
+		    <groupId>io.shardingjdbc</groupId>
+		    <artifactId>sharding-jdbc-core</artifactId>
+		    <version>2.0.3</version>
+		    <optional>true</optional>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>

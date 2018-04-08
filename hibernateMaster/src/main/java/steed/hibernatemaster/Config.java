@@ -19,6 +19,11 @@ public class Config {
 	 * 是否是开发模式
 	 */
 	public static boolean devMode = false;
+	
+	/**
+	 * 数据库操作失败是否抛出异常(全局设置,对当前线程设置请参考<code>{@link steed.hibernatemaster.util.DaoUtil#setThrowException}</code>)
+	 */
+	public static boolean throwException = false;
 	/**
 	 * 默认hql生成器(目前只是生成where 部分的 hql或sql)
 	 */

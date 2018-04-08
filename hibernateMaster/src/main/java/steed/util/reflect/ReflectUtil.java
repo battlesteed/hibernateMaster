@@ -314,7 +314,7 @@ public class ReflectUtil {
 					return declaredMethod;
 				}
 			} catch (NoSuchMethodException | SecurityException e) {
-				steed.util.logging.LoggerFactory.getLogger().info("获取方法出错!%s",e.getMessage());
+//				steed.util.logging.LoggerFactory.getLogger().info("获取方法出错!%s",e.getMessage());
 			}
 			clazz = clazz.getSuperclass();
 		}

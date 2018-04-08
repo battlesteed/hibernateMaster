@@ -17,11 +17,10 @@ import steed.util.test.TestEfficiency;
  */
 public class GenTestData {
 	public final static int classSize = 48;
-	public final static int classCount = 10;
+	public final static int classCount = 100;
 	public final static int schoolCount = 2;
 	
 	public static void main(String[] args){
-//		utis
 		new GenTestData().genData();
 	}
 
@@ -37,6 +36,7 @@ public class GenTestData {
 			School school = new School();
 			school.setName("school"+a);
 			school.setChargeMan("chargeMan"+a);
+//			DaoUtil.listOne(school);
 			school.save();
 			genClass(school);
 		}
@@ -51,6 +51,7 @@ public class GenTestData {
 			clazz.setName("class"+i);
 			clazz.setSchool(school);
 			clazz.setStudentCount(classSize);
+//			DaoUtil.isResultNull(clazz);
 			clazz.save();
 			genStudent(i, clazz);
 		}
@@ -60,6 +61,7 @@ public class GenTestData {
 		for (int j = 0; j < clazz.getStudentCount(); j++) {
 			Student student = new Student();
 			student.setClazz(clazz);
+//			DaoUtil.listOne(student);
 			student.setInDate(new Date());
 			student.setName("student_"+i+"_"+j);
 			student.setSex(j%2);

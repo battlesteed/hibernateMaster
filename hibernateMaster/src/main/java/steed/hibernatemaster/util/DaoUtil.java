@@ -81,6 +81,7 @@ public class DaoUtil {
 	 * 2,调用managTransaction()管理事务;
 	 */
 	private static final ThreadLocal<Boolean> autoManagTransaction = new ThreadLocal<>();
+	private static final ThreadLocal<Boolean> throwException = new ThreadLocal<>();
 	
 //	private static final Map<Class<?>, CRUDListener<?>> CRUDListenerMap = new HashMap<>();
 	
@@ -121,6 +122,19 @@ public class DaoUtil {
 	public final static void setException(Exception exception,boolean rollbackTransaction) {
 		DaoUtil.exception.set(exception);
 		steed.util.logging.LoggerFactory.getLogger().error("数据库操作发生异常",exception);
+		Boolean shouldThrowException = throwException.get();
+		if ((shouldThrowException == null && Config.throwException) || 
+				(shouldThrowException != null && shouldThrowException && exception instanceof RuntimeException)) {
+			throw ((RuntimeException)exception);
+		}
+	}
+	
+	/**
+	 * 数据库操作失败是否抛出异常
+	 * @param isThrow
+	 */
+	public final static void setThrowException(Boolean isThrow) {
+		throwException.set(isThrow);
 	}
 	public final static void setException(Exception exception) {
 		setException(exception, false);
@@ -1459,6 +1473,7 @@ public class DaoUtil {
 		autoManagTransaction.remove();
 		currentTransaction.remove();
 		exception.remove();
+		throwException.remove();
 	}
 	
 	/**
@@ -1801,7 +1816,7 @@ public class DaoUtil {
 	 * 解析要真正要select的字段(去除count(),sum()等)
 	 * 
 	 * @param originalField 要查询的字段
-	 * @return
+	 * @return 真正要select的字段
 	 */
 	private static String praseRealSelectedField(String originalField) {
 		Matcher matcher = RegUtil.getPattern(".+\\((.+)\\)").matcher(originalField);
@@ -1970,7 +1985,7 @@ public class DaoUtil {
 	 * @param desc 
 	 * @param asc
 	 * @param domainSimpleName
-	 * @return
+	 * @return 组装后的hql
 	 */
 	public final static StringBuffer appendHqlOrder(StringBuffer hql,List<String> desc,List<String> asc,String domainSimpleName){
 		boolean hasOrderByAppened = false;
@@ -2169,7 +2184,7 @@ public class DaoUtil {
 	 * 获取没有查询后缀的fieldName
 	 * @param fieldName 查询字段(没有查询后缀也一样可以传过来,不会抛异常,这设计的比较巧妙,可以自己看源码研究
 	 * 		<code>{@link steed.hibernatemaster.util.DaoUtil#isSelectIndex}</code>
-	 * @return
+	 * @return fieldName去掉查询后缀后的名字,也就是真正的字段名(若fieldName没含有查询后缀,则会原样返回)
 	 */
 	public final static String getNoSelectIndexFieldName(String fieldName){
 		int selectIndex = isSelectIndex(fieldName);
