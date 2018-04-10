@@ -383,9 +383,12 @@ public class DaoUtil {
 			if (BaseUtil.isObjEmpty(DomainUtil.getDomainId(obj))) {
 				return save(obj);
 			}else {
-				BaseRelationalDatabaseDomain smartGet = smartGet(obj);
-				if (smartGet != null) {
-					session.evict(smartGet);
+				Map<String, Object> map = new HashMap<>();
+				Class<? extends BaseRelationalDatabaseDomain> clazz = obj.getClass();
+				String domainIDName = DomainUtil.getDomainIDName(clazz);
+				map.put(domainIDName, ReflectUtil.getValue(domainIDName, obj));
+				
+				if (!DaoUtil.isResultNull(clazz, map)) {
 					session.update(obj);
 				}else {
 					session.save(obj);

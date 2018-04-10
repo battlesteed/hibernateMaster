@@ -1,10 +1,13 @@
 package steed.hibernatemaster.domain;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Transient;
@@ -205,12 +208,16 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	
 	@Override
 	public boolean saveOrUpdate(){
-		if (BaseUtil.isObjEmpty(DomainUtil.getDomainId(this))) {
+		Serializable domainId = DomainUtil.getDomainId(this);
+		if (BaseUtil.isObjEmpty(domainId)) {
 			return save();
 		}else {
-			BaseDatabaseDomain smartGet = smartGet();
-			if (smartGet != null) {
-				DaoUtil.evict(smartGet);
+			Map<String, Object> map = new HashMap<>();
+			Class<? extends BaseRelationalDatabaseDomain> clazz = getClass();
+			String domainIDName = DomainUtil.getDomainIDName(clazz);
+			map.put(domainIDName, domainId);
+			
+			if (!DaoUtil.isResultNull(clazz, map)) {
 				return update();
 			}else {
 				return save();
