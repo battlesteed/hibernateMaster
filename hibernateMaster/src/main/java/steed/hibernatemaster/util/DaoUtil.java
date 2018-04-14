@@ -745,6 +745,7 @@ public class DaoUtil {
 		Session session = null;
 		try {
 			session = getSession();
+			beginTransaction();
 			BaseRelationalDatabaseDomain smartGet = DaoUtil.smartGet(obj);
 			if (smartGet == null) {
 				return true;
@@ -909,6 +910,62 @@ public class DaoUtil {
 		try {
 			StringBuffer hql = getSelectHql(target, where, desc, asc);
 			
+			Query query = createQuery(where,hql);
+			paging(1, 1, query);
+			return (T) query.uniqueResult();
+		} catch (Exception e) {
+			setException(e);
+			return null;
+		}finally{
+			closeSession();
+		}
+	}
+	/**
+	 * 查询单个实体类的某几个字段
+	 * 
+	 * @param target 要查询的实体类
+	 * @param where 查询条件
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
+	 */
+	public final static <T> T listOneField(BaseDatabaseDomain where,String... selectedFields){
+		return (T) listOneField(where.getClass(), DaoUtil.putField2Map(where), null, null,selectedFields);
+	}
+	/**
+	 * 查询单个实体类的某几个字段
+	 * 
+	 * @param target 要查询的实体类
+	 * @param where 查询条件
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
+	 */
+	public final static <T> T listOneField(Class<T> target, Map<String, Object> where,String... selectedFields){
+		return listOneField(target, where, null, null,selectedFields);
+	}
+	
+	/**
+	 * 查询单个实体类的某几个字段
+	 * 
+	 * @param target 要查询的实体类
+	 * @param where 查询条件
+	 * @param desc 需要降序排列的字段 不需要请传null
+	 * @param asc 需要升序排列的字段 不需要请传null
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
+	 */
+	public final static <T> T listOneField(Class<T> target, Map<String, Object> where, List<String> desc, List<String> asc, String... selectedFields){
+		return listOneField(target, where, desc, asc, null,selectedFields);
+	}
+	/**
+	 * 查询单个实体类的某几个字段
+	 * 
+	 * @param target 要查询的实体类
+	 * @param where 查询条件
+	 * @param desc 需要降序排列的字段 不需要请传null
+	 * @param asc 需要升序排列的字段 不需要请传null
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
+	 */
+	@SuppressWarnings("unchecked")
+	public final static <T> T listOneField(Class<T> target, Map<String, Object> where, List<String> desc, List<String> asc, String[] groupBy, String... selectedFields){
+		try {
+			StringBuffer hql = getSelectHql(target, where, desc, asc, groupBy, selectedFields);
 			Query query = createQuery(where,hql);
 			paging(1, 1, query);
 			return (T) query.uniqueResult();
@@ -1665,13 +1722,13 @@ public class DaoUtil {
 	 * 获取查询用的hql
 	 * 除了t其它均可为null
 	 * @param t 实体类
-	 * @param map 查询数据
+	 * @param where 查询条件
 	 * @param desc 降序排列字段
 	 * @param asc 升序排列字段
 	 * @return 拼好的hql
 	 */
-	public final static <T> StringBuffer getSelectHql(Class<T> t,Map<String, Object> map,List<String> desc,List<String> asc,String[] groupBy,String... selectedFields) {
-		return getHql(t, map, desc, asc,"select",groupBy, selectedFields);
+	public final static <T> StringBuffer getSelectHql(Class<T> t,Map<String, Object> where,List<String> desc,List<String> asc,String[] groupBy,String... selectedFields) {
+		return getHql(t, where, desc, asc,"select",groupBy, selectedFields);
 	}
 	/**
 	 * 

@@ -4,7 +4,7 @@
 
 	<groupId>com.github.battlesteed</groupId>
 	<artifactId>hibernateMaster</artifactId>
-	<version>1.0.12-SNAPSHOT</version>
+	<version>1.0.13-SNAPSHOT</version>
 	<description>hibernateMaster--让数据操作更简单</description>
 
 	<licenses>
@@ -141,14 +141,14 @@
 		<dependency>
 		    <groupId>org.glassfish</groupId>
 		    <artifactId>javax.el</artifactId>
-		    <version>3.0.1-b04</version>
+		    <version>3.0.0</version>
 		    <optional>true</optional>
 		</dependency>
 		
 		<dependency>
 		    <groupId>javax.el</groupId>
 		    <artifactId>javax.el-api</artifactId>
-		    <version>3.0.1-b04</version>
+		    <version>3.0.0</version>
 		    <optional>true</optional>
 		</dependency>
 

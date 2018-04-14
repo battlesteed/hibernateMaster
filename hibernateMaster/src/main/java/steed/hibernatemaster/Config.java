@@ -21,7 +21,7 @@ public class Config {
 	public static boolean devMode = false;
 	
 	/**
-	 * 数据库操作失败是否抛出异常(全局设置,对当前线程设置请参考<code>{@link steed.hibernatemaster.util.DaoUtil#setThrowException}</code>)
+	 * 数据库操作失败是否抛出异常(该设置项为全局设置,单独对当前线程设置请参考<code>{@link steed.hibernatemaster.util.DaoUtil#setThrowException}</code>)
 	 */
 	public static boolean throwException = false;
 	/**
@@ -44,7 +44,7 @@ public class Config {
 	
 	/**
 	 * 是否自动开启事务,防止用户直接获取session执行写操作,而忘记开启事务,
-	 * 导致写操作不生效,一般不用改
+	 * 导致写操作不生效
 	 */
 	public static boolean autoBeginTransaction = true;
 	
