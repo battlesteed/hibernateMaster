@@ -49,23 +49,23 @@ public class User extends BaseRelationalDatabaseDomain{
 	 */
 	private Set<Role> roleSet;
 	/**
-	 * 用来做查询条件用的，没有对应的数据库字段，
-	 * 表明要查找的people实体类不能关联有roleSet_not_in_1里面的role对象
+	 * 用来做查询条件用的，没有对应的数据库字段，<br>
+	 * 表明要查找的people实体类不能关联有roleSet_not_in_1里面的role对象<br>
 	 * 
 	 * 
 	 * 
-	 * 	roleSet_not_in_1称为“查询条件后缀字段”，
-	 * 	该字段名后面的”_not_in_1“称为“查询条件后缀”，
+	 * 	roleSet_not_in_1称为“查询条件后缀字段”，<br>
+	 * 	该字段名后面的”_not_in_1“称为“查询条件后缀”，<br>
 	 * 	roleSet称为roleSet_not_in_1的约束字段
 	 * 
-	 * 	查询条件后缀有："_max_1","_min_1","_like_1","_not_in_1"，
-	 * 	（请参看steed.util.dao.DaoUtil.indexSuffix）
+	 * 	查询条件后缀有："_max_1","_min_1","_like_1","_not_in_1"，<br>
+	 * 	（请参看steed.util.dao.DaoUtil.indexSuffix）<br>
 	 * 	
-	 * 	查询条件后缀用法：
-	 * 	"_max_1"表明对应的"约束字段"要<="查询条件后缀字段"，
-	 * 	"_min_1"类似上面，
-	 * 	"_like_1"表明对应的"约束字段"要"like"(数据库里的like)"查询条件后缀字段"，
-	 * 	"_not_in_1"表明要查找的实体类不能关联有"查询条件后缀字段"里面的对象，
+	 * 	查询条件后缀用法：<br>
+	 * 	"_max_1"表明对应的"约束字段"要&lt;="查询条件后缀字段"，<br>
+	 * 	"_min_1"类似上面，<br>
+	 * 	"_like_1"表明对应的"约束字段"要"like"(数据库里的like)"查询条件后缀字段"，<br>
+	 * 	"_not_in_1"表明要查找的实体类不能关联有"查询条件后缀字段"里面的对象，<br>
 	 * 	
 	 */
 	private Set<Role> roleSet_not_in_1;

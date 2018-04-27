@@ -7,7 +7,7 @@ import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
 
 /**
- * 查询构建器,复杂的查询(> ,< , in等查询条件),请用该类构建
+ * 查询构建器,复杂的查询(&gt; ,&lt; , in等查询条件),请用该类构建
  * 
  * @author battlesteed
  *

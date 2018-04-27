@@ -55,7 +55,7 @@ public class HibernateUtil{
 	static {
 		try{
 			buildFactory();
-		}catch (Error e) {
+		}catch (Throwable e) {
 			e.printStackTrace();
 			throw e;
 		}

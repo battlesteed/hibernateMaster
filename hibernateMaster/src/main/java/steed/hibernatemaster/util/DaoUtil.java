@@ -923,7 +923,6 @@ public class DaoUtil {
 	/**
 	 * 查询单个实体类的某几个字段
 	 * 
-	 * @param target 要查询的实体类
 	 * @param where 查询条件
 	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
 	 */
@@ -1787,10 +1786,7 @@ public class DaoUtil {
 						//temp = temp.replace(matcher.group(1), domainSimpleName+"."+matcher.group(1));
 							//TODO 支持二级及以上实体类加减乘除操作
 							//TODO 类似a/1 1前面不加实体类前缀,a/b和a-b生成的别名是一样的,a-b可以改成a-b-0
-					String replace = selectedField.replace("/", "/"+domainSimpleName+".")
-							.replace("+", "+"+domainSimpleName+".")
-							.replace("-", "-"+domainSimpleName+".")
-							.replace("*", "*"+domainSimpleName+".").replace(" ", "");
+					String replace = dealMathChar(domainSimpleName, selectedField);
 							
 					String dealedSelectedField = temp.replace(selectedField, domainSimpleName+"."+replace);
 							
@@ -1870,6 +1866,13 @@ public class DaoUtil {
 		steed.util.logging.LoggerFactory.getLogger().debug("参数------>%s",queryMap==null?null:queryMap.toString());
 		
 		return hql;
+	}
+	private static String dealMathChar(String domainSimpleName, String selectedField) {
+		String replace = selectedField.replace("/", "/"+domainSimpleName+".")
+				.replace("+", "+"+domainSimpleName+".")
+				.replace("-", "-"+domainSimpleName+".")
+				.replace("*", "*"+domainSimpleName+".").replace(" ", "");
+		return replace;
 	}
 	
 	/**
@@ -2048,31 +2051,32 @@ public class DaoUtil {
 	 * @return 组装后的hql
 	 */
 	public final static StringBuffer appendHqlOrder(StringBuffer hql,List<String> desc,List<String> asc,String domainSimpleName){
-		boolean hasOrderByAppened = false;
-		if (desc != null && !desc.isEmpty()) {
-			for (String name:desc) {
-				if (!hasOrderByAppened) {
-					hql.append("order by ");
-					hasOrderByAppened = true;
-				}else {
-					hql.append(", ");
-				}
-				hql.append(domainSimpleName).append(".").append(name).append(" desc");
-			}
-		}
-		if (asc != null && !asc.isEmpty()) {
-			for (String name:asc) {
-				if (!hasOrderByAppened) {
-					hql.append("order by ");
-					hasOrderByAppened = true;
-				}else {
-					hql.append(", ");
-				}
-				hql.append(domainSimpleName).append(".").append(name).append(" asc");
-			}
-		}
+		boolean hasOrderByAppened = appendHqlOrder(hql, desc, domainSimpleName, false,true);
+		hasOrderByAppened = appendHqlOrder(hql, asc, domainSimpleName, hasOrderByAppened,false);
 		return hql;
 	}
+	private static boolean appendHqlOrder(StringBuffer hql, List<String> orderField, String domainSimpleName,
+			boolean hasOrderByAppened,boolean desc) {
+		String order = desc ? "desc":"asc";
+		if (orderField != null && !orderField.isEmpty()) {
+			for (String name:orderField) {
+				
+				String selectedField = praseRealSelectedField(name);
+				String replace = dealMathChar(domainSimpleName, selectedField);
+						
+				String dealedSelectedField = name.replace(selectedField, domainSimpleName+"."+replace);
+				if (!hasOrderByAppened) {
+					hql.append("order by ");
+					hasOrderByAppened = true;
+				}else {
+					hql.append(", ");
+				}
+				hql.append(dealedSelectedField).append(order);
+			}
+		}
+		return hasOrderByAppened;
+	}
+	
 	
 	/**
 	 * 根据配置关闭session

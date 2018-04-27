@@ -1,5 +1,7 @@
 package steed.hibernatemaster.test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -45,6 +47,12 @@ public class ListCustomFieldTest {
 	@Test
 	public void testSum(){
 		List<Object> listAllCustomField = DaoUtil.listAllCustomField(new Clazz(), "sum(studentCount)","sum(studentCount)");
+		BaseUtil.out(listAllCustomField.get(0));
+	}
+	
+	@Test
+	public void testOrderBY(){
+		List<Object> listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, null, Arrays.asList("sum(studentCount)"), Arrays.asList("sum(studentCount)"), "id");
 		BaseUtil.out(listAllCustomField.get(0));
 	}
 	
