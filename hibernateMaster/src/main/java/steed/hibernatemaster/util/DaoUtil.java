@@ -1958,6 +1958,8 @@ public class DaoUtil {
 			return chain;
 		}else if (chain.contains(".")) {
 			return getMaxDepthDomainChain(clazz, chain.substring(0, chain.lastIndexOf(".")));
+		}else if (BaseDatabaseDomain.class.isAssignableFrom(chainField.getTarget())) {
+			return chain;
 		}
 		return null;
 	}
@@ -2055,6 +2057,7 @@ public class DaoUtil {
 		hasOrderByAppened = appendHqlOrder(hql, asc, domainSimpleName, hasOrderByAppened,false);
 		return hql;
 	}
+	
 	private static boolean appendHqlOrder(StringBuffer hql, List<String> orderField, String domainSimpleName,
 			boolean hasOrderByAppened,boolean desc) {
 		String order = desc ? "desc":"asc";
@@ -2071,7 +2074,7 @@ public class DaoUtil {
 				}else {
 					hql.append(", ");
 				}
-				hql.append(dealedSelectedField).append(order);
+				hql.append(" ").append(dealedSelectedField).append(" ").append(order);
 			}
 		}
 		return hasOrderByAppened;
