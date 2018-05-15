@@ -17,7 +17,7 @@ import steed.util.test.TestEfficiency;
  */
 public class GenTestData {
 	public final static int classSize = 48;
-	public final static int classCount = 100;
+	public final static int classCount = 10;
 	public final static int schoolCount = 2;
 	
 	public static void main(String[] args){

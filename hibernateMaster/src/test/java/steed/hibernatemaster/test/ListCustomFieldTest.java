@@ -32,10 +32,12 @@ public class ListCustomFieldTest {
 		
 //		DaoUtil.getSession().createQuery("select count(distinct clazz ) as clazzss from steed.hibernatem aster.sample.domain.Student student_steed_00 where  1=1 ").list();
 	}
+	
 	@Test
 	public void testNullMap(){
 		DaoUtil.listAllCustomField(School.class, null, null, null);
 	}
+	
 	@Test
 	public void testListOneField(){
 		List<Object> listAllCustomField = DaoUtil.listAllCustomField(School.class, null, null, null,"id");
@@ -52,7 +54,7 @@ public class ListCustomFieldTest {
 	
 	@Test
 	public void testOrderBY(){
-		List<Object> listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, null, Arrays.asList("sum(studentCount)"), Arrays.asList("sum(studentCount)"), "id");
+		List<Object> listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, null, Arrays.asList("sum(studentCount)","studentCount"), Arrays.asList("sum(studentCount)"), "id");
 		BaseUtil.out(listAllCustomField.get(0));
 	}
 	

@@ -46,7 +46,6 @@ public class TestValidate extends SteedTest{
 		} catch (Exception e) {
 //			assert("班级名字必填".equals(e.getMessage()));
 		}
-		
 	}
 
 }

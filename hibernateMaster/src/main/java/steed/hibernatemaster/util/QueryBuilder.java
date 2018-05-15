@@ -171,7 +171,7 @@ public class QueryBuilder {
 	 * 添加原生的hql where部分,不会被框架转义,处理等(除了外'domain.'会被替换成'实体类简称.'外),生成的hql将包含 'where 其它where条件 and + rawHqlPart'这个条件
 	 * 
 	 * @param rawHqlPart 如," (domain.name like '%admin' or domain.phone = '10086')",
-	 * 			生成的hql将包含 'where 其它where条件 and rawHqlPart' 这个条件
+	 * 			生成的hql将包含 'where 其它where条件 and (domain.name like '%admin' or domain.phone = '10086')' 这个条件
 	 * 
 	 * @return this
 	 */

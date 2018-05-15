@@ -926,8 +926,8 @@ public class DaoUtil {
 	 * @param where 查询条件
 	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
 	 */
-	public final static <T> T listOneField(BaseDatabaseDomain where,String... selectedFields){
-		return (T) listOneField(where.getClass(), DaoUtil.putField2Map(where), null, null,selectedFields);
+	public final static <T> T listOneFields(BaseDatabaseDomain where,String... selectedFields){
+		return (T) listOneFields(where.getClass(), DaoUtil.putField2Map(where), null, null,selectedFields);
 	}
 	/**
 	 * 查询单个实体类的某几个字段
@@ -936,8 +936,8 @@ public class DaoUtil {
 	 * @param where 查询条件
 	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
 	 */
-	public final static <T> T listOneField(Class<T> target, Map<String, Object> where,String... selectedFields){
-		return listOneField(target, where, null, null,selectedFields);
+	public final static <T> T listOneFields(Class<T> target, Map<String, Object> where,String... selectedFields){
+		return listOneFields(target, where, null, null,selectedFields);
 	}
 	
 	/**
@@ -949,8 +949,8 @@ public class DaoUtil {
 	 * @param asc 需要升序排列的字段 不需要请传null
 	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
 	 */
-	public final static <T> T listOneField(Class<T> target, Map<String, Object> where, List<String> desc, List<String> asc, String... selectedFields){
-		return listOneField(target, where, desc, asc, null,selectedFields);
+	public final static <T> T listOneFields(Class<T> target, Map<String, Object> where, List<String> desc, List<String> asc, String... selectedFields){
+		return listOneFields(target, where, desc, asc, null,selectedFields);
 	}
 	/**
 	 * 查询单个实体类的某几个字段
@@ -962,7 +962,7 @@ public class DaoUtil {
 	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
 	 */
 	@SuppressWarnings("unchecked")
-	public final static <T> T listOneField(Class<T> target, Map<String, Object> where, List<String> desc, List<String> asc, String[] groupBy, String... selectedFields){
+	public final static <T> T listOneFields(Class<T> target, Map<String, Object> where, List<String> desc, List<String> asc, String[] groupBy, String... selectedFields){
 		try {
 			StringBuffer hql = getSelectHql(target, where, desc, asc, groupBy, selectedFields);
 			Query query = createQuery(where,hql);
