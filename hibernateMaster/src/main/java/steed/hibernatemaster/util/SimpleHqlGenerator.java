@@ -75,7 +75,7 @@ public class SimpleHqlGenerator implements HqlGenerator{
 			List<String> removedEntry, Map<String, Object> query,Entry<String, Object> e,Map<String, Object> put) {
 		String key = e.getKey();
 		if (e.getValue() != null && (e.getValue() instanceof Collection || e.getValue().getClass().isArray()) 
-				&& !key.endsWith("_not_join")) {
+				&& !key.endsWith("_not_join") && !key.endsWith("_not_in_1")) {
 			//TODO 添加不联表的in和not in
 			boolean isNotIn = key.endsWith("_not_in_1");
 			String joinedName = domainSimpleName.replace("\\.", "_1_")
@@ -111,6 +111,14 @@ public class SimpleHqlGenerator implements HqlGenerator{
 			hql.append(".");
 			hql.append(key.replace("_not_join", ""));
 			hql.append(" in (:");
+			hql.append(dealDot(key));
+			hql.append(") ");
+		}else if(key.endsWith("_not_in_1")){
+			hql.append("and ");
+			hql.append(domainSimpleName);
+			hql.append(".");
+			hql.append(key.replace("_not_in_1", ""));
+			hql.append(" not in (:");
 			hql.append(dealDot(key));
 			hql.append(") ");
 		}else  if(key.endsWith(DaoUtil.rawHqlPart)){
