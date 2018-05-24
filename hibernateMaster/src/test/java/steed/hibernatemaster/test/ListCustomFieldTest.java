@@ -1,6 +1,5 @@
 package steed.hibernatemaster.test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,6 +9,7 @@ import steed.hibernatemaster.sample.domain.Clazz;
 import steed.hibernatemaster.sample.domain.School;
 import steed.hibernatemaster.sample.domain.Student;
 import steed.hibernatemaster.util.DaoUtil;
+import steed.hibernatemaster.util.QueryBuilder;
 import steed.util.base.BaseUtil;
 
 public class ListCustomFieldTest {
@@ -50,6 +50,17 @@ public class ListCustomFieldTest {
 	public void testSum(){
 		List<Object> listAllCustomField = DaoUtil.listAllCustomField(new Clazz(), "sum(studentCount)","sum(studentCount)");
 		BaseUtil.out(listAllCustomField.get(0));
+	}
+	
+	@Test
+	public void testIn(){
+		QueryBuilder builder = new QueryBuilder();
+		builder.addNotIn("id", new String[]{"1111"});
+		long count = DaoUtil.getCount(Clazz.class, builder.getWhere());
+		
+		assert(GenTestData.classCount*GenTestData.schoolCount == count);
+		
+//		List<Object> listAllCustomField = DaoUtil.listAllCustomField(builder.getWhere(), Clazz.class, "id");
 	}
 	
 	@Test
