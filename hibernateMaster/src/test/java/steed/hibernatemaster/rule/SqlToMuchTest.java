@@ -32,7 +32,7 @@ public class SqlToMuchTest extends SteedTest{
 		for(Student temp:studentList){
 			temp.delete();
 		}
-		clearSession();
+		cleanSession();
 		
 		testEfficiency.endAndOutUsedTime(String.format("%d个查询sql,%d个删除sql,用时", dataSize,dataSize));
 	}
@@ -50,7 +50,7 @@ public class SqlToMuchTest extends SteedTest{
 		
 		
 		DaoUtil.deleteByQuery(Student.class,builder.getWhere());
-		clearSession();
+		cleanSession();
 		
 		testEfficiency.endAndOutUsedTime(String.format("1个查询sql,1个删除sql,用时", dataSize,dataSize));
 		
@@ -76,11 +76,11 @@ public class SqlToMuchTest extends SteedTest{
 			student.save();
 		}
 		
-		clearSession();
+		cleanSession();
 	}
 
 	//清理session,防止数据库查询操作直接从session缓存取数据,导致测试结果不准确
-	private void clearSession() {
+	private void cleanSession() {
 		DaoUtil.managTransaction();
 		DaoUtil.relese();
 		DaoUtil.closeSessionNow();
