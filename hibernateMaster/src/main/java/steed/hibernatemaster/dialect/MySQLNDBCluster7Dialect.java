@@ -8,10 +8,10 @@ public class MySQLNDBCluster7Dialect extends MySQLNDB7Dialect {
 		return ENGINE_NDBCluster;
 	}
 
-	@Override
+	/*@Override
 	public String getCreateTableString() {
 		return super.getCreateTableString().replace("utf8mb4", "utf8").replace("UTF8MB4", "utf8");
-	}
+	}*/
 
 	
 }

@@ -137,7 +137,7 @@ class JdkLogger extends Logger {
 	
 	@Override
 	public boolean isTraceEnabled() {
-		return log.isLoggable(Level.FINEST); //TODO
+		return log.isLoggable(Level.FINEST); 
 	}
 
 	@Override

@@ -14,7 +14,7 @@ public class TestDataGenerate {
 	}
 	
 	public void genData(List<Class<? extends BaseDatabaseDomain>> domains){
-		
+//		1499782574
 	}
 	
 	public void genData(String... configFile){

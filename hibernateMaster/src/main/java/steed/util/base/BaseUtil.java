@@ -2,12 +2,20 @@ package steed.util.base;
 
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
+import steed.util.logging.Logger;
+import steed.util.logging.LoggerFactory;
 /**
  * 基础工具类，拥有许多基础方法
  * @author 战马
  *
  */
 public class BaseUtil {
+	private final static Logger logger = LoggerFactory.getLogger();
+	
+	public static Logger getLogger(){
+		return logger;
+	}
+	
 	/**
 	 * 判断对象是否为空，集合为空时也会返回true
 	 * @param obj

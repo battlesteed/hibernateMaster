@@ -59,14 +59,33 @@ public class DomainUtil{
 	 * 
 	 */
 	public static void purify(BaseDomain domain){
+		purify(domain,0);
+	}
+	/**
+	 * 
+	 * @param domain 要净化的实体类
+	 * @param keepDepth 保留深度,(为0时,只保留当前实体类,1即当前实体类关联的实体类会保留)
+	 */
+	public static void purify(BaseDomain domain,int keepDepth){
+		if (domain == null) {
+			return ;
+		}
 		List<Field> allFields = ReflectUtil.getAllFields(domain);
 		for(Field temp:allFields){
 			if (BaseDomain.class.isAssignableFrom(temp.getType())) {
 				temp.setAccessible(true);
-				try {
-					temp.set(domain, null);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					steed.util.logging.LoggerFactory.getLogger().warn("净化实体类出错",e);
+				if (keepDepth - 1 < 0) {
+					try {
+						temp.set(domain, null);
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						BaseUtil.getLogger().warn("净化实体类出错",e);
+					}
+				}else {
+					try {
+						purify((BaseDomain) temp.get(domain), keepDepth -1);
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						BaseUtil.getLogger().warn("净化实体类出错",e);
+					} 
 				}
 			}
 		}
@@ -270,7 +289,7 @@ public class DomainUtil{
 	 * @param clazz
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked"})
 	public static Field getIDfield(Class<? extends BaseDomain> clazz) {
 		if (clazz.getAnnotation(IdClass.class) != null) {
 			StringBuffer sb = new StringBuffer("按照约定含有");
@@ -293,7 +312,7 @@ public class DomainUtil{
 		return getIDfield((Class<? extends BaseDomain>)clazz.getSuperclass());
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked"})
 	public static Method getIDmethod(Class<? extends BaseDomain> clazz) {
 		if (clazz.getAnnotation(IdClass.class) != null) {
 			try {
@@ -322,6 +341,8 @@ public class DomainUtil{
 	 * @param filled
 	 * @param fill
 	 * @param fieldsNotSkip 即使为null也不跳过的字段,如果没有可以传个null
+	 * @return 
+	 * @return filled
 	 */
 	public static <T> void fillDomain(T filled,T fill,Collection<String> fieldsNotSkip){
 		fillDomain(filled, fill, fieldsNotSkip, false);
@@ -337,7 +358,7 @@ public class DomainUtil{
 	 * @param fieldsNotSkip 即使为null也不跳过的字段,如果没有可以传个null
 	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空，否则调用BaseUtil.isObjEmpty判断字段是否为空
 	 * @see BaseUtil#isObjEmpty
-	 * @return
+	 * @return newObj中不为空的字段跟oldObj中值不一样的字段
 	 */
 	public static <T> List<DifferenceField> getDifferenceField(T oldObject,T newObj,Collection<String> fieldsNotSkip,boolean strictlyMode){
 		List<Field> fields = ReflectUtil.getAllFields(newObj);
@@ -435,7 +456,6 @@ public class DomainUtil{
 							case both:
 								f.set(obj, "%"+value+"%");
 								break;
-
 							default:
 								break;
 							}
@@ -485,6 +505,7 @@ public class DomainUtil{
 	
 	/**
 	 * 把obj中非空字段放到map
+	 * @return
 	 */
 	public static void putField2Map(Object obj,Map<String, Object> map,String prefixName) {
 		putField2Map(obj, map, prefixName, true);
@@ -514,7 +535,7 @@ public class DomainUtil{
 				}
 			}
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			steed.util.logging.LoggerFactory.getLogger().debug("putField2Map出错",e);
+			BaseUtil.getLogger().debug("putField2Map出错",e);
 		}
 	}
 	
@@ -527,6 +548,7 @@ public class DomainUtil{
 			Method method = class1.getMethod(fieldSetterName, serializable.getClass());
 			method.invoke(baseDomain, serializable);
 		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
 			throw new RuntimeException(class1+"中没有"+fieldSetterName+"方法", e);
 		} catch (SecurityException
 					| IllegalAccessException 
