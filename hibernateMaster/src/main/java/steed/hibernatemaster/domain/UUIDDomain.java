@@ -40,10 +40,20 @@ public abstract class UUIDDomain extends BaseRelationalDatabaseDomain{
 
 	@Override
 	public boolean save() {
+		generateId();
+		return super.save();
+	}
+
+	/**
+	  *  生成id,一般调用save方法时才会生成id,但是某些时候需要在save之前就获取实体类id,做其它操作,这时候可以调用该方法提取生成id
+	 * @return id
+	 * 
+	 */
+	public String generateId() {
 		if (StringUtil.isStringEmpty(id)) {
 			id = UUID.randomUUID().toString().replace("-", "");
 		}
-		return super.save();
+		return id;
 	}
 	
 }
