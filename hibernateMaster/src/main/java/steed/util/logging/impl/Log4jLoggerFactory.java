@@ -27,7 +27,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContext;
 import org.apache.logging.log4j.util.LoaderUtil;
-import org.apache.logging.log4j.util.ReflectionUtil;
 
 import steed.util.logging.Logger;
 import steed.util.logging.LoggerFactory.InternalLoggerFactory;
@@ -65,8 +64,9 @@ class Log4jLogger extends Logger {
     }
 	
     protected LoggerContext getContext() {
-        final Class<?> anchor = ReflectionUtil.getCallerClass(steed.util.logging.Logger.class.getName(), "steed.util.logging");
-        return anchor == null ? LogManager.getContext() : getContext(ReflectionUtil.getCallerClass(anchor));
+//        final Class<?> anchor = ReflectionUtil.getCallerClass(steed.util.logging.Logger.class.getName(), "steed.util.logging");
+//        return anchor == null ? LogManager.getContext() : getContext(ReflectionUtil.getCallerClass(anchor));
+        return  LogManager.getContext();
     }
 	
 	Log4jLogger(Class<?> clazz) {
@@ -74,7 +74,7 @@ class Log4jLogger extends Logger {
 	}
 	
 	Log4jLogger(String name) {
-		log = LogManager.getLogger(name);
+		log = getContext().getLogger(name);
 	}
 	
 	public void debug(String format, Object... args){

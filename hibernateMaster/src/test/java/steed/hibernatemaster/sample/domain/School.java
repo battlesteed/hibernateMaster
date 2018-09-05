@@ -38,6 +38,7 @@ public class School extends UUIDDomain{
 	public void setChargeMan(String chargeMan) {
 		this.chargeMan = chargeMan;
 	}
+	
 	public Date getBuildDate() {
 		return buildDate;
 	}

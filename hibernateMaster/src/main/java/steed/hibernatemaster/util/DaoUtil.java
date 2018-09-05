@@ -1249,8 +1249,8 @@ public class DaoUtil {
 	@SuppressWarnings("unchecked")
 	public final static <T> List<T> randomlistObj(Class<T> target,int size,Map<String, Object> where){
 		try {
-			List<String> randList = new ArrayList<String>(1);
-			randList.add("RAND()");
+//			List<String> randList = new ArrayList<String>(1);
+//			randList.add("RAND()");
 			StringBuffer hql = getSelectHql(target, where, null, null);
 			hql.append(" order by RAND()");
 			Query query = createQuery(where,hql);

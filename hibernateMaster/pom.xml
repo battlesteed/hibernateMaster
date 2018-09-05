@@ -16,7 +16,7 @@
 	<developers>
 		<developer>
 			<name>battlesteed</name>
-			<email>battle_steed@163.com</email>
+			<email>battle_steed@qq.com</email>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -172,7 +172,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
-			<scope>test</scope>
+			<!-- <scope>test</scope> -->
 			<optional>true</optional>
 		</dependency>
 	</dependencies>

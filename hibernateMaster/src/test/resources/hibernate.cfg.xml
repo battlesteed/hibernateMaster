@@ -29,11 +29,26 @@
         
         <property name="username">root</property>
         <property name="password">root</property>
-        <property name="url">jdbc:mysql://localhost:3307/hibernateMaster?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
-        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="url">jdbc:mysql://localhost:3306/hibernatemaster?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
+      <!--
+      	做读写分离请加上这行
+         <property name="slaveUrl">jdbc:mysql://localhost:3306/hibernatemaster1?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
+       -->  <property name="hibernate.dialect">steed.hibernatemaster.dialect.MySQL5InnoDBNOForeignKeyDialect</property>
+      
+        <!-- <property name="username">root</property>
+        <property name="password">root</property>
+        <property name="url">jdbc:mysql://localhost:3307/hibernatemaster?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
+        <property name="hibernate.dialect">steed.hibernatemaster.dialect.MySQL57InnoDNOForeignKeyDialect</property> -->
         
         
         <property name="hibernate.connection.provider_class">com.alibaba.druid.support.hibernate.DruidConnectionProvider</property>
+        
+       <!--  
+      	做读写分离请用这个,不然用上面那个connection.provider_class
+       <property name="hibernate.connection.provider_class">steed.hibernatemaster.connection.ShardingJDBCConnectionProvider</property>
+        --> <property name="initialSize">1</property>
+        <property name="minIdle">2</property>
+        <property name="maxActive">20</property>
         <property name="validationQuery">select 1</property>
         <property name="testWhileIdle">true</property>
         <!-- 定时输出统计信息到日志中   单位:毫秒 配置了timeBetweenLogStatsMillis属性（大于0）之后，就会定时输出统计信息到日志中。每次输出日志会导致清零（reset）连接池相关的计数器。-->

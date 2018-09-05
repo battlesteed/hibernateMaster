@@ -2,6 +2,8 @@ package steed.hibernatemaster.util;
 
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -35,6 +37,7 @@ public class SingleFactoryEngine implements FactoryEngine{
 			for(Class<? extends BaseDatabaseDomain> temp:scan){
 				metadataSources.addAnnotatedClass(temp);
 			}
+			DataSource source = null;
 			
 		//	new HibernateUtil().scanDomain(metadataSources);
 			
@@ -42,6 +45,7 @@ public class SingleFactoryEngine implements FactoryEngine{
 			    .applyImplicitNamingStrategy( ImplicitNamingStrategyJpaCompliantImpl.INSTANCE )
 			    .build();
 
+//			metadata.getSessionFactoryBuilder().applyNullabilityChecking(arg0)
 			SessionFactory factory2 = metadata.getSessionFactoryBuilder().build();
 		
 			

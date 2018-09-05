@@ -1,8 +1,8 @@
 package steed.hibernatemaster.dialect;
 
-import org.hibernate.dialect.MySQL57InnoDBDialect;
+import org.hibernate.dialect.MySQL5InnoDBDialect;
 
-public class MySQL57InnoDNOForeignKeyDialect extends MySQL57InnoDBDialect {
+public class MySQL5InnoDBNOForeignKeyDialect extends MySQL5InnoDBDialect {
 
 	@Override
 	public String getAddForeignKeyConstraintString(String constraintName, String[] foreignKey, String referencedTable,

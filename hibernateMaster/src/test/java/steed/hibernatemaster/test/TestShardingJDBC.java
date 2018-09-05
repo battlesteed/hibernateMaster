@@ -9,7 +9,7 @@ import steed.util.base.BaseUtil;
 
 public class TestShardingJDBC extends SteedTest{
     
-    @Test
+   /* @Test
     public void ttt(){
     	School school = new School();
     	school.setName("ddd");
@@ -17,5 +17,5 @@ public class TestShardingJDBC extends SteedTest{
     	School listOne = DaoUtil.listOne(school);
     	BaseUtil.out(listOne);
     	BaseUtil.out(DaoUtil.listOne(new Student())+"");
-    }
+    }*/
 }
