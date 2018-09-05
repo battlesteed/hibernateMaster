@@ -341,8 +341,6 @@ public class DomainUtil{
 	 * @param filled
 	 * @param fill
 	 * @param fieldsNotSkip 即使为null也不跳过的字段,如果没有可以传个null
-	 * @return 
-	 * @return filled
 	 */
 	public static <T> void fillDomain(T filled,T fill,Collection<String> fieldsNotSkip){
 		fillDomain(filled, fill, fieldsNotSkip, false);
@@ -505,7 +503,6 @@ public class DomainUtil{
 	
 	/**
 	 * 把obj中非空字段放到map
-	 * @return
 	 */
 	public static void putField2Map(Object obj,Map<String, Object> map,String prefixName) {
 		putField2Map(obj, map, prefixName, true);

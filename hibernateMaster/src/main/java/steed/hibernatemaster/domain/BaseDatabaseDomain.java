@@ -51,7 +51,7 @@ public abstract class BaseDatabaseDomain extends BaseDomain{
 	public abstract <T extends BaseDatabaseDomain> T smartGet();
 	/**
 	 * 最终会调update或save方法,要做实体类切面编程,请重写update或save方法,无需重写该方法,该方法仅仅做判断调update还是save方法而已
-	 * @return
+	 * @return 是否保存或更新成功
 	 */
 	public abstract boolean saveOrUpdate();
 

@@ -54,7 +54,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	
 	/**
 	 * 设置属于本实体类的个性化的hql生成器
-	 * @param personalHqlGenerator
+	 * @param personalHqlGenerator 自定义的hql生成器
 	 * @see steed.hibernatemaster.util.SimpleHqlGenerator
 	 */
 	public void setPersonalHqlGenerator(HqlGenerator personalHqlGenerator) {
@@ -167,6 +167,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 
 	/**
 	 * 设置是否需要框架帮忙把id为空字符串的实体类裁剪,防止找不到空字符串的外键,导致保存或更新失败
+	 * @param trimEmptyDomain 是否把id为空字符串的实体类裁剪,防止找不到空字符串的外键,导致保存或更新失败
 	 * @see #trimEmptyDomain()
 	 * @see #isTrimEmptyDomain()
 	 */
