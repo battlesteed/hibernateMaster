@@ -34,8 +34,13 @@
         <property name="hibernate.dialect">steed.hibernatemaster.dialect.MySQL57InnoDNOForeignKeyDialect</property>
         
         <property name="hibernate.connection.provider_class">com.alibaba.druid.support.hibernate.DruidConnectionProvider</property>
+        
         <property name="validationQuery">select 1</property>
+        <property name="testOnBorrow">true</property>
         <property name="testWhileIdle">true</property>
+        <property name="keepAlive">true</property>
+        <property name="minEvictableIdleTimeMillis">100000</property>
+        
         <!-- 定时输出统计信息到日志中   单位:毫秒 配置了timeBetweenLogStatsMillis属性（大于0）之后，就会定时输出统计信息到日志中。每次输出日志会导致清零（reset）连接池相关的计数器。-->
         <property name="timeBetweenLogStatsMillis">3600000</property>
         <property name="filters">stat,wall,slf4j</property>

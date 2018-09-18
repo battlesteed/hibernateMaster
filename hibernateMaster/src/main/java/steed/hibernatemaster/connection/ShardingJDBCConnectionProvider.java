@@ -87,39 +87,6 @@ public class ShardingJDBCConnectionProvider implements ConnectionProvider,Config
 		conn.close();
 	}
 	
-
-    private DataSource buildDataSource() {
-        //设置分库映射
-    	Map<String, DataSource> dataSourceMap = new HashMap<>();
-    	dataSourceMap.put("masterDataSource", createDataSource("hibernateMaster"));
-    	dataSourceMap.put("slaveDataSource0", createDataSource("hibernateMaster1"));
-    	
-    	MasterSlaveRuleConfiguration masterSlaveRuleConfig = new MasterSlaveRuleConfiguration();
-        masterSlaveRuleConfig.setName("demo_ds_master_slave");
-        masterSlaveRuleConfig.setMasterDataSourceName("masterDataSource");
-        masterSlaveRuleConfig.setSlaveDataSourceNames(Arrays.asList("slaveDataSource0"));
-
-    	DataSource dataSource = null;
-		try {
-			dataSource = MasterSlaveDataSourceFactory.createDataSource(dataSourceMap, masterSlaveRuleConfig, new HashMap<>());
-			dataSource.getConnection().close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-        return dataSource;
-    }
-    
-    private static DataSource createDataSource(final String dataSourceName) {
-        //使用druid连接数据库
-        DruidDataSource result = new DruidDataSource();
-        result.setDriverClassName(Driver.class.getName());
-        result.setUrl(String.format("jdbc:mysql://localhost:3307/%s", dataSourceName));
-        result.setUsername("root");
-        result.setPassword("root");
-        return result;
-    }
-
 	@Override
 	public boolean supportsAggressiveRelease() {
 		return false;
