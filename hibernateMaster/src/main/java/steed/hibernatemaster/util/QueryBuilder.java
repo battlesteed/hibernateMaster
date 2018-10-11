@@ -1,7 +1,9 @@
 package steed.hibernatemaster.util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
@@ -117,6 +119,26 @@ public class QueryBuilder {
 	@SuppressWarnings("unchecked")
 	public <T> QueryBuilder addNotIn(String key,T... value){
 		queryMap.put(key+"_not_in_1", value);
+		return this;
+	}
+	/**
+	 * 添加not in查询条件 生成的hql将包含 "model.key not in( :list )"这个条件
+	 * @param key 字段名
+	 * @param list 值
+	 * @return this
+	 */
+	public <T> QueryBuilder addNotIn(String key,List<T> list){
+		queryMap.put(key+"_not_in_1", list);
+		return this;
+	}
+	/**
+	 * 添加not in查询条件 生成的hql将包含 "model.key not in( :set )"这个条件
+	 * @param key 字段名
+	 * @param set 值
+	 * @return this
+	 */
+	public <T> QueryBuilder addNotIn(String key,Set<T> set){
+		queryMap.put(key+"_not_in_1", set);
 		return this;
 	}
 	/**
