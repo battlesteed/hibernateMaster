@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 
 import steed.hibernatemaster.Config;
+import steed.hibernatemaster.sample.domain.School;
 import steed.hibernatemaster.util.DaoUtil;
 
 public class SteedTest {
@@ -17,6 +18,11 @@ public class SteedTest {
 	public static void init(){
 		Config.autoCommitTransaction = false;
 		Config.devMode = true;
+		School school = new School();
+		school.setName("school0");
+		if (DaoUtil.isResultNull(school)) {
+			new GenTestData().genData();
+		}
 	}
 	
 	@Before
