@@ -1171,7 +1171,7 @@ public class DaoUtil {
 			setMapParam(where, query);
 			return query.list();
 		} catch (Exception e) {
-			e.printStackTrace();
+			setException(e);
 			return null;
 		}finally{
 			closeSession();
