@@ -271,12 +271,13 @@ public class DaoUtil {
 	}
 	
 	public final static boolean saveList(List<? extends BaseRelationalDatabaseDomain> list){
-		Session session = null;
+		if (list == null || list.isEmpty()) {
+			return true;
+		}
 		try {
-			session = getSession();
 			beginTransaction();
-			for (Object obj:list) {
-				session.save(obj);
+			for (BaseRelationalDatabaseDomain obj:list) {
+				obj.save();
 			}
 			return managTransaction(true);
 		} catch (Exception e) {

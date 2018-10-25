@@ -81,9 +81,26 @@ public class QueryBuilder {
 	 * @param key 字段名
 	 * @param value 值
 	 * @return this
+	 * 
+	 * @see #addNotEqual(String, Object, int)
 	 */
 	public QueryBuilder addNotEqual(String key,Object value){
 		queryMap.put(key+"_not_equal_1", value);
+		return this;
+	}
+	
+	/**
+	 * 添加不等于查询条件 生成的hql将包含 "model.key != :value "这个条件
+	 * 直接调用两次{@link #addNotEqual(String, Object)},无法添加user != 2 and user != 3 的情况
+	 * 最后生成的hql 只有一个 != ,而用该方法,有多少个index,就会生成多少个 != 
+	 * 
+	 * @param key 字段名
+	 * @param value 值
+	 * @param index 第几个 != 条件
+	 * @return this
+	 */
+	public QueryBuilder addNotEqual(String key,Object value,int index){
+		queryMap.put(key+"_i_"+index+"_not_equal_1", value);
 		return this;
 	}
 	

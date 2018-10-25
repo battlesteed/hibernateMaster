@@ -155,7 +155,11 @@ public class SimpleHqlGenerator implements HqlGenerator{
 				hql.append(dealDot(key));
 				hql.append(" ");
 			}else if(key.endsWith("_not_equal_1")){
-				hql.append(key.replace("_not_equal_1", ""));
+				String replace = key.replace("_not_equal_1", "");
+				if (replace.lastIndexOf("_i_") != -1) {
+					replace = replace.substring(0, replace.lastIndexOf("_i_"));
+				}
+				hql.append(replace);
 				hql.append(" != :");
 				hql.append(dealDot(key));
 				hql.append(" ");
