@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import steed.hibernatemaster.Config;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
+import steed.util.base.BaseUtil;
+import steed.util.base.StringUtil;
 
 /**
  * 查询构建器,复杂的查询(&gt; ,&lt; , in等查询条件),请用该类构建
@@ -135,6 +138,9 @@ public class QueryBuilder {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> QueryBuilder addNotIn(String key,T... value){
+		if (BaseUtil.isObjEmpty(value)) {
+			return this;
+		}
 		queryMap.put(key+"_not_in_1", value);
 		return this;
 	}
@@ -165,7 +171,15 @@ public class QueryBuilder {
 	 * @return this
 	 */
 	public <T> QueryBuilder addIn(String key,Object value){
-		queryMap.put(key+"_not_join", value);
+		if (BaseUtil.isObjEmpty(value)) {
+			if (Config.sqlWallOpen) {
+				queryMap.put(DaoUtil.rawHqlPart, String.format(" %s = '1' and %s = '2' ", key,key));
+			}else {
+				queryMap.put(DaoUtil.rawHqlPart, " 1 = 2 ");
+			}
+		}else {
+			queryMap.put(key+"_not_join", value);
+		}
 		return this;
 	}
 	

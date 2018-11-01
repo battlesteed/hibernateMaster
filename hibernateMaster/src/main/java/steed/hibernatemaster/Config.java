@@ -48,6 +48,7 @@ public class Config {
 	 */
 	public static boolean autoBeginTransaction = true;
 	
+	public static boolean sqlWallOpen = true;
 	
 	
 }

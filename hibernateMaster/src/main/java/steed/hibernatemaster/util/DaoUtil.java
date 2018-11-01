@@ -935,7 +935,10 @@ public class DaoUtil {
 	 * 
 	 * @param target 要查询的实体类
 	 * @param where 查询条件
-	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null),当selectedFields.length > 1时,返回map<String,Object>
+	 * 当 selectedFields.length == 1时返回 直接返回单个查询字段
+	 * 
+	 * 
 	 */
 	public final static <T> T listOneFields(Class<?> target, Map<String, Object> where,String... selectedFields){
 		return listOneFields(target, where, null, null,selectedFields);
@@ -948,7 +951,8 @@ public class DaoUtil {
 	 * @param where 查询条件
 	 * @param desc 需要降序排列的字段 不需要请传null
 	 * @param asc 需要升序排列的字段 不需要请传null
-	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null),当selectedFields.length > 1时,返回map<String,Object>
+	 * 当 selectedFields.length == 1时返回 直接返回单个查询字段
 	 */
 	public final static <T> T listOneFields(Class<?> target, Map<String, Object> where, List<String> desc, List<String> asc, String... selectedFields){
 		return listOneFields(target, where, desc, asc, null,selectedFields);
