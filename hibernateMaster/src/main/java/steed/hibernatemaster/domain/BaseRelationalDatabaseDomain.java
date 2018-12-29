@@ -226,11 +226,24 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 		}
 	}
 	
+	/**
+	 * update实体类中不为空的字段
+	 * 
+	 * @param updateEvenNull 即使为空也update到数据库中的字段,没有请传null
+	 * 
+	 * @return 是否更新成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
+	 */
 	@Override
 	public boolean updateNotNullField(List<String> updateEvenNull){
 		return updateNotNullField(updateEvenNull, true);
 	}
 	
+	/**
+	 * update实体类中不为空的字段
+	 * 
+	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传个null
+	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空， 否则调用BaseUtil.isObjEmpty判断字段是否为空
+	 */
 	@Override
 	public boolean updateNotNullField(List<String> updateEvenNull,boolean strictlyMode){
 		BaseRelationalDatabaseDomain smartGet = this.smartGet();

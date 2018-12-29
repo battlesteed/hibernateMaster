@@ -935,7 +935,7 @@ public class DaoUtil {
 	 * 
 	 * @param target 要查询的实体类
 	 * @param where 查询条件
-	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null),当selectedFields.length > 1时,返回map<String,Object>
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null),当selectedFields.length &gt; 1时,返回map&lt;String,Object&gt;
 	 * 当 selectedFields.length == 1时返回 直接返回单个查询字段
 	 * 
 	 * 
@@ -951,7 +951,7 @@ public class DaoUtil {
 	 * @param where 查询条件
 	 * @param desc 需要降序排列的字段 不需要请传null
 	 * @param asc 需要升序排列的字段 不需要请传null
-	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null),当selectedFields.length > 1时,返回map<String,Object>
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null),当selectedFields.length &gt; 1时,返回map&lt;String,Object&gt;
 	 * 当 selectedFields.length == 1时返回 直接返回单个查询字段
 	 */
 	public final static <T> T listOneFields(Class<?> target, Map<String, Object> where, List<String> desc, List<String> asc, String... selectedFields){
@@ -1561,7 +1561,8 @@ public class DaoUtil {
 		Transaction transaction = getTransaction();
 		if (transaction != null) {
 			transaction.rollback();
-			steed.util.logging.LoggerFactory.getLogger().debug("回滚事务.....");
+			getSession().clear();
+			steed.util.logging.LoggerFactory.getLogger().debug("回滚事务并清空session.....");
 		}
 		currentTransaction.remove();
 	}
@@ -1963,10 +1964,10 @@ public class DaoUtil {
 			return chain;
 		}else if (chain.contains(".")) {
 			return getMaxDepthDomainChain(clazz, chain.substring(0, chain.lastIndexOf(".")));
-		}else if (BaseDatabaseDomain.class.isAssignableFrom(chainField.getTarget())) {
+		}else if (chainField != null && BaseDatabaseDomain.class.isAssignableFrom(chainField.getTarget())) {
 			return chain;
 		}
-		return null;
+		throw new IllegalArgumentException(clazz.getName()+"中找不到字段"+chain);
 	}
 	
 	/**
