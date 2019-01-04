@@ -38,6 +38,7 @@ import steed.util.base.CollectionsUtil;
 import steed.util.base.DomainUtil;
 import steed.util.base.RegUtil;
 import steed.util.base.StringUtil;
+import steed.util.logging.LoggerFactory;
 import steed.util.reflect.ReflectResult;
 import steed.util.reflect.ReflectUtil;
 /**
@@ -2156,7 +2157,7 @@ public class DaoUtil {
 		 * @param map obj字段容器,用来生成hql或sqlwhere部分的查询条件
 		 * @param prefixName 前缀,当put user里面的school时,prefixName="user.",原理比较复杂,具体可以看源码
 		 * @param getFieldByGetter 是否用Getter方法来获取字段值,若传false,则用field.get直接获取字段值
-		 * @return 是否运行把该对象put到map
+		 * @return 是否执行DaoUtil#putField2Map(Object, Map, String, boolean)
 		 * 
 		 * @see DaoUtil#putField2Map(Object, Map, String, boolean)
 		 */
@@ -2184,49 +2185,66 @@ public class DaoUtil {
 			}
 		}
 		try {
-			Class<? extends Object> objClass = obj.getClass();
-			List<Field> Fields = ReflectUtil.getNotFinalFields(obj);
-			for (Field f:Fields) {
-				String fieldName = f.getName();
-				if (map.containsKey(prefixName+fieldName)) {
-					continue;
-				}
-				//不是索引字段且标有Transient即跳过
-				if (isSelectIndex(fieldName) == 0) {
-					if (ReflectUtil.getAnnotation(Transient.class, objClass, f) != null) {
-						continue;
-					}else if (ReflectUtil.getDeclaredMethod(objClass, StringUtil.getFieldGetterName(fieldName)) == null 
-							&& ReflectUtil.getDeclaredMethod(objClass, StringUtil.getFieldIsMethodName(fieldName)) == null) {
-						continue;
+			boolean containID = false;
+			
+			try {
+				if ((obj instanceof BaseDomain)) {
+					Serializable domainId = DomainUtil.getDomainId((BaseDomain) obj);
+					if (!BaseUtil.isObjEmpty(domainId)) {
+						map.put(prefixName + DomainUtil.getIDfield((Class<? extends BaseDomain>) obj.getClass()).getName(), domainId);
+						containID = true;
 					}
 				}
-				
-				Object value = null;
-				if (getFieldByGetter) {
-					value = ReflectUtil.getFieldValueByGetter(obj, fieldName);
-				}
-				if (value == null) {
-					f.setAccessible(true);
-					value = f.get(obj);
-				}
-				if (!BaseUtil.isObjEmpty(value)) {
-					if (value instanceof BaseRelationalDatabaseDomain ) {
-						JoinColumn annotation = ReflectUtil.getAnnotation(JoinColumn.class, objClass, f);
-						if (annotation == null 
-								|| !(!annotation.insertable() 
-										&& !annotation.updatable())) {
+			} catch (Exception e) {
+				LoggerFactory.getLogger().info("尝试获取实体类id失败,"+e.getMessage());
+			}
+			
+			if (!containID) {
+				Class<? extends Object> objClass = obj.getClass();
+				List<Field> Fields = ReflectUtil.getNotFinalFields(obj);
+				for (Field f:Fields) {
+					String fieldName = f.getName();
+					if (map.containsKey(prefixName+fieldName)) {
+						continue;
+					}
+					//不是索引字段且标有Transient即跳过
+					if (isSelectIndex(fieldName) == 0) {
+						if (ReflectUtil.getAnnotation(Transient.class, objClass, f) != null) {
+							continue;
+						}else if (ReflectUtil.getDeclaredMethod(objClass, StringUtil.getFieldGetterName(fieldName)) == null 
+								&& ReflectUtil.getDeclaredMethod(objClass, StringUtil.getFieldIsMethodName(fieldName)) == null) {
+							continue;
+						}
+					}
+					
+					Object value = null;
+					if (getFieldByGetter) {
+						value = ReflectUtil.getFieldValueByGetter(obj, fieldName);
+					}
+					if (value == null) {
+						f.setAccessible(true);
+						value = f.get(obj);
+					}
+					if (!BaseUtil.isObjEmpty(value)) {
+						if (value instanceof BaseRelationalDatabaseDomain ) {
+							JoinColumn annotation = ReflectUtil.getAnnotation(JoinColumn.class, objClass, f);
+							if (annotation == null 
+									|| !(!annotation.insertable() 
+											&& !annotation.updatable())) {
+								map.put(prefixName + fieldName, value);
+							}
+						}else {
 							map.put(prefixName + fieldName, value);
 						}
-					}else {
-						map.put(prefixName + fieldName, value);
+					}else if (value instanceof BaseRelationalDatabaseDomain 
+							&& !(value instanceof BaseUnionKeyDomain)
+							&& BaseUtil.isObjEmpty(DomainUtil.getDomainId((BaseDomain) value))) {
+						//实体类级联查询支持,离0hql的伟大构想已经非常接近了!
+						putField2Map(value, map,prefixName + fieldName +".");
 					}
-				}else if (value instanceof BaseRelationalDatabaseDomain 
-						&& !(value instanceof BaseUnionKeyDomain)
-						&& BaseUtil.isObjEmpty(DomainUtil.getDomainId((BaseDomain) value))) {
-					//实体类级联查询支持,离0hql的伟大构想已经非常接近了!
-					putField2Map(value, map,prefixName + fieldName +".");
 				}
 			}
+			
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			steed.util.logging.LoggerFactory.getLogger().debug("putField2Map出错",e);
 		}

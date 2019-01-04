@@ -300,7 +300,7 @@ public class DomainUtil{
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field f:fields) {
 			f.setAccessible(true);
-			Annotation temp = f.getAnnotation(Id.class);
+			Annotation temp = ReflectUtil.getAnnotation(Id.class, clazz, f);
 			if (temp == null) {
 				continue;
 			}
