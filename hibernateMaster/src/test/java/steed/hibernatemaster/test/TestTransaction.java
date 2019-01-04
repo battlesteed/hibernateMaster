@@ -19,9 +19,11 @@ public class TestTransaction extends SteedTest{
 	public void testCommitFail(){
 		Student student = new Student();
 		student.setId("TestTransaction.testCommitFail");
+		student.delete();
 		student.save();
 		Student student2 = new Student();
 		student2.setId("TestTransaction.testCommitFail2");
+		student2.delete();
 		student2.save();
 		DaoUtil.managTransaction();
 		DaoUtil.closeSessionNow();
@@ -33,7 +35,7 @@ public class TestTransaction extends SteedTest{
 		
 		DaoUtil.managTransaction();
 		DaoUtil.closeSessionNow();
-//		DaoUtil.rollbackTransaction();
+		student2 = new Student();
 		student2.setName("22222222222");
 		
 		assert(DaoUtil.getCount(student2) == 0);
