@@ -1780,6 +1780,8 @@ public class DaoUtil {
 				if (selectedFields.length > 1) {
 					hql.append("new map( ");
 				}
+				//
+				Map<String, Integer> dealSpecialCharMap = new HashMap<>();
 				for(String temp:selectedFields){
 					Pattern pattern = RegUtil.getPattern("^\\s*\\d+\\s*$");
 					if (pattern.matcher(temp).find()) {
@@ -1799,8 +1801,18 @@ public class DaoUtil {
 							
 					addSelectedDomain(t, domainSelected, selectedField);
 					
+					String dealSpecialChar = dealSpecialChar(selectedField);
+					//修复 同时select Count(name),name 时生成的别名都为name,导致返回的map只有一个key的bug
+					if (dealSpecialCharMap.containsKey(dealSpecialChar)) {
+						int count = dealSpecialCharMap.get(dealSpecialChar);
+						dealSpecialChar += "_steed"+count;
+						dealSpecialCharMap.put(dealSpecialChar, ++count);
+					}else {
+						dealSpecialCharMap.put(dealSpecialChar, 0);
+					}
+					
 					hql.append(dealedSelectedField)
-						.append(" as ").append(dealSpecialChar(selectedField))
+						.append(" as ").append(dealSpecialChar)
 						.append(",");
 				}
 				

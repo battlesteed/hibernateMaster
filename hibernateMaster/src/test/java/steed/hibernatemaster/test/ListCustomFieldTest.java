@@ -1,7 +1,9 @@
 package steed.hibernatemaster.test;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -31,6 +33,14 @@ public class ListCustomFieldTest {
 		
 		
 //		DaoUtil.getSession().createQuery("select count(distinct clazz ) as clazzss from steed.hibernatem aster.sample.domain.Student student_steed_00 where  1=1 ").list();
+	}
+	
+	@Test
+	public void testCountSameField(){
+		List<Map> listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, new  HashMap<String, Object>(), null, null, "school", "name","count( name )");
+		assert(listAllCustomField.get(0).size() == 3);
+		listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, new  HashMap<String, Object>(), null, null, new String[] {"school"}, "name","count( name )");
+		assert(listAllCustomField.get(0).size() == 2);
 	}
 	
 	@Test

@@ -1,5 +1,7 @@
 package steed.hibernatemaster.test;
 
+import java.util.HashMap;
+
 import org.junit.Test;
 
 import steed.hibernatemaster.sample.domain.Clazz;
