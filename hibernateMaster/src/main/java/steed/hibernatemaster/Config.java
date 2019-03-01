@@ -48,7 +48,16 @@ public class Config {
 	 */
 	public static boolean autoBeginTransaction = true;
 	
+	/**
+	 * 是否打开了Sql防火墙(druid连接池专用)
+	 */
 	public static boolean sqlWallOpen = true;
+	
+	/**
+	 * 误更新检查(防止用户编码失误不带where条件更新整个表),按需开启
+	 * @see steed.hibernatemaster.util.DaoUtil#updateByQuery(Class, java.util.Map, java.util.Map)
+	 */
+	public static boolean muffUpdateCheck = false;
 	
 	
 }

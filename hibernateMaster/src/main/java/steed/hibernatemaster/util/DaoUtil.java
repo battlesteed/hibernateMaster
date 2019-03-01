@@ -563,29 +563,36 @@ public class DaoUtil {
 	
 	/**
 	 * 通过hql更新数据库，用于批量更新
-	 * @param queryCondition 查询条件，同listAllObj的查询条件
+	 * @param where 查询条件，同listAllObj的查询条件
 	 * @param updated 存放更新的 字段---值
 	 * @return 更新的记录数，失败返回-1
 	 */
-	public final static int updateByQuery(BaseDomain queryCondition,Map<String, Object> updated){
-		return updateByQuery(queryCondition.getClass(), putField2Map(queryCondition), updated);
+	public final static int updateByQuery(BaseDomain where,Map<String, Object> updated){
+		return updateByQuery(where.getClass(), putField2Map(where), updated);
 	}
 	
 	/**
 	 * 通过hql更新数据库，用于批量更新
-	 * @param queryCondition 查询条件，同listAllObj的查询条件
+	 * @param where 查询条件，同listAllObj的查询条件
 	 * @param updated 存放更新的字段-值
 	 * @return 更新的记录数，失败返回-1
 	 */
-	public final static int updateByQuery(Class<?> clazz,Map<String, Object> queryCondition,Map<String, Object> updated){
+	public final static int updateByQuery(Class<?> clazz,Map<String, Object> where,Map<String, Object> updated){
 		try {
 			beginTransaction();
 			
-			StringBuffer updateHql = getUpdateHql(clazz, queryCondition,updated);
-			for (Entry<String, Object> temp:updated.entrySet()) {
-				queryCondition.put("steedUpdate_"+temp.getKey(), temp.getValue());
+			if (Config.muffUpdateCheck && (where == null || where.isEmpty())) {
+				throw new IllegalArgumentException("steed.hibernatemaster.Config已经开启了误更新检查,为防止误更新,queryCondition不能为空!");
 			}
-			Query query = createQuery(queryCondition, updateHql);
+			
+			if (where == null) {
+				where = new HashMap<>();
+			}
+			StringBuffer updateHql = getUpdateHql(clazz, where,updated);
+			for (Entry<String, Object> temp:updated.entrySet()) {
+				where.put("steedUpdate_"+temp.getKey(), temp.getValue());
+			}
+			Query query = createQuery(where, updateHql);
 			int count = query.executeUpdate();
 			
 			if(managTransaction(true)){
@@ -615,7 +622,7 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 以query为查询条件删除数据库记录
+	 * 以where为查询条件删除数据库记录
 	 * 
 	 * @param where 查询条件
 	 * 
@@ -932,7 +939,7 @@ public class DaoUtil {
 		return listOneFields(where.getClass(), DaoUtil.putField2Map(where), null, null,selectedFields);
 	}
 	/**
-	 * 查询单个实体类的某几个字段
+	 * 查询实体类的某几个字段
 	 * 
 	 * @param target 要查询的实体类
 	 * @param where 查询条件
