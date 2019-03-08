@@ -17,10 +17,13 @@ import java.util.List;
 import java.util.Map;
 
 import steed.util.base.BaseUtil;
+import steed.util.base.DateUtil;
 import steed.util.base.StringUtil;
 import steed.util.logging.LoggerFactory;
 
 public class ReflectUtil {
+	private static final Map<String, Field> fieldCache = new HashMap<>();
+	private static final Map<String, Method> methodCache = new HashMap<>();
 	
 	public static void copySameField(Object copy,Object copyed){
 		List<Field> fields = getNotFinalFields(copyed);
@@ -80,12 +83,30 @@ public class ReflectUtil {
 		}
 	}
 	
+	public static <T extends Date> T convertDate(Class<T> baseType,String str) {
+		try {
+			Date parseDate = DateUtil.parseDate(str);
+			if (parseDate == null) {
+				return null;
+			}
+			if (baseType == Date.class) {
+				return (T) parseDate;
+			}
+			return baseType.getConstructor(long.class).newInstance(parseDate.getTime());
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
+	
 	/**
 	 * 把string转换成基本ID类型
 	 * @param baseType
 	 * @param str
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static Serializable convertFromString(Class<?> baseType,String str){
 		if (str == null) {
 			return null;
@@ -102,6 +123,9 @@ public class ReflectUtil {
 		}*/
 		if (baseType == String.class) {
 			return str;
+		}
+		if (Date.class.isAssignableFrom(baseType)) {
+			return convertDate((Class<Date>) baseType, str);
 		}
 		if (baseType == Integer.class || baseType == int.class) {
 			return Integer.parseInt(str);
@@ -126,22 +150,25 @@ public class ReflectUtil {
 	}
 	public static boolean isClassBaseID(Class<?> clazz){
 		return clazz == String.class || 
-				clazz == Short.class ||
-				clazz == Integer.class||
-				clazz == Float.class ||
-				clazz == Long.class ||
-				clazz == Character.class;
+				clazz == Byte.class || clazz == byte.class || 
+				clazz == Short.class || clazz == short.class ||
+				clazz == Integer.class || clazz == int.class ||
+				clazz == Float.class || clazz == float.class ||
+				clazz == Boolean.class || clazz == boolean.class ||
+				clazz == Character.class || clazz == char.class ||
+				clazz == Double.class || clazz == double.class ||
+				clazz == Long.class || clazz == long.class;
 	}
 	public static boolean isClassBaseType(Class<?> clazz){
-		return clazz == Byte.class || 
-				clazz == Short.class ||
-				clazz == Integer.class||
-				clazz == Float.class ||
-				clazz == Boolean.class ||
-				clazz == Character.class ||
-				clazz == Double.class ||
-				Date.class.isAssignableFrom(clazz) || 
-				clazz == Long.class;
+		return clazz == Byte.class || clazz == byte.class || 
+				clazz == Short.class || clazz == short.class ||
+				clazz == Integer.class || clazz == int.class ||
+				clazz == Float.class || clazz == float.class ||
+				clazz == Boolean.class || clazz == boolean.class ||
+				clazz == Character.class || clazz == char.class ||
+				clazz == Double.class || clazz == double.class ||
+				clazz == Long.class || clazz == long.class ||
+				Date.class.isAssignableFrom(clazz);
 	}
 	
 	public static boolean isObjBaseType(Object obj){
@@ -306,19 +333,38 @@ public class ReflectUtil {
 	 * @return 方法不存在则返回null
 	 */
 	public static Method getDeclaredMethod(Class<?> clazz,String methodName){
-		while(clazz != Object.class){
-			Method declaredMethod;
+		return getMethod(clazz, methodName, false);
+	}
+	/**
+	 * 获取类的方法(包括父类)
+	 * @param clazz
+	 * @param methodName
+	 * @param onlyPublic 是否只获取public方法
+	 * @return 方法不存在则返回null
+	 */
+	public static Method getMethod(Class<?> clazz,String methodName,boolean onlyPublic){
+//		Class<?> target = clazz;
+		Method declaredMethod = null;
+		String key = clazz.getName()+"."+methodName;
+		if (methodCache.containsKey(key)) {
+			declaredMethod = methodCache.get(key);
+			if (declaredMethod == null) {
+				return null;
+			}
+		}
+		while(clazz != Object.class && declaredMethod == null){
 			try {
 				declaredMethod = clazz.getDeclaredMethod(methodName);
-				if (declaredMethod != null) {
-					return declaredMethod;
-				}
 			} catch (NoSuchMethodException | SecurityException e) {
-//				steed.util.logging.LoggerFactory.getLogger().info("获取方法出错!%s",e.getMessage());
+				//BaseUtil.getLogger().info("获取方法出错!{}",e.getMessage());
 			}
 			clazz = clazz.getSuperclass();
 		}
-		return null;
+		if (declaredMethod != null && onlyPublic && !Modifier.isPublic(declaredMethod.getModifiers())) {
+			return null;
+		}
+//		BaseUtil.getLogger().info("{}没有{}方法",new Object[]{target.getName(),methodName});
+		return declaredMethod;
 	}
 	
 	public static Object getFieldValueByGetter(Object obj,String fieldName){
@@ -402,16 +448,7 @@ public class ReflectUtil {
 	 * @see #getDeclaredField(Class, String)
 	 */
 	public static Field getField(Class<?> clazz,String fieldName){
-		Class<?> class4Log = clazz;
-		while (clazz != Object.class) {
-			try {
-				return clazz.getField(fieldName);
-			} catch (NoSuchFieldException | SecurityException e) {
-				clazz = clazz.getSuperclass();
-			}
-		}
-		LoggerFactory.getLogger().warn(class4Log.getName()+"中找不public的"+fieldName+"字段");
-		return null;
+		return getField(clazz, fieldName, true);
 	}
 	
 	/**
@@ -449,17 +486,40 @@ public class ReflectUtil {
 	 * @see #getChainField(Class, String)
 	 */
 	public static Field getDeclaredField(Class<?> clazz,String fieldName){
-		Class<?> class4Log = clazz;
-		while (clazz != Object.class) {
+		return getField(clazz, fieldName, false);
+	}
+	
+	/**
+	 * 获取clazz里面的字段
+	 * @param clazz
+	 * @param fieldName 不能带点
+	 * @param onlyPublic 是否只获取public的方法
+	 * @return
+	 * 
+	 * @see #getChainField(Class, String)
+	 */
+	public static Field getField(Class<?> clazz,String fieldName, boolean onlyPublic){
+		Class<?> rawClazz = clazz;
+		Field field = null;
+		String key = rawClazz.getName()+"."+fieldName;
+		if (fieldCache.containsKey(key)) {
+			field = fieldCache.get(key);
+			if (field == null) {
+				return null;
+			}
+		}
+		while (clazz != Object.class && field == null) {
 			try {
-				return clazz.getDeclaredField(fieldName);
+				field = clazz.getDeclaredField(fieldName);
 			} catch (NoSuchFieldException | SecurityException e) {
 				clazz = clazz.getSuperclass();
 			}
 		}
-		
-		LoggerFactory.getLogger().warn(class4Log.getName()+"中找不到"+fieldName+"字段");
-		return null;
+		fieldCache.put(key, field);
+		if (field != null && onlyPublic && !Modifier.isPublic(field.getModifiers())) {
+			return null;
+		}
+		return field;
 	}
 	
 	public static Method getDeclaredMethod(Class<?> clazz,String name, Class<?>... parameterTypes){

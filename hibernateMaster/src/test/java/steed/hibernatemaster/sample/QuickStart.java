@@ -1,7 +1,9 @@
 package steed.hibernatemaster.sample;
 
 
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import steed.hibernatemaster.sample.domain.user.User;
 import steed.hibernatemaster.test.SteedTest;
@@ -11,7 +13,12 @@ import steed.hibernatemaster.test.SteedTest;
  * @author 战马
  *
  */
+@FixMethodOrder(MethodSorters.JVM)
 public class QuickStart extends SteedTest{
+	
+	public void start() {
+		
+	}
 	
 	/**
 	 * 运行之后会保存一个niceName为'战马'的user实体类.
@@ -31,6 +38,7 @@ public class QuickStart extends SteedTest{
 	 */
 	@Test
 	public void update(){
+//		save();
 		User user = new User();
 		user.setNickName("战马");
 		user.setName("战小马");

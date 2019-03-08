@@ -38,7 +38,10 @@
         <property name="validationQuery">select 1</property>
         <property name="testOnBorrow">true</property>
         <property name="testWhileIdle">true</property>
-        <property name="keepAlive">true</property>
+        <property name="druid.keepAlive">true</property>
+        <property name="druid.minEvictableIdleTimeMillis">100000</property>
+        
+        
         <property name="minEvictableIdleTimeMillis">100000</property>
         
         <!-- 定时输出统计信息到日志中   单位:毫秒 配置了timeBetweenLogStatsMillis属性（大于0）之后，就会定时输出统计信息到日志中。每次输出日志会导致清零（reset）连接池相关的计数器。-->
@@ -77,7 +80,7 @@
         <property name="hibernate.max_fetch_depth">3</property>
         <property name="hibernate.cache.region.factory_class">org.hibernate.testing.cache.CachingRegionFactory</property>
 		<!-- 使用查询缓存 -->
-		<property name="cache.use_query_cache">false</property>
+		<property name="cache.use_query_cache">true</property>
 		<!-- 使用二级缓存 -->
         <property name="cache.use_second_level_cache">true</property>
         <property name="cache.use_structured_entries">true</property>

@@ -14,13 +14,13 @@ public class QuerySuffixTest {
 	public void testMoreThanAdnLessThan(){
 		QueryBuilder builder = new QueryBuilder();
 		builder.addMoreThan("name", "school0");
-		List<School> listAllObj = DaoUtil.listAllObj(School.class, builder.getQueryMap(), null, null);
+		List<School> listAllObj = DaoUtil.listAllObj(School.class, builder.getWhere(), null, null);
 		for (School school:listAllObj) {
 			assert("school0".compareTo(school.getName()) <= 0);
 		}
 		
 		builder.addLessThan("name", "school0");
-		listAllObj = DaoUtil.listAllObj(School.class, builder.getQueryMap(), null, null);
+		listAllObj = DaoUtil.listAllObj(School.class, builder.getWhere(), null, null);
 		for (School school:listAllObj) {
 			assert("school0".equals(school.getName()));
 		}

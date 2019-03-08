@@ -8,7 +8,7 @@ import steed.hibernatemaster.domain.BaseDatabaseDomain;
 public class TestDataGenerate {
 	
 	
-	public void genData(){
+	/*public void genData(){
 		List<Class<? extends BaseDatabaseDomain>> scan = Config.factoryEngine.getScanner(null).scan(null);
 		genData(scan);
 	}
@@ -18,6 +18,6 @@ public class TestDataGenerate {
 	}
 	
 	public void genData(String... configFile){
-	}
+	}*/
 	
 }

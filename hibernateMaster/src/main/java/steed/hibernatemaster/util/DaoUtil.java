@@ -38,6 +38,7 @@ import steed.util.base.CollectionsUtil;
 import steed.util.base.DomainUtil;
 import steed.util.base.RegUtil;
 import steed.util.base.StringUtil;
+import steed.util.logging.Logger;
 import steed.util.logging.LoggerFactory;
 import steed.util.reflect.ReflectResult;
 import steed.util.reflect.ReflectUtil;
@@ -67,7 +68,7 @@ _____#####________####______#####_____###______<br>
 ______#####_______###________###______#________<br>
 ________##_______####________####______________<br>
                                      	葱官赐福   百无禁忌
- * @author 战马 battle_steed@163.com
+ * @author 战马 battle_steed@qq.com
  */
 public class DaoUtil {
 	private static final ThreadLocal<Boolean> transactionType = new ThreadLocal<>();
@@ -75,6 +76,8 @@ public class DaoUtil {
 	private static final ThreadLocal<Exception> exception = new ThreadLocal<>();
 	private static final ThreadLocal<Transaction> currentTransaction = new ThreadLocal<>();
 	public final static String personalHqlGeneratorKey = "personalHqlGenerator";
+	
+	private static final Logger logger = LoggerFactory.getLogger(DaoUtil.class);
 	/**
 	 * 是否自动提交或回滚事务
 	 * 自助事务步骤：
@@ -122,7 +125,7 @@ public class DaoUtil {
 	}
 	public final static void setException(Exception exception,boolean rollbackTransaction) {
 		DaoUtil.exception.set(exception);
-		steed.util.logging.LoggerFactory.getLogger().error("数据库操作发生异常",exception);
+		logger.error("数据库操作发生异常",exception);
 		Boolean shouldThrowException = throwException.get();
 		if ((shouldThrowException == null && Config.throwException) || 
 				(shouldThrowException != null && shouldThrowException && exception instanceof RuntimeException)) {
@@ -188,7 +191,7 @@ public class DaoUtil {
 	 * @return 调用该方法之前的事务数据,用于<code>{@link #immediatelyTransactionEnd(ImmediatelyTransactionData)}</code>恢复之前的事务.
 	 */
 	public final static ImmediatelyTransactionData immediatelyTransactionBegin(){
-		steed.util.logging.LoggerFactory.getLogger().debug("立即事务开始");
+		logger.debug("立即事务开始");
 		Session session = getSession();
 		Transaction currentTransaction = getCurrentTransaction();
 		Boolean autoManagTransaction = getAutoManagTransaction();
@@ -217,7 +220,7 @@ public class DaoUtil {
 		DaoUtil.setCurrentTransaction(immediatelyTransactionData.currentTransaction);
 		DaoUtil.setAutoManagTransaction(immediatelyTransactionData.autoManagTransaction);
 		HibernateUtil.setSession(immediatelyTransactionData.session);
-		steed.util.logging.LoggerFactory.getLogger().debug("立即事务结束");
+		logger.debug("立即事务结束");
 	}
 	
 	
@@ -682,7 +685,7 @@ public class DaoUtil {
 			DomainUtil.setDomainId(newInstance, id);
 			return delete(newInstance);
 		} catch (InstantiationException | IllegalAccessException e) {
-			steed.util.logging.LoggerFactory.getLogger().error(clazz+"实例化失败！！",e);
+			logger.error(clazz+"实例化失败！！",e);
 			throw new RuntimeException(clazz+"实例化失败！！",e);
 		}
 	}
@@ -1491,7 +1494,7 @@ public class DaoUtil {
 	 */
 	public final static void beginTransaction(){
 		if (currentTransaction.get() == null) {
-			steed.util.logging.LoggerFactory.getLogger().debug("开启事务.....");
+			logger.debug("开启事务.....");
 //			transactionType.set(true);
 			currentTransaction.set(HibernateUtil.getSession().beginTransaction());
 		}
@@ -1513,7 +1516,7 @@ public class DaoUtil {
 		try {
 			if (boolean1 == null) {
 				if (currentTransaction.get() != null) {
-					steed.util.logging.LoggerFactory.getLogger().debug("当前事务未进行写操作,回滚事务,防止对查询出来的实体类的更改保存到数据库..");
+					logger.debug("当前事务未进行写操作,回滚事务,防止对查询出来的实体类的更改保存到数据库..");
 					rollbackTransaction();
 				}
 				return true;
@@ -1556,7 +1559,7 @@ public class DaoUtil {
 		Transaction transaction = getTransaction();
 		if (transaction != null) {
 			transaction.commit();
-			steed.util.logging.LoggerFactory.getLogger().debug("提交事务.....");
+			logger.debug("提交事务.....");
 		}
 		currentTransaction.remove();
 	}
@@ -1570,7 +1573,7 @@ public class DaoUtil {
 		if (transaction != null) {
 			transaction.rollback();
 			getSession().clear();
-			steed.util.logging.LoggerFactory.getLogger().debug("回滚事务并清空session.....");
+			logger.debug("回滚事务并清空session.....");
 		}
 		currentTransaction.remove();
 	}
@@ -1704,7 +1707,7 @@ public class DaoUtil {
 		
 		appendHqlWhere(domainSimpleName, hql, queryCondition);
 		
-		steed.util.logging.LoggerFactory.getLogger().debug("hql------>"+hql.toString());
+		logger.debug("hql------>"+hql.toString());
 		return hql;
 	}
 	/**
@@ -1888,8 +1891,8 @@ public class DaoUtil {
 			((HqlGenerator)queryMap.get(personalHqlGeneratorKey)).afterHqlGenered(domainSimpleName, hql, queryMap);
 		}
 		
-		steed.util.logging.LoggerFactory.getLogger().debug("hql------>%s",hql.toString());
-		steed.util.logging.LoggerFactory.getLogger().debug("参数------>%s",queryMap==null?null:queryMap.toString());
+		logger.debug("hql------>%s",hql.toString());
+		logger.debug("参数------>%s",queryMap==null?null:queryMap.toString());
 		
 		return hql;
 	}
@@ -2028,7 +2031,7 @@ public class DaoUtil {
 		}else {
 			countHql.insert(0, "select "+selectedField+" ");
 		}
-		steed.util.logging.LoggerFactory.getLogger().debug("countHql--->"+countHql);
+		logger.debug("countHql--->"+countHql);
 		return countHql;
 	}
 	
@@ -2042,8 +2045,8 @@ public class DaoUtil {
 	 * @return
 	 */
 	public final static Query createQuery(Map<String, Object> map,StringBuffer hql) {
-		steed.util.logging.LoggerFactory.getLogger().debug("hql---->"+hql.toString());
-		steed.util.logging.LoggerFactory.getLogger().debug("参数---->"+map);
+		logger.debug("hql---->"+hql.toString());
+		logger.debug("参数---->"+map);
 		Query query = getSession().createQuery(hql.toString());
 		setMapParam(map, query);
 		return query;
@@ -2055,8 +2058,8 @@ public class DaoUtil {
 	 * @return
 	 */
 	public final static Query createSQLQuery(Map<String, Object> map,StringBuffer sql) {
-		steed.util.logging.LoggerFactory.getLogger().debug("sql---->"+sql.toString());
-		steed.util.logging.LoggerFactory.getLogger().debug("参数---->"+map);
+		logger.debug("sql---->"+sql.toString());
+		logger.debug("参数---->"+map);
 		Query query = getSession().createSQLQuery(sql.toString());
 		setMapParam(map, query);
 		return query;
@@ -2265,7 +2268,7 @@ public class DaoUtil {
 			}
 			
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			steed.util.logging.LoggerFactory.getLogger().debug("putField2Map出错",e);
+			logger.debug("putField2Map出错",e);
 		}
 		if (obj instanceof PutField2MapIntercepter) {
 			((PutField2MapIntercepter)obj).afterPutField2Map(map, prefixName, getFieldByGetter);

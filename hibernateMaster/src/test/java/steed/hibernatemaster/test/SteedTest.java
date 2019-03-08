@@ -8,7 +8,7 @@ import steed.hibernatemaster.Config;
 import steed.hibernatemaster.sample.domain.School;
 import steed.hibernatemaster.util.DaoUtil;
 
-public class SteedTest {
+public class SteedTest extends HibernatemasterTester{
 	
 	public void genData(){
 		new GenTestData().genData();
@@ -32,6 +32,7 @@ public class SteedTest {
 	@After
 	public void afterTest(){
 		assert(DaoUtil.managTransaction());
+		DaoUtil.closeSessionNow();
 	}
 
 }

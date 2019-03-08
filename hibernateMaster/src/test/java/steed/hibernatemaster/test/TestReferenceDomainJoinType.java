@@ -45,7 +45,7 @@ public class TestReferenceDomainJoinType extends SteedTest{
 	public void testJoinType3(){
 		QueryBuilder builder = new QueryBuilder();
 		builder.addIn("clazz.name", new String[]{"class0","class1"});
-		List<Object> listAllCustomField = DaoUtil.listAllCustomField(Student.class, builder.getQueryMap(), null, null, "id");
+		List<Object> listAllCustomField = DaoUtil.listAllCustomField(Student.class, builder.getWhere(), null, null, "id");
 		assert(listAllCustomField.size() == GenTestData.classSize*2*GenTestData.schoolCount);
 	}
 	
