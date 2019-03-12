@@ -7,19 +7,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import steed.hibernatemaster.Config;
+import steed.hibernatemaster.domain.BaseRelationalDatabaseDomain;
 import steed.util.base.CollectionsUtil;
 import steed.util.base.StringUtil;
 
 
 /**
  * SimpleHqlGenerator 顾名思义,简单的hql生成器
- * 可以通过config.properties的dao.HqlGenerator配置默认的hql生成器
- * 通过steed.domain.BaseRelationalDatabaseDomain.setHqlPersonalGenerator(HqlGenerator)
+ * 可以通过{@link Config#defaultHqlGenerator} 配置默认的hql生成器
+ * 通过BaseRelationalDatabaseDomain#setHqlPersonalGenerator(HqlGenerator)
  * 可以设置自定义的hql生成器
  * 
- * @author 战马
- * Email battle_steed@163.com
- * @see steed.hibernatemaster.domain.BaseRelationalDatabaseDomain#setPersonalHqlGenerator(HqlGenerator)
+ * @author 战马 battle_steed@qq.com
+ * @see BaseRelationalDatabaseDomain#setPersonalHqlGenerator(HqlGenerator)
  */
 public class SimpleHqlGenerator implements HqlGenerator{
 
@@ -77,14 +78,14 @@ public class SimpleHqlGenerator implements HqlGenerator{
 		if (e.getValue() != null && (e.getValue() instanceof Collection || e.getValue().getClass().isArray()) 
 				&& !key.endsWith("_not_join") && !key.endsWith("_not_in_1")) {
 			//TODO 添加不联表的in和not in
-			boolean isNotIn = key.endsWith("_not_in_1");
+			boolean isNotIn = key.endsWith(DaoUtil.manyNotIN);
 			String joinedName = domainSimpleName.replace("\\.", "_1_")
-					+ key.replace("_not_in_1", "");
+					+ key.replace(DaoUtil.manyNotIN, "");
 			
 			StringBuffer innerJoinSB = new StringBuffer(" inner join ");
 			innerJoinSB.append(domainSimpleName);
 			innerJoinSB.append(".");
-			innerJoinSB.append(key.replace("_not_in_1", ""));
+			innerJoinSB.append(key.replace(DaoUtil.manyNotIN, ""));
 			
 			innerJoinSB.append(" ");
 			innerJoinSB.append(joinedName);

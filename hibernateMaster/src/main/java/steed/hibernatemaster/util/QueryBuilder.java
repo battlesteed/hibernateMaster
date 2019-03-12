@@ -1,5 +1,7 @@
 package steed.hibernatemaster.util;
 
+import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +11,7 @@ import steed.hibernatemaster.Config;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
 import steed.util.base.BaseUtil;
-import steed.util.base.StringUtil;
+import steed.util.reflect.ReflectUtil;
 
 /**
  * 查询构建器,复杂的查询(&gt; ,&lt; , in等查询条件),请用该类构建
@@ -20,7 +22,7 @@ import steed.util.base.StringUtil;
 public class QueryBuilder {
 	private Map<String,Object> queryMap;
 	
-	private Class<? extends BaseDatabaseDomain> target;
+	private Class<? extends BaseDomain> target;
 	
 	private String[] groupBy;
 	
@@ -30,8 +32,17 @@ public class QueryBuilder {
 		queryMap = new HashMap<>();
 	}
 	
+	public Class<? extends BaseDomain> getTarget() {
+		return target;
+	}
+
 	public QueryBuilder(BaseDomain domain){
 		queryMap = DaoUtil.putField2Map(domain);
+		target = domain.getClass();
+	}
+	public QueryBuilder( Class<? extends BaseDomain> target){
+		this();
+		this.target = target;
 	}
 	
 	public QueryBuilder(BaseDatabaseDomain domain){
@@ -132,6 +143,8 @@ public class QueryBuilder {
 	
 	/**
 	 * 添加not in查询条件 生成的hql将包含 "model.key not in( :value )"这个条件
+	 *  一对多中,一关联的set或list等NotIn条件也可以使用该方法添加,但是调用该方法前得保证 {@link #target } 不为null,
+	 *  否则该方法无法判断NotIn的是普通字段或是一对多中实体类
 	 * @param key 字段名
 	 * @param value 值
 	 * @return this
@@ -141,8 +154,19 @@ public class QueryBuilder {
 		if (BaseUtil.isObjEmpty(value)) {
 			return this;
 		}
-		queryMap.put(key+"_not_in_1", value);
+		queryMap.put(key+ getNotInSubfix(key), value);
 		return this;
+	}
+
+	private String getNotInSubfix(String key) {
+		String notin = DaoUtil.notIN;
+		if (target != null) {
+			Field field = ReflectUtil.getDeclaredField(target, key);
+			if (Collection.class.isAssignableFrom(field.getType()) || field.getType().isArray()) {
+				notin = DaoUtil.manyNotIN;
+			}
+		}
+		return notin;
 	}
 	/**
 	 * 添加not in查询条件 生成的hql将包含 "model.key not in( :list )"这个条件
@@ -151,7 +175,7 @@ public class QueryBuilder {
 	 * @return this
 	 */
 	public <T> QueryBuilder addNotIn(String key,List<T> list){
-		queryMap.put(key+"_not_in_1", list);
+		queryMap.put(key + getNotInSubfix(key), list);
 		return this;
 	}
 	/**
@@ -161,7 +185,7 @@ public class QueryBuilder {
 	 * @return this
 	 */
 	public <T> QueryBuilder addNotIn(String key,Set<T> set){
-		queryMap.put(key+"_not_in_1", set);
+		queryMap.put(key + getNotInSubfix(key), set);
 		return this;
 	}
 	/**

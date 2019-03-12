@@ -67,7 +67,7 @@ ____######________#####_____#####_____####_____<br>
 _____#####________####______#####_____###______<br>
 ______#####_______###________###______#________<br>
 ________##_______####________####______________<br>
-                                     	葱官赐福   百无禁忌
+                                     	
  * @author 战马 battle_steed@qq.com
  */
 public class DaoUtil {
@@ -103,12 +103,21 @@ public class DaoUtil {
 	public static final String orGroup = "_OrGroup";
 	public static final String andGroup = "_AndGroup";
 	public static final String rawHqlPart = "_raw_hql_part";
+	/**
+	 * xxx + manyNotIN 表示一对多中,一关联的set或list等不包含xxx
+	 * @see #notIN
+	 */
+	public static final String manyNotIN = "_manyNotIn";
+	/**
+	 * xxx + notIN 表示实体类中的字段非集合类字段 xxx not in
+	 */
+	public static final String notIN = "_not_in_1";
 	
 	/**
 	 * 查询条件后缀
 	 */
-	public final static String[] indexSuffix = {"_max_1","_min_1","_like_1","_not_in_1","_not_equal_1",
-			"_not_join","_not_null","_not_compile_param",personalHqlGeneratorKey,
+	public final static String[] indexSuffix = {"_max_1","_min_1","_like_1",notIN,"_not_equal_1",
+			manyNotIN,"_not_null","_not_compile_param",personalHqlGeneratorKey,
 			"_greaterThan","_lessThan",rawHqlPart,orGroup};
 	
 	/***********\异常提示专用************/
@@ -310,6 +319,7 @@ public class DaoUtil {
 			Map<String, Object> map = new HashMap<String, Object>();
 			Class<? extends Serializable> idClass = DomainUtil.getDomainIDClass(target);
 			Serializable[] serializables;
+			//TODO 支持非String[] 类型的ids
 			if (idClass == String.class) {
 				serializables = ids;
 			}else{
@@ -956,14 +966,14 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 查询单个实体类的某几个字段
+	 * 查询一条数据库记录,记录为指定的某几个字段
 	 * 
 	 * @param target 要查询的实体类
 	 * @param where 查询条件
 	 * @param desc 需要降序排列的字段 不需要请传null
 	 * @param asc 需要升序排列的字段 不需要请传null
 	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null),当selectedFields.length &gt; 1时,返回map&lt;String,Object&gt;
-	 * 当 selectedFields.length == 1时返回 直接返回单个查询字段
+	 * 当 selectedFields.length == 1时返回 直接返回查询到字段值
 	 */
 	public final static <T> T listOneFields(Class<?> target, Map<String, Object> where, List<String> desc, List<String> asc, String... selectedFields){
 		return listOneFields(target, where, desc, asc, null,selectedFields);
@@ -975,7 +985,8 @@ public class DaoUtil {
 	 * @param where 查询条件
 	 * @param desc 需要降序排列的字段 不需要请传null
 	 * @param asc 需要升序排列的字段 不需要请传null
-	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null),当selectedFields.length &gt; 1时,返回map&lt;String,Object&gt;
+	 * 当 selectedFields.length == 1时返回 直接返回查询到字段值
 	 */
 	@SuppressWarnings("unchecked")
 	public final static <T> T listOneFields(Class<?> target, Map<String, Object> where, List<String> desc, List<String> asc, String[] groupBy, String... selectedFields){
@@ -1088,7 +1099,7 @@ public class DaoUtil {
 	 * 用where做查询条件查询的数据库是否存在对应的记录
 	 * @param target 要查询的实体类
 	 * @param where 查询条件
-	 * @return 结果是否存在
+	 * @return 结果是否不存在
 	 */
 	public final static boolean isResultNull(Class<?> target,Map<String, Object> where){
 		try {
@@ -1399,7 +1410,7 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 根据实体类id查询实体类
+	 * 根据实体类id查询实体类,关联的对象也会全部查询出来,性能较差,但序列化时不需要做特殊处理
 	 * 
 	 * @param <T> 要查询的实体类
 	 * 
@@ -1407,6 +1418,8 @@ public class DaoUtil {
 	 * @param id 实体类id
 	 * 
 	 * @return 查询到的记录(记录不存在则返回null)
+	 * 
+	 * @see #load(Class, Serializable)
 	 */
 	public final static <T extends BaseRelationalDatabaseDomain> T get(Class<T> clazz,Serializable id){
 		try {
@@ -1420,24 +1433,12 @@ public class DaoUtil {
 		}
 	}
 	
-	public final static <T extends BaseRelationalDatabaseDomain> List<T> getList(Class<T> t,Serializable[] keys){
-		try {
-			List<T> list = new ArrayList<T>();
-			for (Serializable s:keys) {
-				list.add(get(t, s));
-			}
-			return list;
-		} catch (Exception e) {
-			setException(e);
-			return null;
-		}finally{
-			closeSession();
-		}
-	}
+	
 	
 	
 	/**
-	 * 根据实体类id加载实体类
+	 * 根据实体类id加载实体类,关联的对象不会全部查询出来,用到的时候才查询,性能较好,
+	 * 序列化时需要做特殊处理或调用 {@link BaseRelationalDatabaseDomain#initializeAll()}initialize关联的实体类  ,也可以使用{@link #get(Class, Serializable)}
 	 * 
 	 * @param <T> 要加载的实体类
 	 * 
@@ -1552,7 +1553,7 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 提交事务,不推荐直接调用该方法提交事务,推荐用下面这个方法让系统判断是提交事务还是回滚事务.
+	 * 提交事务,不推荐直接调用该方法提交事务,推荐用{@link #managTransaction()} 让系统判断是提交事务还是回滚事务.
 	 * @see #managTransaction
 	 */
 	public final static void commitTransaction(){
@@ -1606,11 +1607,13 @@ public class DaoUtil {
 	 * 
 	 * @return 是否更新成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
 	 */
+	@Deprecated
 	public final static boolean updateNotNullField(BaseRelationalDatabaseDomain domain,List<String> updateEvenNull){
 		return updateNotNullField(domain, updateEvenNull, false);
 	}
 	/**
-	 * update实体类中不为空的字段
+	 * update实体类中不为空的字段,该方法不会触发实体类的update方法,无法做update触发操作,
+	 * 推荐用 {@link BaseRelationalDatabaseDomain#updateNotNullField(List) }
 	 * 
 	 * @param domain 要update的实体类
 	 * @param updateEvenNull 即使为空也update到数据库中的字段,没有请传null
@@ -1621,7 +1624,9 @@ public class DaoUtil {
 	 * 
 	 * @see BaseUtil#isObjEmpty
 	 * @see DomainUtil#fillDomain
+	 * @see BaseRelationalDatabaseDomain#updateNotNullField(List)
 	 */
+	@Deprecated
 	public final static boolean updateNotNullField(BaseRelationalDatabaseDomain domain,List<String> updateEvenNull,boolean strictlyMode){
 		BaseRelationalDatabaseDomain smartGet = smartGet(domain);
 		DomainUtil.fillDomain(smartGet, domain,updateEvenNull,strictlyMode);
@@ -2144,20 +2149,20 @@ public class DaoUtil {
 	}
 
 	/**
-	 *  把obj中非空字段放到map
-	 * @param obj
+	 *  把domain中非空字段放到map
+	 * @param domain
 	 * @return map
 	 */
-	public final static Map<String, Object> putField2Map(Object obj) {
+	public final static Map<String, Object> putField2Map(Object domain) {
 		Map<String, Object> map = new HashMap<>();
-		putField2Map(obj, map, "");
+		putField2Map(domain, map, "");
 		return map;
 	}
 	/**
-	 * 把obj中非空字段放到map
+	 * 把domain中非空字段放到map
 	 */
-	public final static void putField2Map(Object obj,Map<String, Object> map,String prefixName) {
-		putField2Map(obj, map, prefixName, true);
+	public final static void putField2Map(Object domain,Map<String, Object> map,String prefixName) {
+		putField2Map(domain, map, prefixName, true);
 	}
 	
 	/**
@@ -2178,8 +2183,8 @@ public class DaoUtil {
 		 * 
 		 * @param map obj字段容器,用来生成hql或sqlwhere部分的查询条件
 		 * @param prefixName 前缀,当put user里面的school时,prefixName="user.",原理比较复杂,具体可以看源码
-		 * @param getFieldByGetter 是否用Getter方法来获取字段值,若传false,则用field.get直接获取字段值
-		 * @return 是否执行DaoUtil#putField2Map(Object, Map, String, boolean)
+		 * @param getFieldByGetter 是否用Getter方法来获取字段值,若传false,则用field.getValue直接获取字段值
+		 * @return 是否继续执行DaoUtil#putField2Map(Object, Map, String, boolean)
 		 * 
 		 * @see DaoUtil#putField2Map(Object, Map, String, boolean)
 		 */
@@ -2190,19 +2195,19 @@ public class DaoUtil {
 	
 	/**
 	 * 
-	 * @param obj 要put到map的对象
+	 * @param domain 要put到map的对象
 	 * @param map obj字段容器,用来生成hql或sqlwhere部分的查询条件
 	 * @param prefixName 前缀,当put user里面的school时,prefixName="user.",原理比较复杂,具体可以看源码
-	 * @param getFieldByGetter 是否用Getter方法来获取字段值,若传false,则用field.get直接获取字段值
+	 * @param getFieldByGetter 是否用Getter方法来获取字段值,若传false,则用field.getValue直接获取字段值
 	 * 
 	 * @see DaoUtil.PutField2MapIntercepter
 	 */
-	public final static void putField2Map(Object obj,Map<String, Object> map,String prefixName,boolean getFieldByGetter) {
-		if (obj == null) {
+	public final static void putField2Map(Object domain,Map<String, Object> map,String prefixName,boolean getFieldByGetter) {
+		if (domain == null) {
 			return;
 		}
-		if (obj instanceof PutField2MapIntercepter) {
-			if(!((PutField2MapIntercepter)obj).beforePutField2Map(map, prefixName, getFieldByGetter)){
+		if (domain instanceof PutField2MapIntercepter) {
+			if(!((PutField2MapIntercepter)domain).beforePutField2Map(map, prefixName, getFieldByGetter)){
 				return;
 			}
 		}
@@ -2210,20 +2215,20 @@ public class DaoUtil {
 			boolean containID = false;
 			
 			try {
-				if ((obj instanceof BaseDomain)) {
-					Serializable domainId = DomainUtil.getDomainId((BaseDomain) obj);
+				if ((domain instanceof BaseDomain)) {
+					Serializable domainId = DomainUtil.getDomainId((BaseDomain) domain);
 					if (!BaseUtil.isObjEmpty(domainId)) {
-						map.put(prefixName + DomainUtil.getIDfield((Class<? extends BaseDomain>) obj.getClass()).getName(), domainId);
+						map.put(prefixName + DomainUtil.getIDfield((Class<? extends BaseDomain>) domain.getClass()).getName(), domainId);
 						containID = true;
 					}
 				}
 			} catch (Exception e) {
-				LoggerFactory.getLogger().info("尝试获取实体类id失败,"+e.getMessage());
+				logger.info("尝试获取实体类id失败,"+e.getMessage());
 			}
 			
 			if (!containID) {
-				Class<? extends Object> objClass = obj.getClass();
-				List<Field> Fields = ReflectUtil.getNotFinalFields(obj);
+				Class<? extends Object> objClass = domain.getClass();
+				List<Field> Fields = ReflectUtil.getNotFinalFields(domain);
 				for (Field f:Fields) {
 					String fieldName = f.getName();
 					if (map.containsKey(prefixName+fieldName)) {
@@ -2241,11 +2246,11 @@ public class DaoUtil {
 					
 					Object value = null;
 					if (getFieldByGetter) {
-						value = ReflectUtil.getFieldValueByGetter(obj, fieldName);
+						value = ReflectUtil.getFieldValueByGetter(domain, fieldName);
 					}
 					if (value == null) {
 						f.setAccessible(true);
-						value = f.get(obj);
+						value = f.get(domain);
 					}
 					if (!BaseUtil.isObjEmpty(value)) {
 						if (value instanceof BaseRelationalDatabaseDomain ) {
@@ -2270,8 +2275,8 @@ public class DaoUtil {
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			logger.debug("putField2Map出错",e);
 		}
-		if (obj instanceof PutField2MapIntercepter) {
-			((PutField2MapIntercepter)obj).afterPutField2Map(map, prefixName, getFieldByGetter);
+		if (domain instanceof PutField2MapIntercepter) {
+			((PutField2MapIntercepter)domain).afterPutField2Map(map, prefixName, getFieldByGetter);
 		}
 	}
 	
@@ -2308,7 +2313,7 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 往map里面put("personalHqlGenerator",steed.util.dao.HqlGenerator);
+	 * 往map里面put("personalHqlGenerator",{@link HqlGenerator} );
 	 * 即可跳过默认的HqlGenerator,用个性化HqlGenerator生成hql
 	 * 
 	 * 组装map参数到hql的where部分

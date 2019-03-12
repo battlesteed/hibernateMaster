@@ -15,11 +15,6 @@ import steed.hibernatemaster.test.SteedTest;
  */
 @FixMethodOrder(MethodSorters.JVM)
 public class QuickStart extends SteedTest{
-	
-	public void start() {
-		
-	}
-	
 	/**
 	 * 运行之后会保存一个niceName为'战马'的user实体类.
 	 * 不需要提前建表,hibernate会自动生成.

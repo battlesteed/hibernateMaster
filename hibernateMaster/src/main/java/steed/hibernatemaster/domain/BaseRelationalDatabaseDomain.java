@@ -98,6 +98,11 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 		}
 		
 	}*/
+	/**
+	 * initialize所有关联的实体类,对hibernate代理对象做序列化之前 请调用该方法
+	 * 
+	 * @see DaoUtil#load(Class, Serializable)
+	 */
 	public void initializeAll(){
 		initialize();
 	}
