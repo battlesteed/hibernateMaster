@@ -15,30 +15,14 @@ public class TestManyToMany extends SteedTest{
 	
 	@Test
 	public void testIn() {
+		String nickName = "testInQuery";
 		User user = new User();
+		User user2 = new User("testInQuery2");
+		
 		Role e = new Role("testInQueryRole2");
 		Role e2 = new Role("testInQueryRole1");
-		String nickName = "testInQuery";
-		user.setNickName(nickName);
-		user.delete();
-		e.delete();
-		e2.delete();
 		
-		DaoUtil.managTransaction();
-		DaoUtil.relese();
-		
-		HashSet<Role> roleSet = new HashSet<>();
-		roleSet.add(e);
-		roleSet.add(e2);
-		user.setRoleSet(roleSet);
-		
-		
-		e.save();
-		e2.save();
-		user.save();
-		
-		DaoUtil.managTransaction();
-		DaoUtil.closeSessionNow();
+		prepareData(user, user2, e, e2, nickName);
 		
 		QueryBuilder queryBuilder = new  QueryBuilder();
 		queryBuilder.add("roleSet", new Role[] {e}).add("nickName", nickName);
@@ -61,24 +45,45 @@ public class TestManyToMany extends SteedTest{
 		
 		
 		queryBuilder = new  QueryBuilder(User.class);
-		queryBuilder.add("nickName", nickName);
+//		queryBuilder.add("nickName", nickName);
 		queryBuilder.addNotIn("roleSet", Arrays.asList(new Role[] {e2}));
+		queryBuilder.add("nickName", "testInQuery%");
 		count = DaoUtil.getCount(User.class, queryBuilder.getWhere());
-		assert(count == 1);
+		assert(count == 2);
 		
 		queryBuilder.addNotIn("roleSet", new Role[] {e2});
 		count = DaoUtil.getCount(User.class, queryBuilder.getWhere());
 		BaseUtil.out(count);
-		assert(count == 1);
+		assert(count == 2);
 		
 		queryBuilder.addNotIn("roleSet", new HashSet<>(Arrays.asList(new Role[] {e})));
 		count = DaoUtil.getCount(User.class, queryBuilder.getWhere());
-		assert(count == 1);
+		assert(count == 2);
 		
 		queryBuilder.addNotIn("roleSet", Arrays.asList(new Role[] {e2}));
 		count = DaoUtil.getCount(User.class, queryBuilder.getWhere());
-		assert(count == 1);
+		assert(count == 2);
 		
 		
+	}
+
+	private void prepareData(User user,User user2, Role e, Role e2, String nickName) {
+		
+		user.setNickName(nickName);
+		
+		HashSet<Role> roleSet = new HashSet<>();
+		roleSet.add(e);
+		roleSet.add(e2);
+		user.setRoleSet(roleSet);
+		
+		DaoUtil.deleteByQuery(user);
+		DaoUtil.deleteByQuery(e);
+		DaoUtil.deleteByQuery(e2);
+		DaoUtil.deleteByQuery(user2);
+		
+		e.save();
+		e2.save();
+		user.save();
+		user2.save();
 	}
 }

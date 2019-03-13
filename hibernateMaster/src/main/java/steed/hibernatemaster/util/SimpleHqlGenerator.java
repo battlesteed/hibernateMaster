@@ -81,8 +81,12 @@ public class SimpleHqlGenerator implements HqlGenerator{
 			boolean isNotIn = key.endsWith(DaoUtil.manyNotIN);
 			String joinedName = domainSimpleName.replace("\\.", "_1_")
 					+ key.replace(DaoUtil.manyNotIN, "");
-			
-			StringBuffer innerJoinSB = new StringBuffer(" inner join ");
+			StringBuffer innerJoinSB;
+			if (isNotIn) {
+				innerJoinSB = new StringBuffer(" left join ");
+			}else {
+				innerJoinSB = new StringBuffer(" inner join ");
+			}
 			innerJoinSB.append(domainSimpleName);
 			innerJoinSB.append(".");
 			innerJoinSB.append(key.replace(DaoUtil.manyNotIN, ""));
@@ -96,7 +100,7 @@ public class SimpleHqlGenerator implements HqlGenerator{
 				hql.insert(index, innerJoinSB);
 			}
 			
-			hql.append("and ");
+			hql.append("and ( ");
 			hql.append(joinedName);
 			if (isNotIn) {
 				hql.append(" not in (");
@@ -105,7 +109,11 @@ public class SimpleHqlGenerator implements HqlGenerator{
 			}
 			hql.append(":");
 			hql.append(dealDot(key));
-			hql.append(") ");
+			hql.append(" ) ");
+			if (isNotIn) {
+				hql.append(" or ").append(joinedName).append(" is null ");
+			}
+			hql.append(" )");
 		}else if(key.endsWith("_not_join")){
 			hql.append("and ");
 			hql.append(domainSimpleName);
