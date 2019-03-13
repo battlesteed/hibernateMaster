@@ -73,7 +73,7 @@ public class QueryBuilder {
 	 * 
 	 * @return this
 	 */
-	private QueryBuilder setTarget(Class<? extends BaseDatabaseDomain> target){
+	public QueryBuilder setTarget(Class<? extends BaseDatabaseDomain> target){
 		this.target = target;
 		return this;
 	}
