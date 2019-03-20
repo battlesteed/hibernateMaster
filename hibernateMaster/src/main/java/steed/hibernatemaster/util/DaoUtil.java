@@ -1515,14 +1515,14 @@ public class DaoUtil {
 	public final static boolean managTransaction(){
 		Boolean boolean1 = transactionType.get();
 		try {
-			if (boolean1 == null) {
+			if (boolean1 == null && exception.get() == null) {
 				if (currentTransaction.get() != null) {
 					logger.debug("当前事务未进行写操作,回滚事务,防止对查询出来的实体类的更改保存到数据库..");
 					rollbackTransaction();
 				}
 				return true;
 			}
-			if (boolean1) {
+			if (exception.get() == null && boolean1) {
 				commitTransaction();
 			}else {
 				rollbackTransaction();
@@ -1811,12 +1811,19 @@ public class DaoUtil {
 							//TODO 支持二级及以上实体类加减乘除操作
 							//TODO 类似a/1 1前面不加实体类前缀,a/b和a-b生成的别名是一样的,a-b可以改成a-b-0
 					String replace = dealMathChar(domainSimpleName, selectedField);
-							
-					String dealedSelectedField = temp.replace(selectedField, domainSimpleName+"."+replace);
-							
-					addSelectedDomain(t, domainSelected, selectedField);
+					String dealedSelectedField;
+					String dealSpecialChar;
+					if (!"*".equals(selectedField)) {
+						dealedSelectedField = temp.replace(selectedField, domainSimpleName+"."+replace);
+						
+						addSelectedDomain(t, domainSelected, selectedField);
+						dealSpecialChar = dealSpecialChar(selectedField);
+					}else {
+						//count(*)的情况
+						dealedSelectedField = temp;
+						dealSpecialChar = dealSpecialChar(temp.replace(")", "").replace("(", ""));
+					}
 					
-					String dealSpecialChar = dealSpecialChar(selectedField);
 					//修复 同时select Count(name),name 时生成的别名都为name,导致返回的map只有一个key的bug
 					if (dealSpecialCharMap.containsKey(dealSpecialChar)) {
 						int count = dealSpecialCharMap.get(dealSpecialChar);

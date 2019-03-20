@@ -153,6 +153,9 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 		return DaoUtil.update(this);
 	}
 	
+	/**
+	 * 可以重写该方法做级联删除,也可以直接设置数据对应外键的删除策略
+	 */
 	@Override
 	public boolean delete(){
 		return DaoUtil.delete(this);
@@ -246,7 +249,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	/**
 	 * update实体类中不为空的字段
 	 * 
-	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传个null
+	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传null
 	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空， 否则调用BaseUtil.isObjEmpty判断字段是否为空
 	 */
 	@Override

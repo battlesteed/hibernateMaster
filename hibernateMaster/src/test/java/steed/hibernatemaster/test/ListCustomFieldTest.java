@@ -14,7 +14,7 @@ import steed.hibernatemaster.util.DaoUtil;
 import steed.hibernatemaster.util.QueryBuilder;
 import steed.util.base.BaseUtil;
 
-public class ListCustomFieldTest {
+public class ListCustomFieldTest extends SteedTest{
 	
 	@Test
 	public void testDistinct(){
@@ -77,6 +77,11 @@ public class ListCustomFieldTest {
 	public void testOrderBY(){
 		List<Object> listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, null, Arrays.asList("sum(studentCount)","studentCount"), Arrays.asList("sum(studentCount)"), "id");
 		BaseUtil.out(listAllCustomField.get(0));
+	}
+	@Test
+	public void testCountAll(){
+		Clazz clazz = new Clazz();
+		DaoUtil.listOneFields(clazz, "sum(studentCount)","count(*)");
 	}
 	
 }

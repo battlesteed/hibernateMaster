@@ -46,8 +46,8 @@ public class TestManyToMany extends SteedTest{
 		
 		queryBuilder = new  QueryBuilder(User.class);
 //		queryBuilder.add("nickName", nickName);
-		queryBuilder.addNotIn("roleSet", Arrays.asList(new Role[] {e2}));
 		queryBuilder.add("nickName", "testInQuery%");
+		queryBuilder.addNotIn("roleSet", Arrays.asList(new Role[] {e2}));
 		count = DaoUtil.getCount(User.class, queryBuilder.getWhere());
 		assert(count == 2);
 		
@@ -64,7 +64,23 @@ public class TestManyToMany extends SteedTest{
 		count = DaoUtil.getCount(User.class, queryBuilder.getWhere());
 		assert(count == 2);
 		
+		queryBuilder.add("nickName", "testInQuery");
+		queryBuilder.addNotIn("roleSet", Arrays.asList(new Role[] {e2}));
+		count = DaoUtil.getCount(User.class, queryBuilder.getWhere());
+		assert(count == 1);
 		
+		queryBuilder.addNotIn("roleSet", new Role[] {e2});
+		count = DaoUtil.getCount(User.class, queryBuilder.getWhere());
+		BaseUtil.out(count);
+		assert(count == 1);
+		
+		queryBuilder.addNotIn("roleSet", new HashSet<>(Arrays.asList(new Role[] {e})));
+		count = DaoUtil.getCount(User.class, queryBuilder.getWhere());
+		assert(count == 1);
+		
+		queryBuilder.addNotIn("roleSet", Arrays.asList(new Role[] {e2}));
+		count = DaoUtil.getCount(User.class, queryBuilder.getWhere());
+		assert(count == 1);
 	}
 
 	private void prepareData(User user,User user2, Role e, Role e2, String nickName) {
