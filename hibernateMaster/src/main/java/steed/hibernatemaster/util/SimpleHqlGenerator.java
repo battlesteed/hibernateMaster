@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import steed.hibernatemaster.Config;
 import steed.hibernatemaster.domain.BaseRelationalDatabaseDomain;
+import steed.util.base.BaseUtil;
 import steed.util.base.CollectionsUtil;
 import steed.util.base.StringUtil;
 
@@ -27,11 +28,9 @@ public class SimpleHqlGenerator implements HqlGenerator{
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public StringBuffer appendHqlWhere(String domainSimpleName, StringBuffer hql, Map<String, Object> map) {
-		if (CollectionsUtil.isCollectionsEmpty(map)) {
-			return hql;
-		}
 		hql.append(" ");
 		appendPersonalWhere(domainSimpleName, hql, map);
+		BaseUtil.out(toString());
 		if (hql.indexOf(" domain.") > -1) {
 			hql = new StringBuffer(hql.toString().replace(" domain.", " "+domainSimpleName+"."));
 		}
@@ -59,7 +58,7 @@ public class SimpleHqlGenerator implements HqlGenerator{
 	 *  相反,若你domainSimpleName.foo = :foo ,而query 里面没有foo这个key,则需要 {@code query.add('foo',value)}
 	 */
 	protected void appendPersonalWhere(String domainSimpleName, StringBuffer hql,Map<String, Object> query) {
-		
+		BaseUtil.out("33333fdsafdsafds");
 	}
 
 	/**
