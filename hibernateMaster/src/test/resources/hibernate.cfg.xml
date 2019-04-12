@@ -29,7 +29,7 @@
         
         <property name="username">root</property>
         <property name="password">root</property>
-        <property name="url">jdbc:mysql://localhost:3306/hibernatemaster?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
+        <property name="url">jdbc:mysql://localhost:3306/hibernatemaster?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
       <!--
       	做读写分离请加上这行
          <property name="slaveUrl">jdbc:mysql://localhost:3306/hibernatemaster1?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
@@ -53,7 +53,8 @@
         <property name="testWhileIdle">true</property>
         <!-- 定时输出统计信息到日志中   单位:毫秒 配置了timeBetweenLogStatsMillis属性（大于0）之后，就会定时输出统计信息到日志中。每次输出日志会导致清零（reset）连接池相关的计数器。-->
         <property name="timeBetweenLogStatsMillis">3600000</property>
-        <property name="filters">stat,wall,slf4j</property>
+        <property name="filters">stat,slf4j</property>
+<!--         <property name="filters">stat,wall,slf4j</property> -->
         
         <!-- 连接泄漏监测 开始-->
         <property name="removeAbandoned" >true</property> <!-- 打开removeAbandoned功能 -->

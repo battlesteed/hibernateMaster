@@ -37,9 +37,9 @@ public class ListCustomFieldTest extends SteedTest{
 	
 	@Test
 	public void testCountSameField(){
-		List<Map> listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, new  HashMap<String, Object>(), null, null, "school", "name","count( name )");
-		assert(listAllCustomField.get(0).size() == 3);
-		listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, new  HashMap<String, Object>(), null, null, new String[] {"school"}, "name","count( name )");
+		List<Map> listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, new  HashMap<String, Object>(), null, null, new String[] {"name"}, "name","count( name )");
+		assert(listAllCustomField.get(0).size() == 2);
+		listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, new  HashMap<String, Object>(), null, null, new String[] {"school"}, "school","count( school )");
 		assert(listAllCustomField.get(0).size() == 2);
 	}
 	
@@ -75,7 +75,7 @@ public class ListCustomFieldTest extends SteedTest{
 	
 	@Test
 	public void testOrderBY(){
-		List<Object> listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, null, Arrays.asList("sum(studentCount)","studentCount"), Arrays.asList("sum(studentCount)"), "id");
+		List<Object> listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, null, Arrays.asList("sum(studentCount)","studentCount"), Arrays.asList("sum(studentCount)"), new String[] {"studentCount"}, "studentCount");
 		BaseUtil.out(listAllCustomField.get(0));
 	}
 	@Test
