@@ -45,11 +45,6 @@ public class QueryBuilder {
 		this.target = target;
 	}
 	
-	public QueryBuilder(BaseDatabaseDomain domain){
-		queryMap = DaoUtil.putField2Map(domain);
-		target = domain.getClass();
-	}
-	
 	/**
 	 * 设置hql的groupBy部分
 	 * 

@@ -1857,7 +1857,7 @@ public class DaoUtil {
 		
 		if (queryMap != null) {
 			for(String temp:queryMap.keySet()){
-				if (temp.contains(".")) {
+				if (temp.contains(".") && !(queryMap.get(temp) instanceof HqlGenerator)) {
 					String chain = getMaxDepthDomainChain(temp, t);
 					if (chain != null) {
 						innerJoin.add(chain);
@@ -1971,7 +1971,11 @@ public class DaoUtil {
 	}
 	
 	private static String getMaxDepthDomainChain(String chain,Class<?> clazz){
-		return getMaxDepthDomainChain(clazz, getNoSelectIndexFieldName(chain));
+		String maxDepthDomainChain = getMaxDepthDomainChain(clazz, getNoSelectIndexFieldName(chain));
+		if (!StringUtil.isStringEmpty(chain) && maxDepthDomainChain.endsWith(".")) {
+			return maxDepthDomainChain.substring(0,maxDepthDomainChain.length()-1);
+		}
+		return maxDepthDomainChain;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -2333,7 +2337,7 @@ public class DaoUtil {
 	 */
 	public final static StringBuffer appendHqlWhere(String domainSimpleName, StringBuffer hql,
 			Map<String, Object> where) {
-		if (where == null) {
+		if (where == null || where.isEmpty()) {
 			return hql;
 		}
 		Object object = where.get(personalHqlGeneratorKey);

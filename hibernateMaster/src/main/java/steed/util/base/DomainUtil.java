@@ -25,6 +25,7 @@ import steed.hibernatemaster.domain.BaseRelationalDatabaseDomain;
 import steed.hibernatemaster.domain.UnionKeyDomain;
 import steed.hibernatemaster.exception.DomainIdAnnotationNotFoundException;
 import steed.hibernatemaster.util.DaoUtil;
+import steed.hibernatemaster.util.HqlGenerator;
 import steed.util.reflect.ReflectUtil;
 /**
  * 实体类工具类
@@ -64,7 +65,7 @@ public class DomainUtil{
 	/**
 	 * 
 	 * @param domain 要净化的实体类
-	 * @param keepDepth 保留深度,(为0时,只保留当前实体类,1即当前实体类关联的实体类会保留)
+	 * @param keepDepth 保留深度,(为0时,只保留当前实体类,1即当前实体类关联的实体类会保留),HqlGenerator为系统字段,不会保留
 	 */
 	public static void purify(BaseDomain domain,int keepDepth){
 		if (domain == null) {
@@ -72,9 +73,9 @@ public class DomainUtil{
 		}
 		List<Field> allFields = ReflectUtil.getAllFields(domain);
 		for(Field temp:allFields){
-			if (BaseDomain.class.isAssignableFrom(temp.getType())) {
+			if (BaseDomain.class.isAssignableFrom(temp.getType()) || HqlGenerator.class.isAssignableFrom(temp.getType())) {
 				temp.setAccessible(true);
-				if (keepDepth - 1 < 0) {
+				if (keepDepth - 1 < 0 || HqlGenerator.class.isAssignableFrom(temp.getType())) {
 					try {
 						temp.set(domain, null);
 					} catch (IllegalArgumentException | IllegalAccessException e) {
