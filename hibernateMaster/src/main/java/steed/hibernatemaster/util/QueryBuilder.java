@@ -32,6 +32,11 @@ public class QueryBuilder {
 		queryMap = new HashMap<>();
 	}
 	
+	public QueryBuilder(Map<String, Object> queryMap) {
+		super();
+		this.queryMap = queryMap;
+	}
+
 	public Class<? extends BaseDomain> getTarget() {
 		return target;
 	}
@@ -211,6 +216,16 @@ public class QueryBuilder {
 	 */
 	public QueryBuilder addNotNull(String key,boolean notNull){
 		queryMap.put(key+"_not_null", notNull);
+		return this;
+	}
+	/**
+	 * 删除非空查询条件 生
+	 * @param key 字段名
+	 * 
+	 * @return this
+	 */
+	public QueryBuilder removeNotNull(String key){
+		queryMap.remove(key+"_not_null");
 		return this;
 	}
 	

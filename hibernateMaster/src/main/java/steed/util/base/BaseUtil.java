@@ -1,5 +1,8 @@
 package steed.util.base;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
 import steed.util.logging.Logger;
@@ -14,6 +17,26 @@ public class BaseUtil {
 	
 	public static Logger getLogger(){
 		return logger;
+	}
+	
+	public static URL getResourceURL(String path) {
+		URL url;
+
+	      url = Thread.currentThread().getContextClassLoader().getResource(path);
+
+	      if (url == null) {
+	         // trying a different classloader now
+	         url = new BaseUtil().getClass().getClassLoader().getResource(path);
+	      }
+
+	      if (url == null) {
+	         try {
+				url = new URL(path);
+			} catch (MalformedURLException e) {
+//				logger.info("获取资源路径失败!");
+			}
+	      }
+	     return url;
 	}
 	
 	/**

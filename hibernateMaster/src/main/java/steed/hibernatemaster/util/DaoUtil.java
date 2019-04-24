@@ -158,9 +158,21 @@ public class DaoUtil {
 	public final static void setCurrentTransaction(Transaction currentTransaction) {
 		DaoUtil.currentTransaction.set(currentTransaction);
 	}
+	
 	public final static Boolean getTransactionType() {
 		return transactionType.get();
 	}
+	
+	/**
+	 * 设置默认事务类型
+	 * @param isCommit
+	 */
+	public final static void setDefaultTransactionType(boolean isCommit) {
+		if (isCommit && DaoUtil.transactionType.get() == null) {
+			 DaoUtil.transactionType.set(isCommit);
+		}
+	}
+	
 	public final static void setTransactionType(Boolean transactionType) {
 		DaoUtil.transactionType.set(transactionType);
 	}
@@ -1904,7 +1916,7 @@ public class DaoUtil {
 		}
 		
 		logger.debug("hql------>%s",hql.toString());
-		logger.debug("参数------>%s",queryMap==null?null:queryMap.toString());
+		logger.debug("参数----->%s",queryMap==null?null:queryMap.toString());
 		
 		return hql;
 	}
