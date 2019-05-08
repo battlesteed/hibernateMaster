@@ -20,9 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package steed.util.logging;
+package steed.ext.util.logging;
 
-import steed.util.logging.impl.JdkLoggerFactory;
+import steed.ext.util.logging.impl.JdkLoggerFactory;
 
 public class LoggerFactory {
 	public static interface InternalLoggerFactory {

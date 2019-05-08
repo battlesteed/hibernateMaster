@@ -6,12 +6,12 @@ import java.util.List;
 
 import javax.persistence.Entity;
 
+import steed.ext.util.base.PathUtil;
+import steed.ext.util.file.FileUtil;
 import steed.hibernatemaster.Config;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseRelationalDatabaseDomain;
 import steed.hibernatemaster.domain.DomainScanner;
-import steed.util.base.PathUtil;
-import steed.util.file.FileUtil;
 
 /**
  * 单数据库实体类扫描器
@@ -44,7 +44,7 @@ public class SingleDomainScanner implements DomainScanner{
 			String replaceAll = absolutePath.substring(absolutePath.indexOf("classes")+"classes.".length()).replace("\\", ".").replace("/", ".");
 			try {
 				String domainClassName = replaceAll.substring(0,replaceAll.length() - 6);
-				steed.util.logging.LoggerFactory.getLogger().debug("扫描%s",domainClassName);
+				steed.ext.util.logging.LoggerFactory.getLogger().debug("扫描%s",domainClassName);
 				Class<?> domainClass = Class.forName(domainClassName);
 				if (BaseRelationalDatabaseDomain.class.isAssignableFrom(domainClass)) {
 					if (domainClass.getAnnotation(Entity.class) != null) {

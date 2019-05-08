@@ -6,7 +6,7 @@ import java.util.Date;
 import org.junit.Assert;
 import org.junit.Test;
 
-import steed.util.reflect.ReflectUtil;
+import steed.ext.util.reflect.ReflectUtil;
 
 public class ReflectTest {
 	

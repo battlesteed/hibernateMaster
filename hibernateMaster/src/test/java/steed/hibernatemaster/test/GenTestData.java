@@ -4,12 +4,12 @@ import java.util.Date;
 
 import org.junit.Assert;
 
+import steed.ext.util.test.TestEfficiency;
 import steed.hibernatemaster.sample.domain.Clazz;
 import steed.hibernatemaster.sample.domain.School;
 import steed.hibernatemaster.sample.domain.Student;
 import steed.hibernatemaster.util.DaoUtil;
 import steed.hibernatemaster.util.DaoUtil.ImmediatelyTransactionData;
-import steed.util.test.TestEfficiency;
 /**
  * 生成测试数据
  * @author battlesteed

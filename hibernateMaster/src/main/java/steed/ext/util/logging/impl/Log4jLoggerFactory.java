@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package steed.util.logging.impl;
+package steed.ext.util.logging.impl;
 
 
 import org.apache.logging.log4j.Level;
@@ -28,8 +28,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContext;
 import org.apache.logging.log4j.util.LoaderUtil;
 
-import steed.util.logging.Logger;
-import steed.util.logging.LoggerFactory.InternalLoggerFactory;
+import steed.ext.util.logging.Logger;
+import steed.ext.util.logging.LoggerFactory.InternalLoggerFactory;
 
 
 public class Log4jLoggerFactory implements InternalLoggerFactory {

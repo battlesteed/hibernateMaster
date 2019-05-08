@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import steed.ext.util.base.StringUtil;
 import steed.hibernatemaster.Config;
 import steed.hibernatemaster.domain.BaseRelationalDatabaseDomain;
-import steed.util.base.StringUtil;
 
 
 /**

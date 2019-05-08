@@ -6,11 +6,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import steed.ext.util.logging.LoggerFactory;
 import steed.hibernatemaster.sample.domain.Student;
 import steed.hibernatemaster.test.SteedTest;
 import steed.hibernatemaster.util.DaoUtil;
 import steed.hibernatemaster.util.QueryBuilder;
-import steed.util.logging.LoggerFactory;
 
 public class SqlToMuchTest extends SteedTest{
 	private String[] studentIds;
@@ -18,7 +18,7 @@ public class SqlToMuchTest extends SteedTest{
 	
 	@Test
 	public void testManySqlTime(){
-		steed.util.test.TestEfficiency testEfficiency = new steed.util.test.TestEfficiency();
+		steed.ext.util.test.TestEfficiency testEfficiency = new steed.ext.util.test.TestEfficiency();
 		testEfficiency.begin();
 		
 		List<Student> studentList = new ArrayList<>(dataSize);
@@ -39,7 +39,7 @@ public class SqlToMuchTest extends SteedTest{
 	
 	@Test
 	public void testOneSqlTime(){
-		steed.util.test.TestEfficiency testEfficiency = new steed.util.test.TestEfficiency();
+		steed.ext.util.test.TestEfficiency testEfficiency = new steed.ext.util.test.TestEfficiency();
 		testEfficiency.begin();
 		
 		QueryBuilder builder = new QueryBuilder();

@@ -1,4 +1,4 @@
-package steed.util.base;
+package steed.ext.util.base;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -18,6 +18,7 @@ import javax.persistence.IdClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import steed.ext.util.reflect.ReflectUtil;
 import steed.hibernatemaster.annotation.FuzzyQuery;
 import steed.hibernatemaster.annotation.FuzzyQuery.FuzzyQuerystrategy;
 import steed.hibernatemaster.domain.BaseDomain;
@@ -26,7 +27,6 @@ import steed.hibernatemaster.domain.UnionKeyDomain;
 import steed.hibernatemaster.exception.DomainIdAnnotationNotFoundException;
 import steed.hibernatemaster.util.DaoUtil;
 import steed.hibernatemaster.util.HqlGenerator;
-import steed.util.reflect.ReflectUtil;
 /**
  * 实体类工具类
  * @author 战马
@@ -388,7 +388,7 @@ public class DomainUtil{
 				}
 			}
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			steed.util.logging.LoggerFactory.getLogger().info("获取字段值出错",e);
+			steed.ext.util.logging.LoggerFactory.getLogger().info("获取字段值出错",e);
 		}
 		return differenceFields;
 	}
@@ -418,7 +418,7 @@ public class DomainUtil{
 			try {
 				temp.getField().set(filled, temp.getNewField());
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				steed.util.logging.LoggerFactory.getLogger().info("设置字段出错",e);
+				steed.ext.util.logging.LoggerFactory.getLogger().info("设置字段出错",e);
 			}
 		}
 		return differenceField;

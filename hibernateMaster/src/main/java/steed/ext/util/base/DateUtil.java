@@ -1,4 +1,4 @@
-package steed.util.base;
+package steed.ext.util.base;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import steed.util.logging.LoggerFactory;
+import steed.ext.util.logging.LoggerFactory;
 
 public class DateUtil {
 	public static final String yyyy_MM_dd = "yyyy-MM-dd";

@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import steed.ext.util.base.BaseUtil;
 import steed.hibernatemaster.Config;
 import steed.hibernatemaster.sample.domain.Clazz;
 import steed.hibernatemaster.sample.domain.Student;
 import steed.hibernatemaster.util.DaoUtil;
-import steed.util.base.BaseUtil;
 
 public class TestEfficiency {
 	private static AtomicInteger atomicInteger = new AtomicInteger(0);
@@ -21,7 +21,7 @@ public class TestEfficiency {
 		Config.autoCommitTransaction = false;
 		Config.devMode = true;
 		DaoUtil.getSession();
-		steed.util.test.TestEfficiency testEfficiency = new steed.util.test.TestEfficiency();
+		steed.ext.util.test.TestEfficiency testEfficiency = new steed.ext.util.test.TestEfficiency();
 		testEfficiency.begin();
 		for (int i = 0; i < count; i++) {
 			test();
@@ -42,7 +42,7 @@ public class TestEfficiency {
 	public static void test(){
 		new Thread(new Runnable() {
 			public void run() {
-				steed.util.test.TestEfficiency testEfficiency = new steed.util.test.TestEfficiency();
+				steed.ext.util.test.TestEfficiency testEfficiency = new steed.ext.util.test.TestEfficiency();
 				Student where = new Student();
 				Clazz clazz = new Clazz();
 				where.setClazz(clazz);

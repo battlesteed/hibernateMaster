@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import steed.ext.util.base.BaseUtil;
+import steed.ext.util.reflect.ReflectUtil;
 import steed.hibernatemaster.Config;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
-import steed.util.base.BaseUtil;
-import steed.util.reflect.ReflectUtil;
 
 /**
  * 查询构建器,复杂的查询(&gt; ,&lt; , in等查询条件),请用该类构建

@@ -1,4 +1,4 @@
-package steed.util.base;
+package steed.ext.util.base;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.UUID;
-
 
 public class StringUtil {
 	public static boolean isStringEmpty(String str){

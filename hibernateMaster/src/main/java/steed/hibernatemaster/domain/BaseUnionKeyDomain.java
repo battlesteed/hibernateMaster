@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 
-import steed.util.reflect.ReflectUtil;
+import steed.ext.util.reflect.ReflectUtil;
 
 
 

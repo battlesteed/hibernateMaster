@@ -20,13 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package steed.util.logging.impl;
+package steed.ext.util.logging.impl;
  
 
 import org.slf4j.spi.LocationAwareLogger;
 
-import steed.util.logging.Logger;
-import steed.util.logging.LoggerFactory.InternalLoggerFactory;
+import steed.ext.util.logging.Logger;
+import steed.ext.util.logging.LoggerFactory.InternalLoggerFactory;
 
 
 public class Sl4jLoggerFactory implements InternalLoggerFactory {

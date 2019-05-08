@@ -7,12 +7,12 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import steed.ext.util.base.BaseUtil;
 import steed.hibernatemaster.sample.domain.Clazz;
 import steed.hibernatemaster.sample.domain.School;
 import steed.hibernatemaster.sample.domain.Student;
 import steed.hibernatemaster.util.DaoUtil;
 import steed.hibernatemaster.util.QueryBuilder;
-import steed.util.base.BaseUtil;
 
 public class ListCustomFieldTest extends SteedTest{
 	

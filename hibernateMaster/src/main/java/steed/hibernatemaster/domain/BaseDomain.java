@@ -3,7 +3,7 @@ package steed.hibernatemaster.domain;
 import java.beans.Transient;
 import java.io.Serializable;
 
-import steed.util.base.DomainUtil;
+import steed.ext.util.base.DomainUtil;
 
 
 

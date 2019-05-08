@@ -52,7 +52,7 @@ public class SingleFactoryEngine implements FactoryEngine{
 			return factory2;
 			/*ProxoolConnectionProvider aConnectionProvider;*/
 		} catch (Exception e) {
-			steed.util.logging.LoggerFactory.getLogger().error("创建sessionFactory失败",e);
+			steed.ext.util.logging.LoggerFactory.getLogger().error("创建sessionFactory失败",e);
 		}
 		return null;
 	}

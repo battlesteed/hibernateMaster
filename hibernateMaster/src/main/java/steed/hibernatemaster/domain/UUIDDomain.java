@@ -9,7 +9,7 @@ import javax.persistence.MappedSuperclass;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import steed.util.base.StringUtil;
+import steed.ext.util.base.StringUtil;
 
 /**
  * uuid基础实体类,主键不要用自增的

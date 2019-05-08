@@ -1,12 +1,12 @@
-package steed.util.base;
+package steed.ext.util.base;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import steed.ext.util.logging.Logger;
+import steed.ext.util.logging.LoggerFactory;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
-import steed.util.logging.Logger;
-import steed.util.logging.LoggerFactory;
 /**
  * 基础工具类，拥有许多基础方法
  * @author 战马

@@ -5,11 +5,11 @@ import java.util.HashSet;
 
 import org.junit.Test;
 
+import steed.ext.util.base.BaseUtil;
 import steed.hibernatemaster.sample.domain.user.Role;
 import steed.hibernatemaster.sample.domain.user.User;
 import steed.hibernatemaster.util.DaoUtil;
 import steed.hibernatemaster.util.QueryBuilder;
-import steed.util.base.BaseUtil;
 
 public class TestManyToMany extends SteedTest{
 	

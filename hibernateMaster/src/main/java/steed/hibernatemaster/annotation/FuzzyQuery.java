@@ -6,7 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import steed.util.base.DomainUtil;
+import steed.ext.util.base.DomainUtil;
 /**
  * 标明该字段的模糊查询策略,
  * 一般用于系统自动模糊查询的时候在字段值前面加上

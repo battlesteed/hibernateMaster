@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package steed.util.logging;
+package steed.ext.util.logging;
 
 public abstract class Logger {  
 	public void debug(String format, Object... args){

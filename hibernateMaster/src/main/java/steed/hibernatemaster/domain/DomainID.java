@@ -3,7 +3,7 @@ package steed.hibernatemaster.domain;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
-import steed.util.reflect.ReflectUtil;
+import steed.ext.util.reflect.ReflectUtil;
 
 
 /**

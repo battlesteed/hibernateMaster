@@ -3,10 +3,10 @@ package steed.hibernatemaster.test;
 import org.junit.Assert;
 import org.junit.Test;
 
+import steed.ext.util.reflect.ReflectUtil;
 import steed.hibernatemaster.sample.domain.Clazz;
 import steed.hibernatemaster.sample.domain.School;
 import steed.hibernatemaster.util.DaoUtil;
-import steed.util.reflect.ReflectUtil;
 
 public class BaseRelationalDatabaseDomainTest extends SteedTest{
 	

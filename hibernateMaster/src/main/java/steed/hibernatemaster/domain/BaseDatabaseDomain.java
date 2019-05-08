@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import steed.util.base.BaseUtil;
-import steed.util.base.DomainUtil;
+import steed.ext.util.base.BaseUtil;
+import steed.ext.util.base.DomainUtil;
 
 public abstract class BaseDatabaseDomain extends BaseDomain{
 	private static final long serialVersionUID = -6872283825535497093L;
