@@ -391,7 +391,7 @@ public class ReflectUtil {
 			LoggerFactory.getLogger().info("获取字段之出错!{}",e.getMessage());
 		}
 		
-		LoggerFactory.getLogger().info("{}没有{} getter方法,通过gett获取值失败",new Object[]{obj.getClass().getName(),fieldName});
+		LoggerFactory.getLogger().info("{}没有{} getter方法,通过gett获取值失败",obj.getClass().getName(),fieldName);
 		return null;
 		
 	}

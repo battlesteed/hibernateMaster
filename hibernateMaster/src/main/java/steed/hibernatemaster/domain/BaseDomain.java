@@ -1,7 +1,8 @@
 package steed.hibernatemaster.domain;
 
-import java.beans.Transient;
 import java.io.Serializable;
+
+import javax.persistence.Transient;
 
 import steed.ext.util.base.DomainUtil;
 
@@ -14,7 +15,7 @@ public abstract class BaseDomain implements Serializable{
 	public void setVirtualID(Serializable serializable){
 		DomainUtil.setDomainId(this,serializable);
 	}
-	@javax.persistence.Transient
+	@Transient
 	public Serializable getVirtualID(){
 		return DomainUtil.getDomainId(this);
 	}

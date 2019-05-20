@@ -1562,6 +1562,7 @@ public class DaoUtil {
 		currentTransaction.remove();
 		exception.remove();
 		throwException.remove();
+		HibernateUtil.release();
 	}
 	
 	/**
