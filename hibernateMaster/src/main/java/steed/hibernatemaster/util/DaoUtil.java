@@ -954,15 +954,18 @@ public class DaoUtil {
 			closeSession();
 		}
 	}
+	
 	/**
-	 * 查询单个实体类的某几个字段
+	 * 查询实体类的某几个字段(只查第一行记录)
 	 * 
 	 * @param where 查询条件
-	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
+	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null),当selectedFields.length &gt; 1时,返回map&lt;String,Object&gt;
+	 * 当 selectedFields.length == 1时返回 直接返回单个查询字段
 	 */
 	public final static <T> T listOneFields(BaseDatabaseDomain where,String... selectedFields){
 		return listOneFields(where.getClass(), DaoUtil.putField2Map(where), null, null,selectedFields);
 	}
+	
 	/**
 	 * 查询实体类的某几个字段
 	 * 
@@ -990,6 +993,7 @@ public class DaoUtil {
 	public final static <T> T listOneFields(Class<?> target, Map<String, Object> where, List<String> desc, List<String> asc, String... selectedFields){
 		return listOneFields(target, where, desc, asc, null,selectedFields);
 	}
+	
 	/**
 	 * 查询单个实体类的某几个字段
 	 * 
@@ -1048,8 +1052,6 @@ public class DaoUtil {
 			}
 		}
 	}
-	
-	
 	
 	/**
 	 * 获取所有符合查询条件的记录
@@ -1153,6 +1155,7 @@ public class DaoUtil {
 	public final static <T> List<T> listAllCustomField(BaseDomain where,String... selectedFields){
 		return listAllCustomField(DaoUtil.putField2Map(where), where.getClass(), selectedFields);
 	}
+	
 	/**
 	 * 查询实体类指定的字段
 	 * 
@@ -1169,6 +1172,7 @@ public class DaoUtil {
 	public final static <T> List<T> listAllCustomField(Map<String, Object> where,Class<?> target,String... selectedFields){
 		return listAllCustomField(target, where, null, null, selectedFields);
 	}
+	
 	/**
 	 * 查询实体类指定的字段
 	 * 
@@ -1187,6 +1191,7 @@ public class DaoUtil {
 	public final static <T> List<T> listAllCustomField(Class<?> target,Map<String, Object> where,List<String> desc,List<String> asc,String... selectedFields){
 		return listAllCustomField(target, where, desc, asc, null, selectedFields);
 	}
+	
 	/**
 	 * 查询实体类指定的字段
 	 * 
@@ -1257,6 +1262,7 @@ public class DaoUtil {
 		putField2Map(where, map, "");
 		return listObj(t,pageSize,currentPage,map,desc,asc) ;
 	}
+	
 	/**
 	 * 随机取size条记录
 	 * 
@@ -1322,6 +1328,7 @@ public class DaoUtil {
 	public final static <T> Page<T> listObj(Class<T> target,int pageSize,int currentPage,Map<String, Object> where,List<String> desc,List<String> asc,boolean queryRecordCount){
 		return listCustomField(target, pageSize, currentPage, where, desc, asc, queryRecordCount);
 	}
+	
 	public final static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,Map<String, Object> map,List<String> desc,List<String> asc){
 		return listObj(t, pageSize, currentPage, map, desc, asc, true);
 	}
@@ -1350,6 +1357,7 @@ public class DaoUtil {
 			List<String> desc,List<String> asc,boolean queryRecordCount,String... selectField){
 		return listCustomField(target, pageSize, currentPage, where, desc, asc, queryRecordCount, null, selectField);
 	}
+	
 	/**
 	 * 查询target里面指定的字段
 	 * 
@@ -1445,9 +1453,6 @@ public class DaoUtil {
 		}
 	}
 	
-	
-	
-	
 	/**
 	 * 根据实体类id加载实体类,关联的对象不会全部查询出来,用到的时候才查询,性能较好,
 	 * 序列化时需要做特殊处理或调用 {@link BaseRelationalDatabaseDomain#initializeAll()}initialize关联的实体类  ,也可以使用{@link #get(Class, Serializable)}
@@ -1502,6 +1507,7 @@ public class DaoUtil {
 			return true;
 		}
 	}
+	
 	/**
 	 * 开启事务
 	 */
@@ -1612,6 +1618,7 @@ public class DaoUtil {
 			closeSession();
 		}
 	}
+	
 	/**
 	 * update实体类中不为空的字段
 	 * 
@@ -1624,6 +1631,7 @@ public class DaoUtil {
 	public final static boolean updateNotNullField(BaseRelationalDatabaseDomain domain,List<String> updateEvenNull){
 		return updateNotNullField(domain, updateEvenNull, false);
 	}
+	
 	/**
 	 * update实体类中不为空的字段,该方法不会触发实体类的update方法,无法做update触发操作,
 	 * 推荐用 {@link BaseRelationalDatabaseDomain#updateNotNullField(List) }
@@ -1728,28 +1736,29 @@ public class DaoUtil {
 		logger.debug("hql------>"+hql.toString());
 		return hql;
 	}
+	
 	/**
 	 * 获取删除用的hql
 	 * 除了t其它均可为null
 	 * @param t 实体类
-	 * @param map 查询数据
+	 * @param where 查询条件
 	 * @return 拼好的hql
 	 */
-	public final static StringBuffer getDeleteHql(Class<? extends BaseRelationalDatabaseDomain> t,Map<String, Object> map) {
-		return getHql(t, map, null, null,"delete");
+	public final static StringBuffer getDeleteHql(Class<? extends BaseRelationalDatabaseDomain> t,Map<String, Object> where) {
+		return getHql(t, where, null, null,"delete");
 	}
 	
 	/**
 	 * 获取查询用的hql
 	 * 除了t其它均可为null
 	 * @param t 实体类
-	 * @param map 查询数据
+	 * @param where 查询条件
 	 * @param desc 降序排列字段
 	 * @param asc 升序排列字段
 	 * @return 拼好的hql
 	 */
-	public final static <T> StringBuffer getSelectHql(Class<T> t,Map<String, Object> map,List<String> desc,List<String> asc,String... selectedFields) {
-		return getHql(t, map, desc, asc,"select",null,selectedFields);
+	public final static <T> StringBuffer getSelectHql(Class<T> t,Map<String, Object> where,List<String> desc,List<String> asc,String... selectedFields) {
+		return getHql(t, where, desc, asc,"select",null,selectedFields);
 	}
 	
 	/**
@@ -1784,14 +1793,14 @@ public class DaoUtil {
 	 * 获取hql
 	 * 除了t其它均可为null
 	 * @param t 实体类
-	 * @param queryMap 查询数据
+	 * @param where 查询条件
 	 * @param desc 降序排列字段
 	 * @param asc 升序排列字段
 	 * @param prefix hql前面部分目前只支持"select"或"delete"
 	 * @param groupBy hql group by 的字段
 	 * @return 拼好的hql
 	 */
-	public final static <T> StringBuffer getHql(Class<T> t, Map<String, Object> queryMap,List<String> desc,
+	public final static <T> StringBuffer getHql(Class<T> t, Map<String, Object> where,List<String> desc,
 			List<String> asc,String prefix,String[] groupBy,String... selectedFields) {
 		String fullClassName = t.getName();
 		StringBuffer hql = new StringBuffer();
@@ -1868,9 +1877,9 @@ public class DaoUtil {
 		
 		dealSortFieldsJoin(t, asc, domainSelected);
 		
-		if (queryMap != null) {
-			for(String temp:queryMap.keySet()){
-				if (temp.contains(".") && !(queryMap.get(temp) instanceof HqlGenerator)) {
+		if (where != null) {
+			for(String temp:where.keySet()){
+				if (temp.contains(".") && !(where.get(temp) instanceof HqlGenerator)) {
 					String chain = getMaxDepthDomainChain(temp, t);
 					if (chain != null) {
 						innerJoin.add(chain);
@@ -1897,7 +1906,7 @@ public class DaoUtil {
 		hql.append(" where  1=1 ");
 		
 		
-		hql = appendHqlWhere(domainSimpleName, hql, queryMap);
+		hql = appendHqlWhere(domainSimpleName, hql, where);
 		
 		if (groupBy != null && groupBy.length > 0) {
 			int i = 0;
@@ -1912,12 +1921,12 @@ public class DaoUtil {
 		
 		appendHqlOrder(hql, desc, asc, domainSimpleName);
 		
-		if (queryMap != null && queryMap.get(personalHqlGeneratorKey) != null) {
-			((HqlGenerator)queryMap.get(personalHqlGeneratorKey)).afterHqlGenered(domainSimpleName, hql, queryMap);
+		if (where != null && where.get(personalHqlGeneratorKey) != null) {
+			((HqlGenerator)where.get(personalHqlGeneratorKey)).afterHqlGenered(domainSimpleName, hql, where);
 		}
 		
 		logger.debug("hql------>%s",hql.toString());
-		logger.debug("参数----->%s",queryMap==null?null:queryMap.toString());
+		logger.debug("参数----->%s",where==null?null:where.toString());
 		
 		return hql;
 	}
@@ -2044,6 +2053,7 @@ public class DaoUtil {
 	public final static StringBuffer getCountHql(StringBuffer hql) {
 		return changeSelectHql(hql, "count(*)");
 	}
+	
 	/**
 	 * 获取该条查询的记录总数
 	 * @param hql
@@ -2068,29 +2078,29 @@ public class DaoUtil {
 	 * 
 	 * 生成query并设置查询参数,如果udpate,delete等语句,确保之前调用了DaoUtil其它自动开启事务的方法否则请手动调用DaoUtil.beginTransaction()
 	 * 开启事务或手动管理事务,不然系统无法提交事务,造成udpate或delete不生效bug
-	 * @param map
+	 * @param where
 	 * @param hql
 	 * @see #beginTransaction
 	 * @return
 	 */
-	public final static Query createQuery(Map<String, Object> map,StringBuffer hql) {
+	public final static Query createQuery(Map<String, Object> where,StringBuffer hql) {
 		logger.debug("hql---->"+hql.toString());
-		logger.debug("参数---->"+map);
+		logger.debug("参数---->"+where);
 		Query query = getSession().createQuery(hql.toString());
-		setMapParam(map, query);
+		setMapParam(where, query);
 		return query;
 	}
 	/**
 	 * 生成SQLquery并设置查询参数
-	 * @param map
+	 * @param where
 	 * @param sql
 	 * @return
 	 */
-	public final static Query createSQLQuery(Map<String, Object> map,StringBuffer sql) {
+	public final static Query createSQLQuery(Map<String, Object> where,StringBuffer sql) {
 		logger.debug("sql---->"+sql.toString());
-		logger.debug("参数---->"+map);
+		logger.debug("参数---->"+where);
 		Query query = getSession().createSQLQuery(sql.toString());
-		setMapParam(map, query);
+		setMapParam(where, query);
 		return query;
 	}
 	
@@ -2337,10 +2347,10 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 往map里面put("personalHqlGenerator",{@link HqlGenerator} );
+	 * 往where里面put("personalHqlGenerator",{@link HqlGenerator} );
 	 * 即可跳过默认的HqlGenerator,用个性化HqlGenerator生成hql
 	 * 
-	 * 组装map参数到hql的where部分
+	 * 组装参数到hql的where部分
 	 * 
 	 * @param domainSimpleName 类简称
 	 * @param hql 要append的hql

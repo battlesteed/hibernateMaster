@@ -1,5 +1,6 @@
 package steed.hibernatemaster.test;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.Map;
@@ -18,5 +19,6 @@ public class TestPutField2Map {
 		student.setTempData("tempData");
 		Map<String, Object> putField2Map = DaoUtil.putField2Map(student);
 		assertNull(putField2Map.get("tempData"));
+		assertNotNull(putField2Map.get("name"));
 	}
 }

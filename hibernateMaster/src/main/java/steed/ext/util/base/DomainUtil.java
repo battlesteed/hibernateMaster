@@ -15,9 +15,8 @@ import java.util.Map;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import steed.ext.util.logging.Logger;
+import steed.ext.util.logging.LoggerFactory;
 import steed.ext.util.reflect.ReflectUtil;
 import steed.hibernatemaster.annotation.FuzzyQuery;
 import steed.hibernatemaster.annotation.FuzzyQuery.FuzzyQuerystrategy;

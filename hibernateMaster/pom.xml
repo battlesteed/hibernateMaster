@@ -101,12 +101,12 @@
 
 		<!-- druid连接池 -->
 		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>druid</artifactId>
-			<version>1.1.5</version>
-			<scope>compile</scope>
-			<optional>true</optional>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>druid</artifactId>
+		    <version>1.1.17</version>
+		    <optional>true</optional>
 		</dependency>
+
 
 		<!-- proxool连接池 -->
 		<!-- <dependency> <groupId>org.hibernate</groupId> <artifactId>hibernate-proxool</artifactId> 

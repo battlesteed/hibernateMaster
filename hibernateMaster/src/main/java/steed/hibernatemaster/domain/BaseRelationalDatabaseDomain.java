@@ -22,6 +22,7 @@ import org.hibernate.collection.internal.PersistentSet;
 
 import steed.ext.util.base.BaseUtil;
 import steed.ext.util.base.DomainUtil;
+import steed.ext.util.logging.Logger;
 import steed.ext.util.logging.LoggerFactory;
 import steed.ext.util.reflect.ReflectUtil;
 import steed.hibernatemaster.Config;
@@ -34,17 +35,23 @@ import steed.hibernatemaster.util.HqlGenerator;
  *
  */
 public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
+	private static final Logger logger = LoggerFactory.getLogger(BaseRelationalDatabaseDomain.class);
 	
 	private static final long serialVersionUID = -3084039108845387366L;
 	protected HqlGenerator personalHqlGenerator;
 	private transient boolean trimEmptyDomain;
 	
-	protected final static Validator validator;
+	protected static Validator validator;
 	
 	static{
-		Configuration<?> configure = Validation.byDefaultProvider().configure();
-    	configure.addProperty("hibernate.validator.fail_fast", "true");
-    	validator = configure.buildValidatorFactory().getValidator();
+		try {
+			Class.forName("javax.el.ELManager");
+			Configuration<?> configure = Validation.byDefaultProvider().configure();
+			configure.addProperty("hibernate.validator.fail_fast", "true");
+			validator = configure.buildValidatorFactory().getValidator();
+		} catch (ClassNotFoundException e) {
+			logger.warn("el库不存在,不启用hibernateValidator");
+		}
 	}
 	
 	@Transient
@@ -108,6 +115,10 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 	protected boolean validate(){
+		if (validator == null) {
+			return true;
+		}
+		
 		Set<ConstraintViolation<BaseRelationalDatabaseDomain>> validate = validator.validate(this);
 		
 		if (Config.devMode) {
