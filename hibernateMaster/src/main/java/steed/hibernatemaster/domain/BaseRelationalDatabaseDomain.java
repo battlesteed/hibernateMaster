@@ -11,10 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Transient;
-import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
 
 import org.hibernate.Hibernate;
 import org.hibernate.collection.internal.PersistentList;
@@ -40,19 +37,6 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	private static final long serialVersionUID = -3084039108845387366L;
 	protected HqlGenerator personalHqlGenerator;
 	private transient boolean trimEmptyDomain;
-	
-	protected static Validator validator;
-	
-	static{
-		try {
-			Class.forName("javax.el.ELManager");
-			Configuration<?> configure = Validation.byDefaultProvider().configure();
-			configure.addProperty("hibernate.validator.fail_fast", "true");
-			validator = configure.buildValidatorFactory().getValidator();
-		} catch (ClassNotFoundException e) {
-			logger.warn("el库不存在,不启用hibernateValidator");
-		}
-	}
 	
 	@Transient
 	public HqlGenerator getPersonalHqlGenerator() {
@@ -115,11 +99,11 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 	protected boolean validate(){
-		if (validator == null) {
+		if (Config.validator == null) {
 			return true;
 		}
 		
-		Set<ConstraintViolation<BaseRelationalDatabaseDomain>> validate = validator.validate(this);
+		Set<ConstraintViolation<BaseRelationalDatabaseDomain>> validate = Config.validator.validate(this);
 		
 		if (Config.devMode) {
 			for (ConstraintViolation<BaseRelationalDatabaseDomain> temp:validate) {

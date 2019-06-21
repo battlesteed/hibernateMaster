@@ -1,11 +1,29 @@
 package steed.hibernatemaster;
 
+import javax.validation.Configuration;
+import javax.validation.Validation;
+import javax.validation.Validator;
+
+import steed.ext.util.logging.Logger;
+import steed.ext.util.logging.LoggerFactory;
 import steed.hibernatemaster.util.FactoryEngine;
 import steed.hibernatemaster.util.HqlGenerator;
 import steed.hibernatemaster.util.SimpleHqlGenerator;
 import steed.hibernatemaster.util.SingleFactoryEngine;
 
 public class Config {
+	public static final Logger logger = LoggerFactory.getLogger(Config.class);
+	
+	static{
+		try {
+			Class.forName("javax.el.ELManager");
+			Configuration<?> configure = Validation.byDefaultProvider().configure();
+			configure.addProperty("hibernate.validator.fail_fast", "true");
+			validator = configure.buildValidatorFactory().getValidator();
+		} catch (ClassNotFoundException e) {
+			logger.warn("el库不存在,不启用hibernateValidator");
+		}
+	}
 	/**
 	 * 是否是单数据库模式,可以调用<code>{@link steed.hibernatemaster.util.HibernateUtil#switchDatabase}</code>
 	 * 切换数据库<br>
@@ -58,6 +76,8 @@ public class Config {
 	 * @see steed.hibernatemaster.util.DaoUtil#updateByQuery(Class, java.util.Map, java.util.Map)
 	 */
 	public static boolean muffUpdateCheck = false;
+	
+	public static Validator validator;
 	
 	
 }
