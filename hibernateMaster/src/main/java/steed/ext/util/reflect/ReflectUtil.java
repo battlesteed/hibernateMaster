@@ -187,11 +187,21 @@ public class ReflectUtil {
 	public static boolean isFieldFinal(Field field){
 		return (field.getModifiers()&Modifier.FINAL)==Modifier.FINAL;
 	}
-	public static Map<String, Object> field2Map(Object obj){
+	
+	public static Map<String, Object> field2Map(Object obj,boolean strictlyMode){
 		Map<String, Object> map = new HashMap<>();
-		return field2Map(0,obj, map);
+		return field2Map(0,obj, map, strictlyMode);
 	}
+	
+	public static Map<String, Object> field2Map(Object obj){
+		return field2Map(obj, false);
+	}
+	
 	public static Map<String, Object> field2Map(int classDdeep,Object obj,Map<String, Object> map){
+		return field2Map(classDdeep, obj, map, false);
+	}
+	
+	public static Map<String, Object> field2Map(int classDdeep,Object obj,Map<String, Object> map,boolean strictlyMode){
 		Class<?> tempClass = obj.getClass();
 		for (int i = 0; i < classDdeep; i++) {
 			tempClass = tempClass.getSuperclass();
@@ -203,7 +213,7 @@ public class ReflectUtil {
 			temp.setAccessible(true);
 			try {
 				Object obj2 = temp.get(obj);
-				if (!BaseUtil.isObjEmpty(obj2)) {
+				if (!isNull(strictlyMode, obj2)) {
 					map.put(temp.getName(), obj2);
 				}
 			} catch (IllegalArgumentException e) {
@@ -213,7 +223,17 @@ public class ReflectUtil {
 			}
 		}
 		
-		return field2Map(++classDdeep, obj, map);
+		return field2Map(++classDdeep, obj, map, strictlyMode);
+	}
+
+	private static boolean isNull(boolean strictlyMode, Object obj2) {
+		boolean isNull;
+		if (strictlyMode) {
+			isNull = obj2 == null;
+		}else {
+			isNull = BaseUtil.isObjEmpty(obj2);
+		}
+		return isNull;
 	}
 	
 	

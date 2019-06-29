@@ -921,7 +921,7 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 查询单个实体类
+	 * 查询单个实体类,若要通过id查某条记录,请用{@link #get(Class, Serializable)} 或 {@link #load(Class, Serializable)}方法
 	 * 
 	 * @param where 查询条件
 	 * @return 符合查询条件的第一个记录(没有符合查询条件的结果时返回null)
