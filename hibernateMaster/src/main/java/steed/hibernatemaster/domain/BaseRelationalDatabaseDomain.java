@@ -248,11 +248,36 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	 * update实体类中不为空的字段,直接用hql update,update整个实体类,比{@link #updateNotNullFieldByHql(List, boolean) }性能好,
 	 * 	但是无法通过重写{@link #update} 方法做aop
 	 * 
+	 */
+	public boolean updateNotNullFieldByHql(){
+		return updateNotNullFieldByHql(null, true);
+	}
+	
+	/**
+	 * update实体类中不为空的字段,直接用hql update,update整个实体类,比{@link #updateNotNullFieldByHql(List, boolean) }性能好,
+	 * 	但是无法通过重写{@link #update} 方法做aop
+	 * 
 	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传null
 	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空， 否则调用BaseUtil.isObjEmpty判断字段是否为空
 	 */
 	public boolean updateNotNullFieldByHql(List<String> updateEvenNull,boolean strictlyMode){
-		Map<String, Object> field2Map = ReflectUtil.field2Map(this, strictlyMode);
+		/*
+		 * Map<String, Object> field2Map = DaoUtil.putField2Map(this); List<String>
+		 * keys4Remove = new ArrayList<String>(); field2Map.entrySet().forEach((e)->{ if
+		 * (e.getKey().contains(".")) { keys4Remove.add(e.getKey()); return; } if
+		 * (strictlyMode) {
+		 * 
+		 * } });
+		 */
+		Map<String, Object> field2Map = ReflectUtil.field2Map(this, strictlyMode, true);
+		if (updateEvenNull != null) {
+			updateEvenNull.forEach((temp)->{
+				if (!field2Map.containsKey(temp)) {
+					field2Map.put(temp, null);
+				}
+			});
+		}
+		
 		String domainIDName = DomainUtil.getDomainIDName(getClass());
 		Object id = field2Map.get(domainIDName);
 		field2Map.remove(domainIDName);

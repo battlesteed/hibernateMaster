@@ -2269,13 +2269,8 @@ public class DaoUtil {
 						continue;
 					}
 					//不是索引字段且标有Transient即跳过
-					if (isSelectIndex(fieldName) == 0) {
-						if (ReflectUtil.getAnnotation(Transient.class, objClass, f) != null) {
-							continue;
-						}else if (ReflectUtil.getDeclaredMethod(objClass, StringUtil.getFieldGetterName(fieldName)) == null 
-								&& ReflectUtil.getDeclaredMethod(objClass, StringUtil.getFieldIsMethodName(fieldName)) == null) {
-							continue;
-						}
+					if (isSelectIndex(fieldName) == 0 && !DomainUtil.isDatabaseField(objClass, f)) {
+						continue;
 					}
 					
 					Object value = null;

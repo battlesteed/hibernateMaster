@@ -14,12 +14,14 @@ import java.util.Map;
 
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Transient;
 
 import steed.ext.util.logging.Logger;
 import steed.ext.util.logging.LoggerFactory;
 import steed.ext.util.reflect.ReflectUtil;
 import steed.hibernatemaster.annotation.FuzzyQuery;
 import steed.hibernatemaster.annotation.FuzzyQuery.FuzzyQuerystrategy;
+import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
 import steed.hibernatemaster.domain.BaseRelationalDatabaseDomain;
 import steed.hibernatemaster.domain.UnionKeyDomain;
@@ -390,6 +392,26 @@ public class DomainUtil{
 			steed.ext.util.logging.LoggerFactory.getLogger().info("获取字段值出错",e);
 		}
 		return differenceFields;
+	}
+	
+	/**
+	 *  判断实体类字段是否属于数据库字段(是否映射了数据库列)
+	 * @param target
+	 * @param field
+	 * @return 
+	 */
+	public static boolean isDatabaseField(Class<?> target,Field field) {
+		
+		if (!BaseDatabaseDomain.class.isAssignableFrom(target) || 
+				ReflectUtil.isFieldFinal(field) || 
+				ReflectUtil.getAnnotation(Transient.class, target, field) != null) {
+			return false;
+		}
+		if (ReflectUtil.getDeclaredMethod(target, StringUtil.getFieldGetterName(field.getName())) == null 
+				&& ReflectUtil.getDeclaredMethod(target, StringUtil.getFieldIsMethodName(field.getName())) == null) {
+			return false;
+		}
+		return true;
 	}
 	
 	private static <T> Object getFieldValue(T target, Field f) throws IllegalAccessException {

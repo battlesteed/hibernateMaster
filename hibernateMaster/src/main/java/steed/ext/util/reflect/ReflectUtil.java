@@ -18,6 +18,7 @@ import java.util.Map;
 
 import steed.ext.util.base.BaseUtil;
 import steed.ext.util.base.DateUtil;
+import steed.ext.util.base.DomainUtil;
 import steed.ext.util.base.StringUtil;
 import steed.ext.util.logging.LoggerFactory;
 
@@ -193,6 +194,11 @@ public class ReflectUtil {
 		return field2Map(0,obj, map, strictlyMode);
 	}
 	
+	public static Map<String, Object> field2Map(Object obj,boolean strictlyMode, boolean onlyPutDatabaseField){
+		Map<String, Object> map = new HashMap<>();
+		return field2Map(0,obj, map, strictlyMode, onlyPutDatabaseField);
+	}
+	
 	public static Map<String, Object> field2Map(Object obj){
 		return field2Map(obj, false);
 	}
@@ -202,6 +208,10 @@ public class ReflectUtil {
 	}
 	
 	public static Map<String, Object> field2Map(int classDdeep,Object obj,Map<String, Object> map,boolean strictlyMode){
+		return field2Map(classDdeep, obj, map, strictlyMode, false);
+	}
+	
+	public static Map<String, Object> field2Map(int classDdeep,Object obj,Map<String, Object> map,boolean strictlyMode,boolean onlyPutDatabaseField){
 		Class<?> tempClass = obj.getClass();
 		for (int i = 0; i < classDdeep; i++) {
 			tempClass = tempClass.getSuperclass();
@@ -214,6 +224,9 @@ public class ReflectUtil {
 			try {
 				Object obj2 = temp.get(obj);
 				if (!isNull(strictlyMode, obj2)) {
+					if (onlyPutDatabaseField && !DomainUtil.isDatabaseField(tempClass, temp)) {
+						continue;
+					}
 					map.put(temp.getName(), obj2);
 				}
 			} catch (IllegalArgumentException e) {
@@ -223,7 +236,7 @@ public class ReflectUtil {
 			}
 		}
 		
-		return field2Map(++classDdeep, obj, map, strictlyMode);
+		return field2Map(++classDdeep, obj, map, strictlyMode, onlyPutDatabaseField);
 	}
 
 	private static boolean isNull(boolean strictlyMode, Object obj2) {
