@@ -229,23 +229,10 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 		}
 	}
 	
-	/**
-	 * update实体类中不为空的字段,直接用hql update,update整个实体类,比{@link #updateNotNullFieldByHql(List, boolean) }性能好,
-	 * 	但是无法通过重写{@link #update} 方法做aop
-	 * 
-	 * @param updateEvenNull 即使为空也update到数据库中的字段,没有请传null
-	 * 
-	 * @return 是否更新成功(即使返回true,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用)
-	 * 
-	 * @see #updateNotNullFieldByHql(List, boolean)
-	 */
-	@Override
-	public boolean updateNotNullField(List<String> updateEvenNull){
-		return updateNotNullField(updateEvenNull, true);
-	}
+
 	
 	/**
-	 * update实体类中不为空的字段,直接用hql update,update整个实体类,比{@link #updateNotNullFieldByHql(List, boolean) }性能好,
+	 * update不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好,
 	 * 	但是无法通过重写{@link #update} 方法做aop
 	 * 
 	 */
@@ -254,11 +241,11 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 	/**
-	 * update实体类中不为空的字段,直接用hql update,update整个实体类,比{@link #updateNotNullFieldByHql(List, boolean) }性能好,
+	 * update不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好,
 	 * 	但是无法通过重写{@link #update} 方法做aop
 	 * 
 	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传null
-	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空， 否则调用BaseUtil.isObjEmpty判断字段是否为空
+	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空， 否则调用{@link BaseUtil#isObjEmpty(Object)} 判断字段是否为空
 	 */
 	public boolean updateNotNullFieldByHql(List<String> updateEvenNull,boolean strictlyMode){
 		/*
@@ -289,12 +276,26 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 	/**
-	 * update实体类中不为空的字段(把本对象为空的字段从数据库查出来填充进去),然后调用{@link update}方法,
+	 * update不为空的字段(把本实例为空的字段从数据库查出来填充进去),然后调用{@link update}方法,update整个实例
 	 * 
-	 *    若想做aop,可以直接重写update方法即可,不用重写该方法
+	 *    若想做aop,可以直接重写update方法即可,不用重写该方法,若没有aop需求,可以用{@link #updateNotNullFieldByHql(List, boolean)}
 	 * 
 	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传null
-	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空， 否则调用BaseUtil.isObjEmpty判断字段是否为空
+	 * 
+	 * @see #updateNotNullFieldByHql(List, boolean)
+	 */
+	@Override
+	public boolean updateNotNullField(List<String> updateEvenNull){
+		return updateNotNullField(updateEvenNull, true);
+	}
+	
+	/**
+	 * update不为空的字段(把本实例为空的字段从数据库查出来填充进去),然后调用{@link update}方法,update整个实例
+	 * 
+	 *    若想做aop,可以直接重写update方法即可,不用重写该方法,若没有aop需求,可以用{@link #updateNotNullFieldByHql(List, boolean)}
+	 * 
+	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传null
+	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空， 否则调用{@link BaseUtil#isObjEmpty(Object)} 判断字段是否为空
 	 * 
 	 * @see #updateNotNullFieldByHql(List, boolean)
 	 */

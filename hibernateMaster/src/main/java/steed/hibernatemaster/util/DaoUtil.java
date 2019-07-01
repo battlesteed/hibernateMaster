@@ -673,8 +673,7 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 级联删除,不推荐,应该重写实体类delete方法实现级联删除,
-	 * 已经过时,推荐通过重写实体类的delete方法来实现级联删除
+	 * 级联删除,已不推荐使用,推荐通过重写实体类的delete方法来实现级联删除
 	 * 
 	 * @param domain 目标实体类
 	 * 
@@ -1364,8 +1363,8 @@ public class DaoUtil {
 	 * @param <T> 要查询的实体类
 	 * 
 	 * @param t 要查询的类
-	 * @param pageSize
-	 * @param currentPage
+	 * @param pageSize 分页大小
+	 * @param currentPage 当前页码
 	 * @param constraint 查询条件
 	 * @param desc
 	 * @param asc
@@ -1408,7 +1407,7 @@ public class DaoUtil {
 	 * 
 	 * @return 查询到的实体类的代理对象(记录不存则返回null)
 	 * 
-	 * @see DaoUtil#get(Class, Serializable)
+	 * @see #get(Class, Serializable)
 	 */
 	@SuppressWarnings("unchecked")
 	public final static <T extends BaseRelationalDatabaseDomain> T smartLoad(T domain){
@@ -1661,7 +1660,7 @@ public class DaoUtil {
 	}*/
 	
 	/**
-	 * update实体类中不为空的字段
+	 * update整个实体类
 	 * 
 	 * @param domain 要update的实体类
 	 * 
@@ -1684,13 +1683,13 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 不要求list里面所有对象一起update成功或失败,update单位是单个对象,
-	 * 你可能需要另外一个方法updateList(List list),若事务失败了,数据库操作一样会失败,所以该返回值只做参考用
+	 * 不要求list里面所有对象一起update成功或失败,update单位是单个对象,若事务失败了,数据库操作一样会失败,所以该返回值只做参考用
 	 * 
 	 * @see #updateList
 	 * @param list 要update的对象
 	 * 
 	 * @return update失败的对象数
+	 * 
 	 */
 	public final static int updateListOneByOne(List<? extends BaseRelationalDatabaseDomain> list){
 		int failed = 0;
