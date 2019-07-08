@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -101,12 +102,19 @@
 
 		<!-- druid连接池 -->
 		<dependency>
-		    <groupId>com.alibaba</groupId>
-		    <artifactId>druid</artifactId>
-		    <version>1.1.17</version>
-		    <optional>true</optional>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>1.1.17</version>
+			<optional>true</optional>
 		</dependency>
 
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-context</artifactId>
+		    <version>5.1.8.RELEASE</version>
+		    <optional>true</optional>
+		</dependency>
+		
 
 		<!-- proxool连接池 -->
 		<!-- <dependency> <groupId>org.hibernate</groupId> <artifactId>hibernate-proxool</artifactId> 
@@ -129,43 +137,43 @@
 			<scope>compile</scope>
 			<optional>true</optional>
 		</dependency>
-		
+
 		<!-- hibernate validator -->
 		<dependency>
-		    <groupId>org.hibernate.validator</groupId>
-		    <artifactId>hibernate-validator</artifactId>
-		    <version>6.0.8.Final</version>
-		    <optional>false</optional>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.glassfish</groupId>
-		    <artifactId>javax.el</artifactId>
-		    <version>3.0.0</version>
-		    <optional>true</optional>
-		</dependency>
-		
-		<dependency>
-		    <groupId>javax.el</groupId>
-		    <artifactId>javax.el-api</artifactId>
-		    <version>3.0.0</version>
-		    <optional>true</optional>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>6.0.8.Final</version>
+			<optional>false</optional>
 		</dependency>
 
 		<dependency>
-		    <groupId>org.hibernate.validator</groupId>
-		    <artifactId>hibernate-validator-cdi</artifactId>
-		    <version>6.0.8.Final</version>
-		    <optional>false</optional>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.el</artifactId>
+			<version>3.0.0</version>
+			<optional>true</optional>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>javax.el-api</artifactId>
+			<version>3.0.0</version>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator-cdi</artifactId>
+			<version>6.0.8.Final</version>
+			<optional>false</optional>
+		</dependency>
+
 
 		<!-- 引入sharding-jdbc核心模块 -->
 		<dependency>
-		    <groupId>io.shardingjdbc</groupId>
-		    <artifactId>sharding-jdbc-core</artifactId>
-		    <version>2.0.3</version>
-		    <optional>true</optional>
+			<groupId>io.shardingjdbc</groupId>
+			<artifactId>sharding-jdbc-core</artifactId>
+			<version>2.0.3</version>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
@@ -176,84 +184,84 @@
 			<optional>true</optional>
 		</dependency>
 	</dependencies>
-	  <build>
-	<plugins>
-    <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.3</version>
-        <extensions>true</extensions>
-        <configuration>
-            <serverId>ossrh</serverId>
-            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-        </configuration>
-    </plugin>
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.3</version>
-        <executions>
-            <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                    <goal>jar</goal>
-                </goals>
-            </execution>
-        </executions>
-    </plugin>
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-            <execution>
-                <id>attach-sources</id>
-                <goals>
-                    <goal>jar-no-fork</goal>
-                </goals>
-            </execution>
-        </executions>
-    </plugin>
-    <plugin>  
-        <groupId>org.apache.maven.plugins</groupId>  
-        <artifactId>maven-compiler-plugin</artifactId>  
-        <configuration>  
-          <source>1.8</source>  
-          <target>1.8</target>  
-          <encoding>UTF-8</encoding>
-        </configuration>  
-      </plugin>  
-     <plugin>
-   <groupId>org.apache.maven.plugins</groupId>
-   <artifactId>maven-javadoc-plugin</artifactId>
-   <version>2.9.1</version>
-   <configuration>
-      <charset>UTF-8</charset>
-      <docencoding>UTF-8</docencoding>
-   </configuration>
-   <executions>
-      <execution>
-         <id>attach-javadocs</id>
-         <goals>
-            <goal>jar</goal>
-         </goals>
-      </execution>
-   </executions>
-</plugin>
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-            <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                    <goal>sign</goal>
-                </goals>
-            </execution>
-        </executions>
-    </plugin>
-</plugins>
-	  </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.3</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.3</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<configuration>
+					<charset>UTF-8</charset>
+					<docencoding>UTF-8</docencoding>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

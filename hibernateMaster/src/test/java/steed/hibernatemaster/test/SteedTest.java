@@ -18,6 +18,7 @@ public class SteedTest extends HibernatemasterTester{
 	public static void init(){
 		Config.autoCommitTransaction = false;
 		Config.devMode = true;
+		Config.enableHibernateValidate = true;
 		School school = new School();
 		school.setName("school0");
 		if (DaoUtil.isResultNull(school)) {

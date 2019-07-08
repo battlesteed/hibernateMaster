@@ -99,7 +99,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 	protected boolean validate(){
-		if (Config.validator == null) {
+		if (Config.validator == null || !Config.enableHibernateValidate) {
 			return true;
 		}
 		

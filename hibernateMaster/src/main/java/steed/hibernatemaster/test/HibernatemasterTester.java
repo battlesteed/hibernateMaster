@@ -14,6 +14,7 @@ public class HibernatemasterTester {
 	public static void init(){
 		Config.autoCommitTransaction = false;
 		Config.devMode = true;
+		Config.enableHibernateValidate = true;
 	}
 	
 	@Before

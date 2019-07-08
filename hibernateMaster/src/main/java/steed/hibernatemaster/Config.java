@@ -77,6 +77,8 @@ public class Config {
 	 */
 	public static boolean muffUpdateCheck = false;
 	
+	public static boolean enableHibernateValidate = false;
+	
 	public static Validator validator;
 	
 	

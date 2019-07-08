@@ -448,7 +448,7 @@ public class DomainUtil{
 	private static void fuzzyQueryInitialize(String prefix,BaseDomain obj,boolean skipId,String ...fieldsSkip){
 		List<String> fieldsSkipList = new ArrayList<String>();
 		Collections.addAll(fieldsSkipList, fieldsSkip);
-		List<Field> allFields = ReflectUtil.getAllFields(obj);
+		List<Field> allFields = ReflectUtil.getNotFinalFields(obj);
 		for (Field f:allFields) {
 			try {
 				if (DaoUtil.isSelectIndex(f.getName()) > 0) {
