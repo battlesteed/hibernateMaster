@@ -598,6 +598,16 @@ public class DaoUtil {
 	/**
 	 * 通过hql更新数据库，用于批量更新
 	 * @param where 查询条件，同listAllObj的查询条件
+	 * @param updated 要更新的字段值(不为null的字段将会被更新到数据库)
+	 * @return 更新的记录数，失败返回-1
+	 */
+	public final static int updateByQuery(BaseDomain where,BaseDomain updated){
+		return updateByQuery(where, ReflectUtil.field2Map(updated, true, true));
+	}
+	
+	/**
+	 * 通过hql更新数据库，用于批量更新
+	 * @param where 查询条件，同listAllObj的查询条件
 	 * @param updated 存放更新的字段-值
 	 * @return 更新的记录数，失败返回-1
 	 */

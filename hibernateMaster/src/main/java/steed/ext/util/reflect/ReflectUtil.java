@@ -194,6 +194,13 @@ public class ReflectUtil {
 		return field2Map(0,obj, map, strictlyMode);
 	}
 	
+	/**
+	 * 把实体类字段放到map中
+	 * @param obj 
+	 * @param strictlyMode 是否严格模式
+	 * @param onlyPutDatabaseField 是否只放数据库映射字段
+	 * @return
+	 */
 	public static Map<String, Object> field2Map(Object obj,boolean strictlyMode, boolean onlyPutDatabaseField){
 		Map<String, Object> map = new HashMap<>();
 		return field2Map(0,obj, map, strictlyMode, onlyPutDatabaseField);
@@ -210,7 +217,15 @@ public class ReflectUtil {
 	public static Map<String, Object> field2Map(int classDdeep,Object obj,Map<String, Object> map,boolean strictlyMode){
 		return field2Map(classDdeep, obj, map, strictlyMode, false);
 	}
-	
+	/**
+	 * 把对象中的字段放到map
+	 * @param classDdeep 递归深度,0开始
+	 * @param obj 目标对象
+	 * @param map 字段容器
+	 * @param strictlyMode 是否严格模式
+	 * @param onlyPutDatabaseField 是否只放数据库映射字段
+	 * @return
+	 */
 	public static Map<String, Object> field2Map(int classDdeep,Object obj,Map<String, Object> map,boolean strictlyMode,boolean onlyPutDatabaseField){
 		Class<?> tempClass = obj.getClass();
 		for (int i = 0; i < classDdeep; i++) {

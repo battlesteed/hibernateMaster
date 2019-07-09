@@ -2,11 +2,13 @@ package steed.hibernatemaster.test;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import steed.ext.util.reflect.ReflectUtil;
+import steed.hibernatemaster.sample.domain.Student;
 
 public class ReflectTest {
 	
@@ -25,5 +27,12 @@ public class ReflectTest {
 		}
 	}
 	
+	@Test
+	public void testPutfield2map() {
+		Student student = new Student();
+		student.setName("testPutfield2map");
+		Map<String, Object> putField2Map = ReflectUtil.field2Map(student, true, true);
+		assert("testPutfield2map".equals(putField2Map.get("name")));
+	}
 	
 }

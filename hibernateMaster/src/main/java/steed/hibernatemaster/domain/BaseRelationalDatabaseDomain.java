@@ -130,11 +130,20 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 	
+	/**
+	 * 用当前实例的id查询数据库记录
+	 * @return 查询到的记录
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BaseDatabaseDomain> T smartGet(){
 		return (T) DaoUtil.smartGet(this);
 	}
+	
+	/**
+	 * 用当前实例的id查询数据库记录
+	 * @return 查询到的记录
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BaseDatabaseDomain> T smartLoad(){
@@ -149,6 +158,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 	/**
+	 * 删除当前实例的id对应的数据库记录
 	 * 可以重写该方法做级联删除,也可以直接设置数据对应外键的删除策略
 	 */
 	@Override
@@ -267,6 +277,9 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 		
 		String domainIDName = DomainUtil.getDomainIDName(getClass());
 		Object id = field2Map.get(domainIDName);
+		if (id == null) {
+			throw new IllegalArgumentException("实体类实例id必须不为null才能调用updateNotNullFieldByHql方法");
+		}
 		field2Map.remove(domainIDName);
 		
 		HashMap<String, Object> where = new HashMap<String, Object>();
