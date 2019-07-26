@@ -243,7 +243,6 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	
 	/**
 	 * update不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好,
-	 * 	但是无法通过重写{@link #update} 方法做aop
 	 * 
 	 */
 	public boolean updateNotNullFieldByHql(){
@@ -251,13 +250,33 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 	/**
-	 * update不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好,
-	 * 	但是无法通过重写{@link #update} 方法做aop
+	 * 用id做where条件,update其它不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好
 	 * 
 	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传null
 	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空， 否则调用{@link BaseUtil#isObjEmpty(Object)} 判断字段是否为空
 	 */
 	public boolean updateNotNullFieldByHql(List<String> updateEvenNull,boolean strictlyMode){
+		String domainIDName = DomainUtil.getDomainIDName(getClass());
+		return updateNotNullFieldByHql(updateEvenNull, strictlyMode, domainIDName);
+	}
+	/**
+	 * update不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好.
+	 * 若要update clazz.id 为1 的student 实体类的 inDate为 当前时间,type为8,则可以这样写:
+	 * <pre>{@code
+	 * 	Student student = new Student();
+		Clazz clazz = new Clazz();
+		clazz.setId("5");
+		student.setClazz(clazz);
+		student.setInDate(new Date());
+		student.setType(8);
+		student.updateNotNullFieldByHql(null, true, "clazz");//也可以student.updateNotNullFieldByHql(null, true, "clazz.id");
+	 * }</pre>
+	 * 
+	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传null
+	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空， 否则调用{@link BaseUtil#isObjEmpty(Object)} 判断字段是否为空
+	 * @param whereField 要作为where条件的字段
+	 */
+	public boolean updateNotNullFieldByHql(List<String> updateEvenNull,boolean strictlyMode,String... whereField){
 		/*
 		 * Map<String, Object> field2Map = DaoUtil.putField2Map(this); List<String>
 		 * keys4Remove = new ArrayList<String>(); field2Map.entrySet().forEach((e)->{ if
@@ -274,16 +293,16 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 				}
 			});
 		}
-		
-		String domainIDName = DomainUtil.getDomainIDName(getClass());
-		Object id = field2Map.get(domainIDName);
-		if (id == null) {
-			throw new IllegalArgumentException("实体类实例id必须不为null才能调用updateNotNullFieldByHql方法");
-		}
-		field2Map.remove(domainIDName);
-		
 		HashMap<String, Object> where = new HashMap<String, Object>();
-		where.put(domainIDName, id);
+		for (String temp:whereField) {
+			if (field2Map.containsKey(temp)) {
+				where.put(temp, field2Map.get(temp));
+				field2Map.remove(temp);
+			}else {
+				where.put(temp, ReflectUtil.getChainValue(temp, this));
+				field2Map.remove(temp.substring(0, temp.lastIndexOf(".")));
+			}
+		}
 		
 		return DaoUtil.updateByQuery(getClass(), where, field2Map) > 0;
 	}
@@ -291,12 +310,13 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	/**
 	 * update不为空的字段(把本实例为空的字段从数据库查出来填充进去),然后调用{@link update}方法,update整个实例
 	 * 
-	 *    若想做aop,可以直接重写update方法即可,不用重写该方法,若没有aop需求,可以用{@link #updateNotNullFieldByHql(List, boolean)}
+	 *    若想做aop,可以直接重写update方法即可,不用重写该方法,推荐用{@link #updateNotNullFieldByHql(List, boolean)}
 	 * 
 	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传null
 	 * 
 	 * @see #updateNotNullFieldByHql(List, boolean)
 	 */
+	@Deprecated
 	@Override
 	public boolean updateNotNullField(List<String> updateEvenNull){
 		return updateNotNullField(updateEvenNull, true);
@@ -305,13 +325,14 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	/**
 	 * update不为空的字段(把本实例为空的字段从数据库查出来填充进去),然后调用{@link update}方法,update整个实例
 	 * 
-	 *    若想做aop,可以直接重写update方法即可,不用重写该方法,若没有aop需求,可以用{@link #updateNotNullFieldByHql(List, boolean)}
+	 *    若想做aop,可以直接重写update方法即可,不用重写该方法,推荐用{@link #updateNotNullFieldByHql(List, boolean)}
 	 * 
 	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传null
 	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空， 否则调用{@link BaseUtil#isObjEmpty(Object)} 判断字段是否为空
 	 * 
 	 * @see #updateNotNullFieldByHql(List, boolean)
 	 */
+	@Deprecated
 	@Override
 	public boolean updateNotNullField(List<String> updateEvenNull,boolean strictlyMode){
 		BaseRelationalDatabaseDomain smartGet = this.smartGet();
