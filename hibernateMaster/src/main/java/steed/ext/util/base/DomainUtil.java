@@ -492,7 +492,7 @@ public class DomainUtil{
 		}
 	}
 	/**
-	 * 初始化查询实体类模糊查询
+	 * 初始化查询实体类模糊查询,自动给实体类String字段添加'%',可以在实体类字段加{@link FuzzyQuery}注解,全局设置模糊查询策略
 	 * @param obj
 	 * @param fieldsSkip 跳过的字段，不跳请传空
 	 * 
@@ -502,8 +502,9 @@ public class DomainUtil{
 		fuzzyQueryInitialize(obj, true, fieldsSkip);
 	}
 	/**
-	 * 初始化查询实体类模糊查询
+	 * 初始化查询实体类模糊查询,自动给实体类String字段添加'%',可以在实体类字段加{@link FuzzyQuery}注解,全局设置模糊查询策略
 	 * @param obj
+	 * @param skipId 是否跳过id字段,id字段不模糊查询
 	 * @param fieldsSkip 跳过的字段，不跳请传空
 	 * 
 	 * @see FuzzyQuery
