@@ -40,7 +40,7 @@ public class BaseUtil {
 	}
 	
 	/**
-	 * 判断对象是否为空，集合为空时也会返回true
+	 * 判断对象是否为空，集合为空时也会返回true,string 为空字符串时也返回 true,若obj为实体类,其id为空时,也返回true
 	 * @param obj
 	 * @return 是否为空
 	 */

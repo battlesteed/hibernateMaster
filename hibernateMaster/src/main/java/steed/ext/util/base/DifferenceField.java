@@ -18,9 +18,11 @@ public class DifferenceField {
 		this.oldField = oldField;
 		this.field = field;
 	}
+	
 	public String getFieldName() {
 		return fieldName;
 	}
+	
 	public Class<?> getTarget() {
 		return target;
 	}

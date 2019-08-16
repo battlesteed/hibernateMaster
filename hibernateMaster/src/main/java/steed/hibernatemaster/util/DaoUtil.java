@@ -1543,7 +1543,7 @@ public class DaoUtil {
 		try {
 			if (boolean1 == null && exception.get() == null) {
 				if (currentTransaction.get() != null) {
-					logger.debug("当前事务未进行写操作,回滚事务,防止对查询出来的实体类的更改保存到数据库..");
+					logger.info("当前事务未进行写操作,回滚事务,防止对查询出来的实体类的更改保存到数据库..");
 					rollbackTransaction();
 				}
 				return true;
@@ -1938,6 +1938,7 @@ public class DaoUtil {
 		
 		return hql;
 	}
+	
 	private static String dealMathChar(String domainSimpleName, String selectedField) {
 		String replace = selectedField.replace("/", "/"+domainSimpleName+".")
 				.replace("+", "+"+domainSimpleName+".")
@@ -1947,7 +1948,7 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 解析要真正要select的字段(去除count(),sum()等)
+	 * 解析真正要select的字段(去除count(),sum()等)
 	 * 
 	 * @param originalField 要查询的字段
 	 * @return 真正要select的字段
@@ -1979,7 +1980,7 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 排序字段含有关联实体类时hibernate生成的sql 默认inner join 关联表的,得在select后指明left join...
+	 * 排序字段含有关联实体类时hibernate生成的sql 默认inner join 关联表,得在select后指明left join...
 	 * @param t
 	 * @param desc
 	 * @param domainSelected
@@ -1996,6 +1997,7 @@ public class DaoUtil {
 			}
 		}
 	}
+	
 	private static String dealSpecialChar(String group) {
 		return group.replace(".", "__").replace("\r", "").replace("*", "_").replace("/", "_").replace("-", "_").replace("+", "_");
 	}
@@ -2074,9 +2076,9 @@ public class DaoUtil {
 		Pattern p = RegUtil.getPattern("select .+? from");
 		Matcher m = p.matcher(countHql);
 		if (m.find()) {
-			countHql.replace(m.start(0), m.end(0), "select "+selectedField+" from");
+			countHql.replace(m.start(0), m.end(0), "select " + selectedField + " from");
 		}else {
-			countHql.insert(0, "select "+selectedField+" ");
+			countHql.insert(0, "select " + selectedField + " ");
 		}
 		logger.debug("countHql--->"+countHql);
 		return countHql;

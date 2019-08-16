@@ -250,7 +250,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 	/**
-	 * 用id做where条件,update其它不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好
+	 * 用id做where条件(调用该方法之前一定要设置实例id),update其它不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好
 	 * 
 	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传null
 	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空， 否则调用{@link BaseUtil#isObjEmpty(Object)} 判断字段是否为空
@@ -303,7 +303,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 				field2Map.remove(temp.substring(0, temp.lastIndexOf(".")));
 			}
 		}
-		
+		//TODO 校验whereField是否合法
 		return DaoUtil.updateByQuery(getClass(), where, field2Map) > 0;
 	}
 	
