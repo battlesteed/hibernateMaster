@@ -24,6 +24,7 @@ public class Config {
 			logger.warn("el库不存在,不启用hibernateValidator");
 		}
 	}
+	
 	/**
 	 * 是否是单数据库模式,可以调用<code>{@link steed.hibernatemaster.util.HibernateUtil#switchDatabase}</code>
 	 * 切换数据库<br>

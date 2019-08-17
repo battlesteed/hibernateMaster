@@ -222,6 +222,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	
 	@Override
 	public boolean saveOrUpdate(){
+		//TODO 移除id是否为空判断,若为null,肯定不会调saveOrUpdate,无法update,只能save
 		Serializable domainId = DomainUtil.getDomainId(this);
 		if (BaseUtil.isObjEmpty(domainId)) {
 			return save();
@@ -250,6 +251,25 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 	/**
+	 * update不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好.
+	 * 若要update clazz.id 为1 的student 实体类的 inDate为 当前时间,type为8,则可以这样写:
+	 * <pre>{@code
+	 * 	Student student = new Student();
+		Clazz clazz = new Clazz();
+		clazz.setId("5");
+		student.setClazz(clazz);
+		student.setInDate(new Date());
+		student.setType(8);
+		student.updateNotNullFieldByHql("clazz");//也可以student.updateNotNullFieldByHql("clazz.id");
+	 * }</pre>
+	 * 
+	 * @param whereField 要作为where条件的字段
+	 */
+	public boolean updateNotNullFieldByHql(String... whereField){
+		return updateNotNullFieldByHql(null, true, whereField);
+	}
+	
+	/**
 	 * 用id做where条件(调用该方法之前一定要设置实例id),update其它不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好
 	 * 
 	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传null
@@ -257,6 +277,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	 */
 	public boolean updateNotNullFieldByHql(List<String> updateEvenNull,boolean strictlyMode){
 		String domainIDName = DomainUtil.getDomainIDName(getClass());
+		//TODO 校验是否设置了id
 		return updateNotNullFieldByHql(updateEvenNull, strictlyMode, domainIDName);
 	}
 	/**
@@ -303,7 +324,6 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 				field2Map.remove(temp.substring(0, temp.lastIndexOf(".")));
 			}
 		}
-		//TODO 校验whereField是否合法
 		return DaoUtil.updateByQuery(getClass(), where, field2Map) > 0;
 	}
 	

@@ -41,10 +41,11 @@ public class QueryBuilder {
 		return target;
 	}
 
-	public QueryBuilder(BaseDomain domain){
-		queryMap = DaoUtil.putField2Map(domain);
-		target = domain.getClass();
+	public QueryBuilder(BaseDomain where){
+		queryMap = DaoUtil.putField2Map(where);
+		target = where.getClass();
 	}
+	
 	public QueryBuilder( Class<? extends BaseDomain> target){
 		this();
 		this.target = target;
@@ -77,7 +78,6 @@ public class QueryBuilder {
 		this.target = target;
 		return this;
 	}
-	
 	
 	/**
 	 * 添加普通查询条件, 生成的hql将包含 "model.key = :value "这个条件
@@ -168,6 +168,7 @@ public class QueryBuilder {
 		}
 		return notin;
 	}
+	
 	/**
 	 * 添加not in查询条件 生成的hql将包含 "model.key not in( :list )"这个条件
 	 * @param key 字段名
@@ -178,6 +179,7 @@ public class QueryBuilder {
 		queryMap.put(key + getNotInSubfix(key), list);
 		return this;
 	}
+	
 	/**
 	 * 添加not in查询条件 生成的hql将包含 "model.key not in( :set )"这个条件
 	 * @param key 字段名
@@ -188,6 +190,7 @@ public class QueryBuilder {
 		queryMap.put(key + getNotInSubfix(key), set);
 		return this;
 	}
+	
 	/**
 	 * 添加in查询条件 生成的hql将包含 "model.key in( :value )"这个条件
 	 * @param key 字段名
@@ -218,8 +221,9 @@ public class QueryBuilder {
 		queryMap.put(key+"_not_null", notNull);
 		return this;
 	}
+	
 	/**
-	 * 删除非空查询条件 生
+	 * 删除{@link #addNotNull(String, boolean)}方法添加的非空查询条件
 	 * @param key 字段名
 	 * 
 	 * @return this
@@ -254,8 +258,9 @@ public class QueryBuilder {
 		queryMap.put(key+"_greaterThan", value);
 		return this;
 	}
+	
 	/**
-	 * 添加原生的hql where部分,不会被框架转义,处理等(除了外'domain.'会被替换成'实体类简称.'外),生成的hql将包含 'where 其它where条件 and + rawHqlPart'这个条件
+	 * 添加原生的hql where部分,不会被框架转义,处理等(除了'domain.'会被替换成'实体类简称.'外),生成的hql将包含 'where 其它where条件 and + rawHqlPart'这个条件
 	 * 
 	 * @param rawHqlPart 如," (domain.name like '%admin' or domain.phone = '10086')",
 	 * 			生成的hql将包含 'where 其它where条件 and (domain.name like '%admin' or domain.phone = '10086')' 这个条件
@@ -295,6 +300,7 @@ public class QueryBuilder {
 		queryMap.put(key+"_max_1", value);
 		return this;
 	}
+	
 	/**
 	 * 添加大于或等于查询条件 生成的hql将包含 "model.key &gt;= :value "这个条件
 	 * @param key 字段名
@@ -319,6 +325,7 @@ public class QueryBuilder {
 	public Map<String, Object> getQueryMap() {
 		return queryMap;
 	}
+	
 	/**
 	 * 获取查询条件map
 	 * 
