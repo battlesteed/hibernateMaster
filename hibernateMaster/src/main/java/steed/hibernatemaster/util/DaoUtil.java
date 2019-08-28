@@ -89,11 +89,11 @@ public class DaoUtil {
 //	private static final Map<Class<?>, CRUDListener<?>> CRUDListenerMap = new HashMap<>();
 	
 	
-	public interface CRUDListener<T>{
-		public default void onDelete(T t){};
-		public default void onSave(T t){};
-		public default void onUpdate(){};
-	}
+//	public interface CRUDListener<T>{
+//		public default void onDelete(T t){};
+//		public default void onSave(T t){};
+//		public default void onUpdate(){};
+//	}
 	
 	
 	private DaoUtil() {
@@ -1163,6 +1163,36 @@ public class DaoUtil {
 	public final static <T> List<T> listAllCustomField(BaseDomain where,String... selectedFields){
 		return listAllCustomField(DaoUtil.putField2Map(where), where.getClass(), selectedFields);
 	}
+	/**
+	 * 查询实体类指定的字段
+	 * @param where 查询条件
+	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
+	 * @param desc 需要降序排列的字段 不需要请传null
+	 * @param asc 需要升序排列的字段 不需要请传null
+	 * @param groupBy hql group by部分语句,不需要请传null
+	 * 
+	 * @return 符合查询条件的所有记录(List),当selectedFields长度为0时,返回List&lt;target&gt;<br>
+	 * 		当selectedFields长度只有1时,返回List&lt;selectedField&gt;<br>
+	 * 		当selectedFields长度&gt;1时,返回List&lt;Map&lt;selectedField,value&gt;&gt;<br>
+	 */
+	public final static <T> List<T> listAllCustomField(BaseDomain where,List<String> desc,List<String> asc,String[] groupBy,String... selectedFields){
+		return listAllCustomField(where.getClass(), DaoUtil.putField2Map(where), desc, asc, groupBy, selectedFields);
+	}
+	
+	/**
+	 * 查询实体类指定的字段
+	 * @param where 查询条件
+	 * @param selectedFields 要查询的字段 可以带'.' 比如 user.role.name
+	 * @param desc 需要降序排列的字段 不需要请传null
+	 * @param asc 需要升序排列的字段 不需要请传null
+	 * 
+	 * @return 符合查询条件的所有记录(List),当selectedFields长度为0时,返回List&lt;target&gt;<br>
+	 * 		当selectedFields长度只有1时,返回List&lt;selectedField&gt;<br>
+	 * 		当selectedFields长度&gt;1时,返回List&lt;Map&lt;selectedField,value&gt;&gt;<br>
+	 */
+	public final static <T> List<T> listAllCustomField(BaseDomain where,List<String> desc,List<String> asc,String... selectedFields){
+		return listAllCustomField(where.getClass(), DaoUtil.putField2Map(where), desc, asc, null, selectedFields);
+	}
 	
 	/**
 	 * 查询实体类指定的字段
@@ -1734,11 +1764,31 @@ public class DaoUtil {
 			.append(fullClassName)
 			.append(" ")
 			.append(domainSimpleName);
+		//TODO 级联update
+//		
+//		Set<String> innerJoin = new HashSet<String>();
+//		if (queryCondition != null) {
+//			for(String temp:queryCondition.keySet()){
+//				if (temp.contains(".") && !(queryCondition.get(temp) instanceof HqlGenerator)) {
+//					String chain = getMaxDepthDomainChain(temp, t);
+//					if (chain != null) {
+//						innerJoin.add(chain);
+//					}
+//				}
+//			}
+//		}
+//		
+//		for(String temp:innerJoin){
+//			hql.append(" inner join ").append(domainSimpleName).append(".")
+//			.append(temp).append(" ");
+//		}
+		
 		hql.append(" set ");
 		appendHqlUpdateSet(hql, domainSimpleName, updated);
 		
-		hql.append(" where 1=1 ");
 		
+		hql.append(" where 1=1 ");
+//		getHql(t, where, desc, asc, prefix, groupBy, selectedFields)
 		appendHqlWhere(domainSimpleName, hql, queryCondition);
 		
 		logger.debug("hql------>"+hql.toString());

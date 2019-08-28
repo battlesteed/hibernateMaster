@@ -6,6 +6,9 @@ import javax.validation.Validator;
 
 import steed.ext.util.logging.Logger;
 import steed.ext.util.logging.LoggerFactory;
+import steed.hibernatemaster.domain.BaseDatabaseDomain;
+import steed.hibernatemaster.listener.CRUDListener;
+import steed.hibernatemaster.listener.CRUDListenerManager;
 import steed.hibernatemaster.util.FactoryEngine;
 import steed.hibernatemaster.util.HqlGenerator;
 import steed.hibernatemaster.util.SimpleHqlGenerator;
@@ -78,9 +81,23 @@ public class Config {
 	 */
 	public static boolean muffUpdateCheck = false;
 	
+	/**
+	 * 是否启用HibernateValidate
+	 */
 	public static boolean enableHibernateValidate = false;
-	
+	/**
+	 * 实体类字段校验器,{@link #enableHibernateValidate}为true时才有用
+	 */
 	public static Validator validator;
 	
-	
+	/**
+	 * 增删查监听器管理器,管理,扫描增删查监听器
+	 */
+	public static CRUDListenerManager CRUDListenerManager = new CRUDListenerManager() {
+		
+		@Override
+		public CRUDListener<? extends BaseDatabaseDomain>[] getListeners(Class<? extends BaseDatabaseDomain> clazz) {
+			return null;
+		}
+	};
 }

@@ -24,6 +24,7 @@ import steed.ext.util.logging.LoggerFactory;
 import steed.ext.util.reflect.ReflectUtil;
 import steed.hibernatemaster.Config;
 import steed.hibernatemaster.exception.ValidateException;
+import steed.hibernatemaster.listener.CRUDListener;
 import steed.hibernatemaster.util.DaoUtil;
 import steed.hibernatemaster.util.HqlGenerator;
 /**
@@ -163,7 +164,19 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	 */
 	@Override
 	public boolean delete(){
-		return DaoUtil.delete(this);
+		CRUDListener[] listeners = Config.CRUDListenerManager.getListeners(getClass());
+		if (listeners != null) {
+			for (int i = 0; i < listeners.length; i++) {
+				listeners[i].beforeDelete(this);
+			}
+		}
+		boolean delete = DaoUtil.delete(this);
+		if (listeners != null) {
+			for (int i = 0; i < listeners.length; i++) {
+				listeners[i].afterDelete(this);
+			}
+		}
+		return delete;
 	}
 	
 	/**
@@ -217,7 +230,19 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	public boolean save(){
 		trimEmptyDomain();
 		validate();
-		return DaoUtil.save(this);
+		CRUDListener[] listeners = Config.CRUDListenerManager.getListeners(getClass());
+		if (listeners != null) {
+			for (int i = 0; i < listeners.length; i++) {
+				listeners[i].beforSave(this);
+			}
+		}
+		boolean save = DaoUtil.save(this);
+		if (listeners != null) {
+			for (int i = 0; i < listeners.length; i++) {
+				listeners[i].afterSave(this);
+			}
+		}
+		return save;
 	}
 	
 	@Override
