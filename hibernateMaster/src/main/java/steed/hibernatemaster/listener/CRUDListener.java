@@ -52,12 +52,16 @@ public interface CRUDListener<T extends BaseDatabaseDomain> {
 	 */
 	public default Class<? extends BaseDatabaseDomain> getListenClass() {
 		Class<? extends CRUDListener<? extends BaseDatabaseDomain>> clazz = (Class<? extends CRUDListener<? extends BaseDatabaseDomain>>) getClass();
-		Type genericSuperclass = clazz.getGenericSuperclass();
-		if (!(genericSuperclass instanceof ParameterizedType)) {
-			return null;
+		Type[] genericSuperclass = clazz.getGenericInterfaces();
+		for (Type temp:genericSuperclass) {
+			if (temp instanceof ParameterizedType) {
+				ParameterizedType parameterizedType = (ParameterizedType) temp;
+				if (BaseDatabaseDomain.class.isAssignableFrom((Class<?>) (parameterizedType.getActualTypeArguments()[0]))) {
+					return (Class<? extends BaseDatabaseDomain>) parameterizedType.getActualTypeArguments()[0];
+				}
+			}
 		}
-		ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
-		return (Class<? extends BaseDatabaseDomain>) (parameterizedType.getActualTypeArguments()[0]);
+		return null;
 	}
 //	
 //	/**
