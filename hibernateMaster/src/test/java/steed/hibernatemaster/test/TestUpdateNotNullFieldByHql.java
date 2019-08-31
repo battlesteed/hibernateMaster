@@ -102,7 +102,7 @@ public class TestUpdateNotNullFieldByHql extends SteedTest{
 		clazz.delete();
 	}
 	
-	@Test
+//	@Test
 	public void testUpdateNotNullFieldByHql4() {
 		Clazz clazz = prepareClazz();
 		

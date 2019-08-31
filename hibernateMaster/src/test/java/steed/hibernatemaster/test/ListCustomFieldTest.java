@@ -74,10 +74,19 @@ public class ListCustomFieldTest extends SteedTest{
 	}
 	
 	@Test
+	public void testNotNull() {
+		QueryBuilder queryBuilder = new QueryBuilder();
+		queryBuilder.addNotNull("school", false);
+		long count = DaoUtil.getCount(Clazz.class, queryBuilder.getWhere());
+		assert(count == 0);
+	}
+	
+	@Test
 	public void testOrderBY(){
 		List<Object> listAllCustomField = DaoUtil.listAllCustomField(Clazz.class, null, Arrays.asList("sum(studentCount)","studentCount"), Arrays.asList("sum(studentCount)"), new String[] {"studentCount"}, "studentCount");
 		BaseUtil.out(listAllCustomField.get(0));
 	}
+	
 	@Test
 	public void testCountAll(){
 		Clazz clazz = new Clazz();

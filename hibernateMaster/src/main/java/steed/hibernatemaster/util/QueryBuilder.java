@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import steed.ext.util.base.BaseUtil;
+import steed.ext.util.logging.Logger;
+import steed.ext.util.logging.LoggerFactory;
 import steed.ext.util.reflect.ReflectUtil;
 import steed.hibernatemaster.Config;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
@@ -20,6 +22,7 @@ import steed.hibernatemaster.domain.BaseDomain;
  *
  */
 public class QueryBuilder {
+	public static final Logger logger = LoggerFactory.getLogger(QueryBuilder.class);
 	private Map<String,Object> queryMap;
 	
 	private Class<? extends BaseDomain> target;
@@ -152,6 +155,7 @@ public class QueryBuilder {
 	@SuppressWarnings("unchecked")
 	public <T> QueryBuilder addNotIn(String key,T... value){
 		if (BaseUtil.isObjEmpty(value)) {
+			logger.info("addNotIn 数组为空,不添加addNotIn条件");
 			return this;
 		}
 		queryMap.put(key+ getNotInSubfix(key), value);
@@ -176,6 +180,10 @@ public class QueryBuilder {
 	 * @return this
 	 */
 	public <T> QueryBuilder addNotIn(String key,List<T> list){
+		if (list == null || list.isEmpty()) {
+			logger.info("addNotIn 数组为空,不添加addNotIn条件");
+			return this;
+		}
 		queryMap.put(key + getNotInSubfix(key), list);
 		return this;
 	}
@@ -187,6 +195,10 @@ public class QueryBuilder {
 	 * @return this
 	 */
 	public <T> QueryBuilder addNotIn(String key,Set<T> set){
+		if (set == null || set.isEmpty()) {
+			logger.info("addNotIn 数组为空,不添加addNotIn条件");
+			return this;
+		}
 		queryMap.put(key + getNotInSubfix(key), set);
 		return this;
 	}

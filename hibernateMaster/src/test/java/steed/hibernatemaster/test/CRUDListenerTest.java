@@ -17,18 +17,17 @@ public class CRUDListenerTest extends SteedTest{
 		
 		School school = new School();
 		school.setId("CRUDListenerTest.testSave()");
-		school.delete();
 		school.save();
 		
 		assert(school.smartGet() == null);
 	}
+	
 	@Test
 	public void testSpringCRUDListenerManager() {
 		Config.CRUDListenerManager = new SpringCRUDListenerScanner("steed");
 		
 		School school = new School();
 		school.setId("CRUDListenerTest.testSave()");
-		school.delete();
 		school.save();
 		
 		assert(school.smartGet() == null);
