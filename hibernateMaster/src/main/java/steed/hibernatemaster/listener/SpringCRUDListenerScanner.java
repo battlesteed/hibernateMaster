@@ -22,7 +22,7 @@ import steed.hibernatemaster.domain.BaseDatabaseDomain;
  */
 public class SpringCRUDListenerScanner implements CRUDListenerManager{
 	public static final steed.ext.util.logging.Logger logger = LoggerFactory.getLogger(SpringCRUDListenerScanner.class);
-	private Map<Class<? extends BaseDatabaseDomain>, CRUDListener<? extends BaseDatabaseDomain>> listeners;
+	private Map<CRUDListener<? extends BaseDatabaseDomain>, Class<? extends BaseDatabaseDomain>> listeners;
 	private Map<Class<? extends BaseDatabaseDomain>, CRUDListener<? extends BaseDatabaseDomain>[]> listenerMap = new HashMap<Class<? extends BaseDatabaseDomain>, CRUDListener<? extends BaseDatabaseDomain>[]>();
 	private String[] packages;
 	
@@ -32,11 +32,11 @@ public class SpringCRUDListenerScanner implements CRUDListenerManager{
 		listeners = scan();
 	}
 
-	public Map<Class<? extends BaseDatabaseDomain>, CRUDListener<? extends BaseDatabaseDomain>> scan() {
+	public Map<CRUDListener<? extends BaseDatabaseDomain>, Class<? extends BaseDatabaseDomain>> scan() {
 		if (listeners != null) {
 			return listeners;
 		}
-		listeners = new HashMap<Class<? extends BaseDatabaseDomain>, CRUDListener<? extends BaseDatabaseDomain>>();
+		listeners = new HashMap<CRUDListener<? extends BaseDatabaseDomain>, Class<? extends BaseDatabaseDomain>>();
 		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
 //		provider.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
 		provider.addIncludeFilter(new AssignableTypeFilter(CRUDListener.class));
@@ -53,7 +53,7 @@ public class SpringCRUDListenerScanner implements CRUDListenerManager{
 				Class<? extends BaseDatabaseDomain> listenClass = newInstance.getListenClass();
 				if (listenClass != null) {
 					logger.debug("添加crud监听器"+listenerClass.getName());
-					listeners.put(listenClass, newInstance);
+					listeners.put(newInstance, listenClass);
 				}
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 				logger.error("扫描crud监听器出错!",e);
@@ -67,10 +67,10 @@ public class SpringCRUDListenerScanner implements CRUDListenerManager{
 	public CRUDListener<? extends BaseDatabaseDomain>[] getListeners(Class<? extends BaseDatabaseDomain> clazz) {
 		if (listenerMap.get(clazz) == null) {
 			List<CRUDListener<? extends BaseDatabaseDomain>> list = new ArrayList<CRUDListener<? extends BaseDatabaseDomain>>();
-			Set<Entry<Class<? extends BaseDatabaseDomain>, CRUDListener<? extends BaseDatabaseDomain>>> entrySet = listeners.entrySet();
-			for (Entry<Class<? extends BaseDatabaseDomain>, CRUDListener<? extends BaseDatabaseDomain>> e:entrySet) {
-				if (e.getKey().isAssignableFrom(clazz)) {
-					list.add(e.getValue());
+			Set<Entry<CRUDListener<? extends BaseDatabaseDomain>, Class<? extends BaseDatabaseDomain>>> entrySet = listeners.entrySet();
+			for (Entry<CRUDListener<? extends BaseDatabaseDomain>, Class<? extends BaseDatabaseDomain>> e:entrySet) {
+				if (e.getValue().isAssignableFrom(clazz)) {
+					list.add(e.getKey());
 				}
 			}
 			listenerMap.put(clazz, list.toArray(new CRUDListener[list.size()] ));
