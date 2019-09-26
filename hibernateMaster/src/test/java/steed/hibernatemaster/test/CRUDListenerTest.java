@@ -10,13 +10,14 @@ import steed.hibernatemaster.listener.SpringCRUDListenerScanner;
 import steed.hibernatemaster.sample.domain.School;
 
 public class CRUDListenerTest extends SteedTest{
+	public static String CRUDListenerTestID = "CRUDListenerTest.testSave()";
 	
 	@Test
 	public void testSave() {
 		setCRUDListeners();
 		
 		School school = new School();
-		school.setId("CRUDListenerTest.testSave()");
+		school.setId(CRUDListenerTestID);
 		school.save();
 		
 		assert(school.smartGet() == null);
@@ -27,7 +28,7 @@ public class CRUDListenerTest extends SteedTest{
 		Config.CRUDListenerManager = new SpringCRUDListenerScanner("steed");
 		
 		School school = new School();
-		school.setId("CRUDListenerTest.testSave()");
+		school.setId(CRUDListenerTestID);
 		school.save();
 		
 		assert(school.smartGet() == null);

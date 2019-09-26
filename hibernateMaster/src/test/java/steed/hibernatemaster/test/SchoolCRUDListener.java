@@ -8,15 +8,19 @@ public class SchoolCRUDListener implements CRUDListener<School> {
 
 	@Override
 	public void beforSave(School domain) {
-		domain.setName("beforSave");
+		if (CRUDListenerTest.CRUDListenerTestID.equals(domain.getId())) {
+			domain.setName("beforSave");
+		}
 	}
 
 	@Override
 	public void afterSave(School domain) {
-		DaoUtil.managTransaction();
-		domain = domain.smartGet();
-		assert("beforSave".equals(domain.getName()));
-		domain.delete();
+		if (CRUDListenerTest.CRUDListenerTestID.equals(domain.getId())) {
+			DaoUtil.managTransaction();
+			domain = domain.smartGet();
+			assert("beforSave".equals(domain.getName()));
+			domain.delete();
+		}
 	}
 	
 }

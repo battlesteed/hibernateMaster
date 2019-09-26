@@ -132,7 +132,8 @@ public class SimpleHqlGenerator implements HqlGenerator{
 			hql.append(") ");
 		}else  if(key.endsWith(DaoUtil.rawHqlPart)){
 			hql.append("and ");
-			hql.append(e.getValue());
+			String rawHql = (String) e.getValue();
+			hql.append(rawHql.replace(" domain.", " "+domainSimpleName+"."));
 			removedEntry.add(key);
 		}else {
 			hql.append("and ");

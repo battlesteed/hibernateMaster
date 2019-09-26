@@ -26,6 +26,32 @@ public class TestQueryBuilder extends SteedTest{
 		
 	}
 	
+	
+	@Test
+	public void testRawHqlPart() {
+		School listOne = new School();
+
+		QueryBuilder queryBuilder = new QueryBuilder();
+		
+		queryBuilder.addRawHqlPart(" domain.name = domain.motto ");
+		DaoUtil.deleteByQuery(School.class, queryBuilder.getWhere());
+		
+		listOne.setName("TestQueryBuilder.testRawHqlPart");
+		listOne.setMotto(listOne.getName());
+		listOne.save();
+		
+		queryBuilder.addRawHqlPart(" domain.name = domain.motto ");
+		
+		long count = DaoUtil.getCount(School.class, queryBuilder.getWhere());
+		assert(count == 1);
+		
+		queryBuilder.addRawHqlPart(" domain.name = domain.motto ");
+		DaoUtil.deleteByQuery(School.class, queryBuilder.getWhere());
+		
+		DaoUtil.evict(listOne);
+		assert(DaoUtil.get(School.class, listOne.getId()) == null);
+	}
+	
 	@Test
 	public void testNotEqual() {
 		School listOne = DaoUtil.listOne(new School());
