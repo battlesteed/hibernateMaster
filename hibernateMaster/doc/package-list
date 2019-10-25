@@ -1,0 +1,17 @@
+steed.ext.util.base
+steed.ext.util.file
+steed.ext.util.logging
+steed.ext.util.logging.impl
+steed.ext.util.reflect
+steed.ext.util.test
+steed.hibernatemaster
+steed.hibernatemaster.annotation
+steed.hibernatemaster.connection
+steed.hibernatemaster.dialect
+steed.hibernatemaster.domain
+steed.hibernatemaster.exception
+steed.hibernatemaster.generate
+steed.hibernatemaster.listener
+steed.hibernatemaster.listener.annotation
+steed.hibernatemaster.test
+steed.hibernatemaster.util
