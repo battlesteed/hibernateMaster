@@ -16,7 +16,7 @@ import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
 
 /**
- * 查询构建器,复杂的查询(&gt; ,&lt; , in等查询条件),请用该类构建
+ * 查询构建器,复杂的查询(&gt; ,&lt; , in等等查询条件),请用该类构建
  * 
  * @author battlesteed
  *
@@ -35,15 +35,25 @@ public class QueryBuilder {
 		queryMap = new HashMap<>();
 	}
 	
-	public QueryBuilder(Map<String, Object> queryMap) {
+	/**
+	 * 以where作为初始where条件创建QueryBuilder
+	 * 
+	 * @param where
+	 */
+	public QueryBuilder(Map<String, Object> where) {
 		super();
-		this.queryMap = queryMap;
+		this.queryMap = where;
 	}
 
 	public Class<? extends BaseDomain> getTarget() {
 		return target;
 	}
 
+	/**
+	 * 以where作为初始where条件创建QueryBuilder
+	 * 
+	 * @param where
+	 */
 	public QueryBuilder(BaseDomain where){
 		queryMap = DaoUtil.putField2Map(where);
 		target = where.getClass();
@@ -127,6 +137,8 @@ public class QueryBuilder {
 	 * @param generator 自定义的hql生成器
 	 * 
 	 * @return this
+	 * 
+	 * @see SimpleHqlGenerator#appendPersonalWhere
 	 */
 	public QueryBuilder addHqlGenerator(HqlGenerator generator){
 		queryMap.put(DaoUtil.personalHqlGeneratorKey, generator);

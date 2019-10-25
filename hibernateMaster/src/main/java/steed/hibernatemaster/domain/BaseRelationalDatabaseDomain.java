@@ -255,8 +255,8 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 			Map<String, Object> map = new HashMap<>();
 			Class<? extends BaseRelationalDatabaseDomain> clazz = getClass();
 			String domainIDName = DomainUtil.getDomainIDName(clazz);
+			//TODO 处理联合主键情况
 			map.put(domainIDName, domainId);
-			
 			if (!DaoUtil.isResultNull(clazz, map)) {
 				return update();
 			}else {
