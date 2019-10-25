@@ -20,7 +20,7 @@
 
 
 ## 快速入门
-[在线javadoc](http://battle_steed.gitee.io/hibernatemaster/hibernateMaster/javadoc/)
+[在线javadoc](https://battle_steed.gitee.io/hibernatemaster/hibernateMaster/doc/index.html)
 
 maven如下添加依赖
 ```
