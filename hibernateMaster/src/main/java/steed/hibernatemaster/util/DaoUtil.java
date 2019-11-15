@@ -866,7 +866,7 @@ public class DaoUtil {
 	public final static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,List<String> desc,List<String> asc,boolean queryRecordCount){
 		try {
 			StringBuffer hql = getSelectHql(t, null, desc, asc);
-			Long recordCount = Long.MAX_VALUE;
+			Long recordCount = (long) Integer.MAX_VALUE;
 			if (queryRecordCount) {
 				recordCount = getRecordCount(null, hql);
 			}
