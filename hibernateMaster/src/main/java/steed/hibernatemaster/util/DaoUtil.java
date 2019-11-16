@@ -864,26 +864,7 @@ public class DaoUtil {
 	 * @see #paging(int, int, Query)
 	 */
 	public final static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,List<String> desc,List<String> asc,boolean queryRecordCount){
-		try {
-			StringBuffer hql = getSelectHql(t, null, desc, asc);
-			Long recordCount = (long) Integer.MAX_VALUE;
-			if (queryRecordCount) {
-				recordCount = getRecordCount(null, hql);
-			}
-			
-			Query query = createQuery(null, hql);
-			paging(pageSize,currentPage, query);
-			@SuppressWarnings("unchecked")
-			List<T> list = query.list();
-			
-			Page<T> page = setPage(currentPage, recordCount, pageSize, list);
-			return page;
-		} catch (Exception e) {
-			setException(e);
-			return null;
-		}finally{
-			closeSession();
-		}
+		return listCustomField(t, pageSize, currentPage, null, desc, asc, queryRecordCount);
 	}
 	
 	/**
@@ -1401,10 +1382,10 @@ public class DaoUtil {
 	 * 
 	 * @param <T> 要查询的实体类
 	 * 
-	 * @param t 要查询的类
+	 * @param target 要查询的类
 	 * @param pageSize 分页大小
 	 * @param currentPage 当前页码
-	 * @param constraint 查询条件
+	 * @param where 查询条件
 	 * @param desc
 	 * @param asc
 	 * @param queryRecordCount 是否查询总记录数(记录很多时查询较费时间),若传false,则返回的page实体类的记录数为Long.MAX_VALUE,<br>
@@ -1413,16 +1394,16 @@ public class DaoUtil {
 	 * 			(这个是可变参数,没有请不传,切忌传null!)
 	 * @return
 	 */
-	public final static <T> Page<T> listCustomField(Class<?> t,int pageSize,int currentPage,Map<String, Object> constraint,
+	public final static <T> Page<T> listCustomField(Class<?> target,int pageSize,int currentPage,Map<String, Object> where,
 			List<String> desc,List<String> asc,boolean queryRecordCount,String[] groupBy,String... selectField){
 		try {
-			StringBuffer hql = getSelectHql(t, constraint, desc, asc, groupBy, selectField);
-			Long recordCount = Long.MAX_VALUE;
+			StringBuffer hql = getSelectHql(target, where, desc, asc, groupBy, selectField);
+			Long recordCount = (long) Integer.MAX_VALUE;
 			if (queryRecordCount) {
-				recordCount = getRecordCount(constraint, hql);
+				recordCount = getRecordCount(where, hql);
 			}
 			
-			Query query = createQuery(constraint,hql);
+			Query query = createQuery(where,hql);
 			
 			paging(pageSize,currentPage, query);
 			@SuppressWarnings("unchecked")
