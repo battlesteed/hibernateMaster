@@ -9,6 +9,7 @@ import steed.ext.util.logging.LoggerFactory;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.listener.CRUDListener;
 import steed.hibernatemaster.listener.CRUDListenerManager;
+import steed.hibernatemaster.util.DaoUtil.GlobalQueryFilter;
 import steed.hibernatemaster.util.FactoryEngine;
 import steed.hibernatemaster.util.HqlGenerator;
 import steed.hibernatemaster.util.SimpleHqlGenerator;
@@ -89,6 +90,8 @@ public class Config {
 	 * 实体类字段校验器,{@link #enableHibernateValidate}为true时才有用
 	 */
 	public static Validator validator;
+	
+	public static GlobalQueryFilter globalQueryFilter = null;
 	
 	/**
 	 * 增删查监听器管理器,管理,扫描增删查监听器

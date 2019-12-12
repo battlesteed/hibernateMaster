@@ -12,20 +12,20 @@ import org.hibernate.annotations.GenericGenerator;
 import steed.ext.util.base.StringUtil;
 
 /**
- * uuid基础实体类,ID注解在方法
+ * uuid基础实体类,ID注解在字段
  * @author 战马
  *
  */
 @MappedSuperclass
-public abstract class UUIDDomain extends BaseRelationalDatabaseDomain{
+public abstract class UUIDDomain2 extends BaseRelationalDatabaseDomain{
 	private static final long serialVersionUID = 8998431532284882361L;
 	
-	protected String id;
-
 	@Id
 	@GenericGenerator(name="generator",strategy="assigned")
 	@GeneratedValue(generator="generator")
 	@Column(length=32)
+	protected String id;
+
 	public String getId() {
 		return id;
 	}

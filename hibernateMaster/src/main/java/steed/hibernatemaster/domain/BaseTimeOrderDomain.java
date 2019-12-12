@@ -34,6 +34,13 @@ public class BaseTimeOrderDomain extends BaseRelationalDatabaseDomain{
 		updateTime = new Date();
 		return super.save();
 	}
+	
+	@Override
+	public boolean updateNotNullFieldByHql(List<String> updateEvenNull, boolean strictlyMode, String... whereField) {
+		updateTime = new Date();
+		return super.updateNotNullFieldByHql(updateEvenNull, strictlyMode, whereField);
+	}
+	
 	@Override
 	public boolean updateNotNullField(List<String> updateEvenNull) {
 		updateTime = new Date();

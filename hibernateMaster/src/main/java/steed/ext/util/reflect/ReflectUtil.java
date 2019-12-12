@@ -23,7 +23,11 @@ import steed.ext.util.base.StringUtil;
 import steed.ext.util.logging.LoggerFactory;
 
 public class ReflectUtil {
+	private static final steed.ext.util.logging.Logger logger = LoggerFactory.getLogger(ReflectUtil.class);
 	private static final Map<String, Field> fieldCache = new HashMap<>();
+	private static final Map<Class<?>, List<Field>> allFieldsCache = new HashMap<>();
+	private static final Map<String, List<Field>> fieldsCache = new HashMap<>();
+	private static final Map<Class<?>, List<Field>> notFinalFieldsCache = new HashMap<>();
 	private static final Map<String, Method> methodCache = new HashMap<>();
 	
 	public static void copySameField(Object copy,Object copyed){
@@ -265,6 +269,15 @@ public class ReflectUtil {
 	}
 	
 	
+	public static void setValue(Field field,Object obj,Object value){
+		try {
+			field.setAccessible(true);
+			field.set(obj, value);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			logger.error("设置字段值出错!",e);
+		}
+	}
+	
 	public static void setValue(String fieldName,Object obj,Object value){
 		try {
 			Field declaredField = getDeclaredField(obj.getClass(), fieldName);
@@ -383,6 +396,7 @@ public class ReflectUtil {
 	public static Method getDeclaredMethod(Class<?> clazz,String methodName){
 		return getMethod(clazz, methodName, false);
 	}
+	
 	/**
 	 * 获取类的方法(包括父类)
 	 * @param clazz
@@ -426,7 +440,7 @@ public class ReflectUtil {
 				return declaredMethod.invoke(obj);
 			}
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			LoggerFactory.getLogger().warn("获取字段值出错!{}",e);
+			LoggerFactory.getLogger().warn("获取字段值出错!",e);
 		}
 		
 		try {
@@ -436,10 +450,10 @@ public class ReflectUtil {
 				return declaredMethod.invoke(obj);
 			}
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			LoggerFactory.getLogger().info("获取字段之出错!{}",e.getMessage());
+			LoggerFactory.getLogger().info("获取字段之出错!",e.getMessage());
 		}
 		
-		LoggerFactory.getLogger().info("{}没有{} getter方法,通过gett获取值失败",obj.getClass().getName(),fieldName);
+		LoggerFactory.getLogger().info(String.format("%s没有%s getter方法,通过gett获取值失败",obj.getClass().getName(),fieldName));
 		return null;
 		
 	}
@@ -462,30 +476,59 @@ public class ReflectUtil {
 		}
 	}
 	
-	public static List<Field> getNotFinalFields(Object object){
-		List<Field> fieldList = getAllFields(object);
-		Iterator<Field> iterator = fieldList.iterator();
-		while (iterator.hasNext()) {
-			if (isFieldFinal(iterator.next())) {
-				iterator.remove();
+	public static List<Field> getAnnotatedFields(Object object,Class<? extends Annotation> annotion){
+		String key = object.getClass().getName()+"."+annotion.getName();
+		//TOOD 开发模式不缓存
+		if (!fieldsCache.containsKey(key)) {
+			
+			List<Field> fields = getNotFinalFields(object);
+			List<Field> fieldList = new ArrayList<Field>();
+			for (Field field:fields) {
+				if (field.getAnnotation(annotion) != null) {
+					fieldList.add(field);
+				}
 			}
+			
+			fieldsCache.put(key, fieldList);
 		}
-		return fieldList;
+		return fieldsCache.get(key);
+	}
+	
+	public static List<Field> getNotFinalFields(Object object){
+		Class<? extends Object> key = object.getClass();
+		if (!notFinalFieldsCache.containsKey(key)) {
+			List<Field> fieldList = getAllFields(object);
+			List<Field> notFinalfieldList = new ArrayList<Field>();
+			Iterator<Field> iterator = fieldList.iterator();
+			while (iterator.hasNext()) {
+				Field next = iterator.next();
+				if (!isFieldFinal(next)) {
+					notFinalfieldList.add(next);
+				}
+			}
+			notFinalFieldsCache.put(key, notFinalfieldList);
+		}
+		return notFinalFieldsCache.get(key);
 	}
 	@SuppressWarnings("unchecked")
 	public static List<Field> getAllFields(Object object){
-		List<Field> fieldList = new ArrayList<>();
-		Class<? extends Object> class1;
-		if (object instanceof Class) {
-			class1 = (Class<? extends Object>) object;
-		}else {
-			class1 = object.getClass();
+		Class<? extends Object> key = object.getClass();
+		if (!allFieldsCache.containsKey(key)) {
+			List<Field> fieldList = new ArrayList<>();
+			Class<? extends Object> class1;
+			if (object instanceof Class) {
+				class1 = (Class<? extends Object>) object;
+			}else {
+				class1 = key;
+			}
+			while (class1 != Object.class) {
+				Collections.addAll(fieldList, class1.getDeclaredFields());
+				class1 = class1.getSuperclass();
+			}
+			allFieldsCache.put(key, fieldList);
 		}
-		while (class1 != Object.class) {
-			Collections.addAll(fieldList, class1.getDeclaredFields());
-			class1 = class1.getSuperclass();
-		}
-		return fieldList;
+		
+		return allFieldsCache.get(key);
 	}
 	/**
 	 * 获取clazz里面public的字段
@@ -568,6 +611,22 @@ public class ReflectUtil {
 			return null;
 		}
 		return field;
+	}
+	/**
+	 * 获取clazz的注解(包括父类)
+	 * @param clazz
+	 * @return 若没有注解,则返回null
+	 * 
+	 */
+	public static <A extends Annotation> A getAnnnotion(Class<?> clazz,Class<A> annotationClass){
+		A annotation = null;
+		while (clazz != Object.class && annotation == null) {
+			annotation = clazz.getAnnotation(annotationClass);
+			if (annotation==null) {
+				clazz = clazz.getSuperclass();
+			}
+		}
+		return annotation;
 	}
 	
 	public static Method getDeclaredMethod(Class<?> clazz,String name, Class<?>... parameterTypes){

@@ -11,7 +11,9 @@ import org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
+import steed.ext.util.reflect.ReflectUtil;
 import steed.hibernatemaster.Config;
+import steed.hibernatemaster.annotation.DefaultOrderBy;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.DomainScanner;
 
@@ -36,6 +38,10 @@ public class SingleFactoryEngine implements FactoryEngine{
 			List<Class<? extends BaseDatabaseDomain>> scan = instanceFromProperties.scan(configFile);
 			for(Class<? extends BaseDatabaseDomain> temp:scan){
 				metadataSources.addAnnotatedClass(temp);
+				DefaultOrderBy annnotion = ReflectUtil.getAnnnotion(temp, DefaultOrderBy.class);
+				if (annnotion != null) {
+					DaoUtil.defaultOrderBy.put(temp, annnotion);
+				}
 			}
 			DataSource source = null;
 			

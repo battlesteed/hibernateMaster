@@ -7,6 +7,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import steed.hibernatemaster.annotation.DefaultOrderBy;
 import steed.hibernatemaster.domain.UUIDDomain;
 /**
  * 班级class是关键词,用clazz代替了

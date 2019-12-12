@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import steed.ext.util.logging.LoggerFactory;
 import steed.hibernatemaster.Config;
 /**
  * 获取线程安全的session
@@ -22,6 +23,7 @@ public class HibernateUtil{
 	private static Map<String, SessionFactory> factoryMap = new HashMap<String, SessionFactory>();
 	public static final String mainFactory = "hibernate.cfg.xml";
 	
+//	private static final Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
 	
 	static {
 		try{

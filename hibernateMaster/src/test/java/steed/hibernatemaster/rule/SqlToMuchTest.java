@@ -16,7 +16,7 @@ public class SqlToMuchTest extends SteedTest{
 	private String[] studentIds;
 	private int dataSize = 1000;
 	
-	@Test
+//	@Test
 	public void testManySqlTime(){
 		steed.ext.util.test.TestEfficiency testEfficiency = new steed.ext.util.test.TestEfficiency();
 		testEfficiency.begin();
@@ -37,7 +37,7 @@ public class SqlToMuchTest extends SteedTest{
 		testEfficiency.endAndOutUsedTime(String.format("%d个查询sql,%d个删除sql,用时", dataSize,dataSize));
 	}
 	
-	@Test
+//	@Test
 	public void testOneSqlTime(){
 		steed.ext.util.test.TestEfficiency testEfficiency = new steed.ext.util.test.TestEfficiency();
 		testEfficiency.begin();
@@ -56,8 +56,8 @@ public class SqlToMuchTest extends SteedTest{
 		
 	}
 	
-	@Before
-	@Override
+//	@Before
+//	@Override
 	public void beforeTest() {
 		super.beforeTest();
 		insertTestData();

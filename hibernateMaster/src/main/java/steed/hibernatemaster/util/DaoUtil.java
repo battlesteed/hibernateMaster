@@ -2,9 +2,11 @@ package steed.hibernatemaster.util;
 
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +38,7 @@ import steed.ext.util.logging.LoggerFactory;
 import steed.ext.util.reflect.ReflectResult;
 import steed.ext.util.reflect.ReflectUtil;
 import steed.hibernatemaster.Config;
+import steed.hibernatemaster.annotation.DefaultOrderBy;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 import steed.hibernatemaster.domain.BaseDomain;
 import steed.hibernatemaster.domain.BaseRelationalDatabaseDomain;
@@ -86,6 +89,7 @@ public class DaoUtil {
 	private static final ThreadLocal<Boolean> autoManagTransaction = new ThreadLocal<>();
 	private static final ThreadLocal<Boolean> throwException = new ThreadLocal<>();
 	
+	protected static final Map<Class<? extends BaseDatabaseDomain>, DefaultOrderBy> defaultOrderBy = new HashMap<Class<? extends BaseDatabaseDomain>, DefaultOrderBy>();
 //	private static final Map<Class<?>, CRUDListener<?>> CRUDListenerMap = new HashMap<>();
 	
 	
@@ -131,6 +135,45 @@ public class DaoUtil {
 	public final static Exception getExceptiontype() {
 		return exception.get();
 	}
+	
+	/**
+	 * 设置实体类默认排序字段(当查询没有指定排序字段时,默认按照该字段排序),也可以直接在实体类加{@link DefaultOrderBy} 注解
+	 * @param target 要排序的表(实体类)
+	 * @param column 要排序的列名(字段名)
+	 * @param desc 是否降序排列
+	 * 
+	 * @see #removeDefaultOrderBy(Class)
+	 * @see steed.hibernatemaster.annotation.DefaultOrderBy
+	 */
+	public static final void setDefaultOrderBy(Class<? extends BaseDatabaseDomain> target,String column,boolean desc) {
+		DefaultOrderBy orderBy = new DefaultOrderBy() {
+			
+			@Override
+			public Class<? extends Annotation> annotationType() {
+				return DefaultOrderBy.class;
+			}
+			
+			@Override
+			public String value() {
+				return column;
+			}
+			
+			@Override
+			public boolean desc() {
+				return desc;
+			}
+		};
+		defaultOrderBy.put(target, orderBy);
+	}
+	/**
+	 * 移除{@link #setDefaultOrderBy(Class, String, boolean)} 设置的实体类默认排序规则
+	 * 
+	 * @see #setDefaultOrderBy(Class, String, boolean)
+	 */
+	public static final void removeDefaultOrderBy(Class<? extends BaseDatabaseDomain> target) {
+		defaultOrderBy.remove(target);
+	}
+	
 	public final static void setException(Exception exception,boolean rollbackTransaction) {
 		DaoUtil.exception.set(exception);
 		logger.error("数据库操作发生异常",exception);
@@ -1615,6 +1658,7 @@ public class DaoUtil {
 			logger.debug("回滚事务并清空session.....");
 		}
 		currentTransaction.remove();
+		relese();
 	}
 	
 	/**
@@ -1957,8 +2001,29 @@ public class DaoUtil {
 				}
 			}
 		}
+		//含有distinct语句,不能order by
+		boolean containsDistinct = false;
+		if (selectedFields != null) {
+			for (String field:selectedFields) {
+				if (field.toLowerCase().contains("distinct ")) {
+					containsDistinct = true;
+					break;
+				}
+			}
+		}
 		
+		if (!containsDistinct && desc == null && asc == null) {
+			DefaultOrderBy defaultOrderBy2 = defaultOrderBy.get(t);
+			if (defaultOrderBy2 != null) {
+				if (defaultOrderBy2.desc()) {
+					desc = Arrays.asList(defaultOrderBy2.value());
+				}else {
+					asc = Arrays.asList(defaultOrderBy2.value());
+				}
+			}
+		}
 		appendHqlOrder(hql, desc, asc, domainSimpleName);
+		
 		
 		if (where != null && where.get(personalHqlGeneratorKey) != null) {
 			((HqlGenerator)where.get(personalHqlGeneratorKey)).afterHqlGenered(domainSimpleName, hql, where);
@@ -2267,6 +2332,31 @@ public class DaoUtil {
 		public default void afterPutField2Map(Map<String, Object> map,String prefixName,boolean getFieldByGetter) {};
 		
 	}
+	/**
+	 * 全局查询过滤器,<code>{@link DaoUtil#putField2Map(Object) }</code>的拦截器,
+	 * 通过设置<code>{@link Config#globalQueryFilter }</code>,来全局实现数据权限控制等,例如:
+	 * 一个多公司系统,用户只能看自己公司的数据,可以在beforePutField2Map方法,
+	 * 把domain的公司字段值设置为当前登陆用户所属公司,这样就只能查出当前公司的数据了
+	 * 
+	 * @author 战马
+	 * @see DaoUtil#putField2Map(Object, Map, String, boolean)
+	 */
+	public interface GlobalQueryFilter{
+		
+		/**
+		 * 
+		 * @param domain 要查询的domain
+		 * @param map domain字段容器,用来生成hql或sqlwhere部分的查询条件
+		 * @param prefixName 前缀,当put user里面的school时,prefixName="user.",原理比较复杂,具体可以看源码
+		 * @param getFieldByGetter 是否用Getter方法来获取字段值,若传false,则用field.getValue直接获取字段值
+		 * @return 是否继续执行DaoUtil#putField2Map(Object, Map, String, boolean)
+		 * 
+		 * @see DaoUtil#putField2Map(Object, Map, String, boolean)
+		 */
+		public boolean beforePutField2Map(Object domain,Map<String, Object> map,String prefixName,boolean getFieldByGetter);
+		public default void afterPutField2Map(Object domain,Map<String, Object> map,String prefixName,boolean getFieldByGetter) {};
+		
+	}
 	
 	/**
 	 * 
@@ -2280,6 +2370,11 @@ public class DaoUtil {
 	public final static void putField2Map(Object domain,Map<String, Object> map,String prefixName,boolean getFieldByGetter) {
 		if (domain == null) {
 			return;
+		}
+		if (Config.globalQueryFilter != null) {
+			if(!Config.globalQueryFilter.beforePutField2Map(domain, map, prefixName, getFieldByGetter)){
+				return;
+			}
 		}
 		if (domain instanceof PutField2MapIntercepter) {
 			if(!((PutField2MapIntercepter)domain).beforePutField2Map(map, prefixName, getFieldByGetter)){
@@ -2344,6 +2439,9 @@ public class DaoUtil {
 			
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			logger.debug("putField2Map出错",e);
+		}
+		if (Config.globalQueryFilter != null) {
+			Config.globalQueryFilter.afterPutField2Map(domain, map, prefixName, getFieldByGetter);
 		}
 		if (domain instanceof PutField2MapIntercepter) {
 			((PutField2MapIntercepter)domain).afterPutField2Map(map, prefixName, getFieldByGetter);

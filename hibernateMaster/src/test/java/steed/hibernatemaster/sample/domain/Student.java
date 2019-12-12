@@ -6,9 +6,11 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.Valid;
 
+import steed.hibernatemaster.annotation.DefaultOrderBy;
 import steed.hibernatemaster.domain.UUIDDomain;
 
 @Entity
+@DefaultOrderBy("studentNumber")
 public class Student extends UUIDDomain{
 	/**
 	 * 学号
