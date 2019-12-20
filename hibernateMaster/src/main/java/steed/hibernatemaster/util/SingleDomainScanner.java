@@ -44,7 +44,7 @@ public class SingleDomainScanner implements DomainScanner{
 			String replaceAll = absolutePath.substring(absolutePath.indexOf("classes")+"classes.".length()).replace("\\", ".").replace("/", ".");
 			try {
 				String domainClassName = replaceAll.substring(0,replaceAll.length() - 6);
-				steed.ext.util.logging.LoggerFactory.getLogger().debug("扫描%s",domainClassName);
+//				steed.ext.util.logging.LoggerFactory.getLogger().debug("扫描%s",domainClassName);
 				Class<?> domainClass = Class.forName(domainClassName);
 				if (BaseRelationalDatabaseDomain.class.isAssignableFrom(domainClass)) {
 					if (domainClass.getAnnotation(Entity.class) != null) {

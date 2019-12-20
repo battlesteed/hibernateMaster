@@ -53,7 +53,7 @@ public class ReflectUtil {
 					e.printStackTrace();
 				}
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				LoggerFactory.getLogger().debug("copyDomainSameField", e);
+				logger.debug("copyDomainSameField", e);
 			} 
 		}
 	}
@@ -78,12 +78,12 @@ public class ReflectUtil {
 					}*/
 					f.set(domain, value);
 				} catch (IllegalAccessException e) {
-					LoggerFactory.getLogger().debug("copyObj", e);
+					logger.debug("copyObj", e);
 				} 
 			}
 			return domain;
 		} catch (InstantiationException | IllegalAccessException e) {
-			LoggerFactory.getLogger().error("复制"+copyed.getClass().getName() + "失败!!",e);
+			logger.error("复制"+copyed.getClass().getName() + "失败!!",e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -288,7 +288,7 @@ public class ReflectUtil {
 			declaredField.set(obj, value);
 			return;
 		} catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
-			LoggerFactory.getLogger().warn("把"+value+"设置到"+obj.getClass().getName()+"的"+fieldName+"字段失败", e);
+			logger.warn("把"+value+"设置到"+obj.getClass().getName()+"的"+fieldName+"字段失败", e);
 		}
 	}
 	
@@ -318,7 +318,7 @@ public class ReflectUtil {
 			declaredField.setAccessible(true);
 			return declaredField.get(obj);
 		} catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
-			LoggerFactory.getLogger().warn("获取"+obj.getClass().getName()+"的"+fieldName+"字段失败-->", e.getMessage());
+			logger.warn("获取"+obj.getClass().getName()+"的"+fieldName+"字段失败-->", e.getMessage());
 		}
 		return null;
 	}
@@ -327,7 +327,7 @@ public class ReflectUtil {
 		try {
 			return Class.forName(className).newInstance();
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			LoggerFactory.getLogger().error(className+"实例化失败！！",e);
+			logger.error(className+"实例化失败！！",e);
 			throw new RuntimeException(className+"实例化失败！！",e);
 		} 
 	}
@@ -440,7 +440,7 @@ public class ReflectUtil {
 				return declaredMethod.invoke(obj);
 			}
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			LoggerFactory.getLogger().warn("获取字段值出错!",e);
+			logger.warn("获取字段值出错!",e);
 		}
 		
 		try {
@@ -450,10 +450,10 @@ public class ReflectUtil {
 				return declaredMethod.invoke(obj);
 			}
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			LoggerFactory.getLogger().info("获取字段之出错!",e.getMessage());
+			logger.info("获取字段之出错!",e.getMessage());
 		}
 		
-		LoggerFactory.getLogger().info(String.format("%s没有%s getter方法,通过gett获取值失败",obj.getClass().getName(),fieldName));
+		logger.info(String.format("%s没有%s getter方法,通过gett获取值失败",obj.getClass().getName(),fieldName));
 		return null;
 		
 	}

@@ -389,7 +389,7 @@ public class DomainUtil{
 				}
 			}
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			steed.ext.util.logging.LoggerFactory.getLogger().info("获取字段值出错",e);
+			logger.info("获取字段值出错",e);
 		}
 		return differenceFields;
 	}
@@ -439,7 +439,7 @@ public class DomainUtil{
 			try {
 				temp.getField().set(filled, temp.getNewField());
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				steed.ext.util.logging.LoggerFactory.getLogger().info("设置字段出错",e);
+				logger.info("设置字段出错",e);
 			}
 		}
 		return differenceField;

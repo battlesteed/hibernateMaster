@@ -6,9 +6,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import steed.ext.util.logging.Logger;
 import steed.ext.util.logging.LoggerFactory;
 
 public class DateUtil {
+	private static Logger logger = LoggerFactory.getLogger(DateUtil.class);
 	public static final String yyyy_MM_dd = "yyyy-MM-dd";
 	public static final String yyyy_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";
 	
@@ -53,7 +55,7 @@ public class DateUtil {
 			} catch (ParseException e) {
 			}
 		}
-		LoggerFactory.getLogger().error("日期%s解析失败!",source);
+		logger.error("日期%s解析失败!",source);
 		return null;
 	}
 	public static Date parseDate(String source,String pattern){

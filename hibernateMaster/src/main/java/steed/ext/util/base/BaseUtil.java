@@ -13,7 +13,7 @@ import steed.hibernatemaster.domain.BaseDomain;
  *
  */
 public class BaseUtil {
-	private final static Logger logger = LoggerFactory.getLogger();
+	private final static Logger logger = LoggerFactory.getLogger(BaseUtil.class);
 	
 	public static Logger getLogger(){
 		return logger;

@@ -108,7 +108,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 		
 		if (Config.devMode) {
 			for (ConstraintViolation<BaseRelationalDatabaseDomain> temp:validate) {
-				LoggerFactory.getLogger().debug("校验失败:"+temp.getMessage());
+				logger.debug("校验失败:"+temp.getMessage());
 			}
 		}
 		
@@ -466,11 +466,11 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 					}
 					f.set(this, value);
 				} catch (IllegalAccessException e) {
-					LoggerFactory.getLogger().debug("copyObj", e);
+					logger.debug("copyObj", e);
 				} 
 			}
 		} catch (Exception e) {
-			LoggerFactory.getLogger().error("hibernate代理Collection转java内置Collection失败!!",e);
+			logger.error("hibernate代理Collection转java内置Collection失败!!",e);
 		//	throw new RuntimeException(e);
 		}
 		return this;

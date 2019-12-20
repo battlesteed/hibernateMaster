@@ -3,7 +3,8 @@ package steed.ext.util.test;
 import java.util.Date;
 import java.util.List;
 
-import steed.ext.util.base.BaseUtil;
+import steed.ext.util.logging.Logger;
+import steed.ext.util.logging.LoggerFactory;
 
 /**
  * 用于测试代码运行效率
@@ -11,6 +12,7 @@ import steed.ext.util.base.BaseUtil;
  *
  */
 public class TestEfficiency {
+	private final static Logger logger = LoggerFactory.getLogger(TestEfficiency.class);
 	private Date begin;
 	private Date end;
 	private List<String> recordList;
@@ -19,7 +21,7 @@ public class TestEfficiency {
 	 */
 	public Date begin(){
 		begin = new Date();
-		steed.ext.util.logging.LoggerFactory.getLogger().debug("开始计时...");
+		logger.debug("开始计时...");
 		return begin;
 	}
 	/**
@@ -39,7 +41,7 @@ public class TestEfficiency {
 			prefix = "用时";
 		}
 		String message = prefix+getUseTime()+"毫秒";
-		steed.ext.util.logging.LoggerFactory.getLogger().info(message);
+		logger.info(message);
 		return message;
 	}
 	/**
@@ -58,7 +60,7 @@ public class TestEfficiency {
 	 */
 	public void printRecord(){
 		for(String str:recordList){
-			steed.ext.util.logging.LoggerFactory.getLogger().info(str);
+			logger.info(str);
 		}
 	}
 	
