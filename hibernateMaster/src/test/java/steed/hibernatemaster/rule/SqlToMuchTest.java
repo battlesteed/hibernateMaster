@@ -27,7 +27,7 @@ public class SqlToMuchTest extends SteedTest{
 			studentList.add(DaoUtil.get(Student.class, id));
 		}
 		
-		LoggerFactory.getLogger().debug("查询到了"+studentList.size()+"个student");
+		LoggerFactory.getLogger(SqlToMuchTest.class).debug("查询到了"+studentList.size()+"个student");
 		
 		for(Student temp:studentList){
 			temp.delete();
@@ -46,7 +46,7 @@ public class SqlToMuchTest extends SteedTest{
 		builder.addIn("id", studentIds);
 		
 		List<Student> studentList = DaoUtil.listAllObj(Student.class, builder.getWhere(), null, null);
-		LoggerFactory.getLogger().debug("查询到了"+studentList.size()+"个student");
+		LoggerFactory.getLogger(SqlToMuchTest.class).debug("查询到了"+studentList.size()+"个student");
 		
 		
 		DaoUtil.deleteByQuery(Student.class,builder.getWhere());

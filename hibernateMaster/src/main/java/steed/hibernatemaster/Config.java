@@ -7,9 +7,9 @@ import javax.validation.Validator;
 import steed.ext.util.logging.Logger;
 import steed.ext.util.logging.LoggerFactory;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
+import steed.hibernatemaster.filter.QueryFilterManager;
 import steed.hibernatemaster.listener.CRUDListener;
 import steed.hibernatemaster.listener.CRUDListenerManager;
-import steed.hibernatemaster.util.DaoUtil.GlobalQueryFilter;
 import steed.hibernatemaster.util.FactoryEngine;
 import steed.hibernatemaster.util.HqlGenerator;
 import steed.hibernatemaster.util.SimpleHqlGenerator;
@@ -91,7 +91,14 @@ public class Config {
 	 */
 	public static Validator validator;
 	
-	public static GlobalQueryFilter globalQueryFilter = null;
+	public static QueryFilterManager queryFilterManager = new QueryFilterManager() {
+		
+		@Override
+		public steed.hibernatemaster.filter.QueryFilter<?>[] getFilters(
+				Class<?> clazz) {
+			return null;
+		}
+	};
 	
 	/**
 	 * 增删查监听器管理器,管理,扫描增删查监听器

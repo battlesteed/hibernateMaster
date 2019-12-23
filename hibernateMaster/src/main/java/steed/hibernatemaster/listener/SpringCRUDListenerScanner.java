@@ -16,7 +16,7 @@ import steed.ext.util.logging.LoggerFactory;
 import steed.hibernatemaster.domain.BaseDatabaseDomain;
 
 /**
- * 单数据库实体类扫描器
+ * spring crud监听器扫描器
  * @author 战马
  *
  */
