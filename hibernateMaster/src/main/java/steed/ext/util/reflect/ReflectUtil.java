@@ -301,10 +301,27 @@ public class ReflectUtil {
 	 * @see #getValue(String, Object)
 	 */
 	public static Object getChainValue(String fieldName,Object obj){
+		return getChainValue(fieldName, obj, false);
+	}
+	/**
+	 * 获取obj里面的字段值
+	 * @param fieldName 可以带点,比如"user.name"
+	 * @param obj
+	 * @param getFieldByGetter 是否用Getter方法来获取字段值,若传false,则用field.getValue直接获取字段值
+	 *  
+	 * @return 若为null则说明没找到该字段或该字段值为null,请自行检讨,为什么会搞错字段名
+	 * 
+	 * @see #getValue(String, Object)
+	 */
+	public static Object getChainValue(String fieldName,Object obj,boolean getFieldByGetter){
 		String[] fields = fieldName.split("\\.");
 		Object target = obj;
 		for(String temp:fields){
-			target = getValue(temp, target);
+			if (getFieldByGetter) {
+				target = getFieldValueByGetter(obj, fieldName);
+			}else {
+				target = getValue(temp, target);
+			}
 			if (target == null) {
 				return null;
 			}
@@ -315,6 +332,10 @@ public class ReflectUtil {
 	public static Object getValue(String fieldName,Object obj){
 		try {
 			Field declaredField = getDeclaredField(obj.getClass(), fieldName);
+			if (declaredField == null) {
+				logger.warn(obj.getClass() + "不存在字段" + fieldName);
+				return null;
+			}
 			declaredField.setAccessible(true);
 			return declaredField.get(obj);
 		} catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
@@ -453,7 +474,7 @@ public class ReflectUtil {
 			logger.info("获取字段之出错!",e.getMessage());
 		}
 		
-		logger.info(String.format("%s没有%s getter方法,通过gett获取值失败",obj.getClass().getName(),fieldName));
+		logger.info(String.format("%s没有%s getter方法,通过getter获取值失败",obj.getClass().getName(),fieldName));
 		return null;
 		
 	}
