@@ -1181,7 +1181,7 @@ public class DaoUtil {
 	/**
 	 * 查询实体类指定的字段
 	 * @param where 查询条件
-	 * @param selectedFields  要查询的字段,可以传sum( id ) count( id ) 之类的函数,注意 括号之间要有空格 可以带'.' 比如 user.role.name
+	 * @param selectedFields  要查询的字段,可以传sum( name ) count( id ) 之类的函数,注意 括号之间要有空格 可以带'.' 比如 user.role.name
 	 * @param <T> 要查询的实体类
 	 * 
 	 * @return 符合查询条件的所有记录(List),当selectedFields长度为0时,返回List&lt;target&gt;<br>
@@ -1194,7 +1194,7 @@ public class DaoUtil {
 	/**
 	 * 查询实体类指定的字段
 	 * @param where 查询条件
-	 * @param selectedFields  要查询的字段,可以传sum( id ) count( id ) 之类的函数,注意 括号之间要有空格 可以带'.' 比如 user.role.name
+	 * @param selectedFields  要查询的字段,可以传sum( name ) count( id ) 之类的函数,注意 括号之间要有空格 可以带'.' 比如 user.role.name
 	 * @param desc 需要降序排列的字段 不需要请传null
 	 * @param asc 需要升序排列的字段 不需要请传null
 	 * @param groupBy hql group by部分语句,不需要请传null
@@ -1210,7 +1210,7 @@ public class DaoUtil {
 	/**
 	 * 查询实体类指定的字段
 	 * @param where 查询条件
-	 * @param selectedFields  要查询的字段,可以传sum( id ) count( id ) 之类的函数,注意 括号之间要有空格 可以带'.' 比如 user.role.name
+	 * @param selectedFields  要查询的字段,可以传sum( name ) count( id ) 之类的函数,注意 括号之间要有空格 可以带'.' 比如 user.role.name
 	 * @param desc 需要降序排列的字段 不需要请传null
 	 * @param asc 需要升序排列的字段 不需要请传null
 	 * 
@@ -1229,7 +1229,7 @@ public class DaoUtil {
 	 * 
 	 * @param where 查询条件
 	 * @param target 要查询的实体类
-	 * @param selectedFields  要查询的字段,可以传sum( id ) count( id ) 之类的函数,注意 括号之间要有空格 可以带'.' 比如 user.role.name
+	 * @param selectedFields  要查询的字段,可以传sum( name ) count( id ) 之类的函数,注意 括号之间要有空格 可以带'.' 比如 user.role.name
 	 * 
 	 * @return 符合查询条件的所有记录(List),当selectedFields长度为0时,返回List&lt;target&gt;<br>
 	 * 		当selectedFields长度只有1时,返回List&lt;selectedField&gt;<br>
@@ -1248,7 +1248,7 @@ public class DaoUtil {
 	 * @param where 查询条件
 	 * @param desc 需要降序排列的字段 不需要请传null
 	 * @param asc 需要升序排列的字段 不需要请传null
-	 * @param selectedFields  要查询的字段,可以传sum( id ) count( id ) 之类的函数,注意 括号之间要有空格 可以带'.' 比如 user.role.name
+	 * @param selectedFields  要查询的字段,可以传sum( name ) count( id ) 之类的函数,注意 括号之间要有空格 可以带'.' 比如 user.role.name
 	 * 
 	 * @return 符合查询条件的所有记录(List),当selectedFields长度为0时,返回List&lt;target&gt;<br>
 	 * 		当selectedFields长度只有1时,返回List&lt;selectedField&gt;<br>
@@ -1268,7 +1268,7 @@ public class DaoUtil {
 	 * @param desc 需要降序排列的字段 不需要请传null
 	 * @param asc 需要升序排列的字段 不需要请传null
 	 * @param groupBy hql group by部分语句,不需要请传null
-	 * @param selectedFields  要查询的字段,可以传sum( id ) count( id ) 之类的函数,注意 括号之间要有空格 可以带'.' 比如 user.role.name
+	 * @param selectedFields  要查询的字段,可以传sum( name ) count( id ) 之类的函数,注意 括号之间要有空格 可以带'.' 比如 user.role.name
 	 * 
 	 * @return 符合查询条件的所有记录(List),当selectedFields长度为0时,返回List&lt;target&gt;<br>
 	 * 		当selectedFields长度只有1时,返回List&lt;selectedField&gt;<br>
@@ -1412,7 +1412,7 @@ public class DaoUtil {
 	 * @param asc 需要升序排列的字段 可以为null
 	 * @param queryRecordCount 是否查询总记录数(记录很多时查询较费时间),若传false,则返回的page实体类的记录数为Long.MAX_VALUE,<br>
 	 * 			前端可做无限分页
-	 * @param selectField 要查询的字段,可以传sum( id ) count( id ) 之类的函数,注意 括号之间要有空格若不传,则查询该类所有字段,page里面放的是实体类,否则放的是map,不过map里面的key的'.'会被替换成'__'<br>
+	 * @param selectField 要查询的字段,可以传sum( name ) count( id ) 之类的函数,注意 括号之间要有空格若不传,则查询该类所有字段,page里面放的是实体类,否则放的是map,不过map里面的key的'.'会被替换成'__'<br>
 	 * 
 	 * @return  符合查询条件的当前页记录(page里面放的是List),当selectedFields长度为0时,page里面的数据为List&lt;target&gt;<br>
 	 * 		当selectedFields长度只有1时,page里面的数据为List&lt;selectedField&gt;<br>
@@ -1436,7 +1436,7 @@ public class DaoUtil {
 	 * @param asc
 	 * @param queryRecordCount 是否查询总记录数(记录很多时查询较费时间),若传false,则返回的page实体类的记录数为Long.MAX_VALUE,<br>
 	 * 			前端可做无限分页
-	 * @param selectField 要查询的字段,可以传sum( id ) count( id ) 之类的函数,注意 括号之间要有空格若不传,则查询该类所有字段,page里面放的是实体类,否则放的是map,不过map里面的key的'.'会被替换成'__'<br>
+	 * @param selectField 要查询的字段,可以传sum( name ) count( id ) 之类的函数,注意 括号之间要有空格若不传,则查询该类所有字段,page里面放的是实体类,否则放的是map,不过map里面的key的'.'会被替换成'__'<br>
 	 * 			(这个是可变参数,没有请不传,切忌传null!)
 	 * @return
 	 */
