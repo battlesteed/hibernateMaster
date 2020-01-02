@@ -1437,7 +1437,7 @@ public class DaoUtil {
 	 * @param queryRecordCount 是否查询总记录数(记录很多时查询较费时间),若传false,则返回的page实体类的记录数为Long.MAX_VALUE,<br>
 	 * 			前端可做无限分页
 	 * @param selectField 要查询的字段,可以传sum( name ) count( id ) 之类的函数,注意 括号之间要有空格若不传,则查询该类所有字段,page里面放的是实体类,否则放的是map,不过map里面的key的'.'会被替换成'__'<br>
-	 * 			(这个是可变参数,没有请不传,切忌传null!)
+	 * 			
 	 * @return
 	 */
 	public final static <T> Page<T> listCustomField(Class<?> target,int pageSize,int currentPage,Map<String, Object> where,
@@ -2432,9 +2432,9 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 是否属于查找索引字段
+	 * 是否属于查询后缀
 	 * @param fieldName 字段名..
-	 * @return 如果不是索引字段返回0,是则返回索引后缀长度...方便subString拿到真实字段名
+	 * @return 如果不是查询后缀返回0,是则返回查询后缀长度...方便subString拿到真实字段名
 	 */
 	public final static int isSelectIndex(String fieldName){
 		for (String suffix:indexSuffix) {

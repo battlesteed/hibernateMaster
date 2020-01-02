@@ -44,7 +44,7 @@ public class PathUtil {
 			isReaction = true;
 			path = path.replace("\\", "/");
 		}else {
-			throw new IllegalArgumentException(String.format("%s%s", path,"已经是顶级目录"));
+			return path;
 		}
 		if (path.endsWith("/")) {
 			path = path.substring(0, path.length()-1);
