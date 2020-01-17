@@ -10,6 +10,7 @@ steed.hibernatemaster.connection
 steed.hibernatemaster.dialect
 steed.hibernatemaster.domain
 steed.hibernatemaster.exception
+steed.hibernatemaster.filter
 steed.hibernatemaster.generate
 steed.hibernatemaster.listener
 steed.hibernatemaster.listener.annotation

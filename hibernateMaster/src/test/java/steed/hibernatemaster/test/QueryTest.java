@@ -2,6 +2,7 @@ package steed.hibernatemaster.test;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.Test;
 
@@ -15,7 +16,7 @@ public class QueryTest extends SteedTest{
 	public void testResultNull(){
 		School where = new School();
 		assert(!DaoUtil.isResultNull(where));
-		where.setId("ddddddddddddddddddddddffds");
+		where.setId(UUID.randomUUID().toString());
 		assert(DaoUtil.isResultNull(where));
 	}
 	@Test

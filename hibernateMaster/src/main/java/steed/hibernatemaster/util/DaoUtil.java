@@ -47,6 +47,7 @@ import steed.hibernatemaster.domain.Page;
 import steed.hibernatemaster.filter.QueryFilter;
 /**
  * 实现0sql和0hql伟大构想的dao工具类，用该类即可满足绝大多数数据库操作<br>
+ * <a href='https://battle_steed.gitee.io/hibernatemaster/hibernateMaster/doc/index.html'>java doc https://battle_steed.gitee.io/hibernatemaster/hibernateMaster/doc/</a><br>
 _______________#########_______________________<br>
 ______________############_____________________<br>
 ______________#############____________________<br>
@@ -1549,9 +1550,9 @@ public class DaoUtil {
 	/**
 	 *  管理事务
 	 * @param isCommit 
-	 * @return 
+	 * @return 事务是提交还是回滚
 	 */
-	private static boolean managTransaction(Boolean isCommit){
+	public static boolean managTransaction(Boolean isCommit){
 		if (shouldCommitNow()) {
 			if (isCommit == null || isCommit) {
 				commitTransaction();
@@ -1625,7 +1626,7 @@ public class DaoUtil {
 	}
 	
 	/**
-	 * 释放资源
+	 * 释放数据库连接等资源
 	 */
 	public final static void relese(){
 		transactionType.remove();
