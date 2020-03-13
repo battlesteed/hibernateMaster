@@ -268,7 +268,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 
 	
 	/**
-	 * update不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好,
+	 * update不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好,若对象刚从数据库查询出来,请直接{@link #update}
 	 * 
 	 */
 	public boolean updateNotNullFieldByHql(){
@@ -276,7 +276,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 	/**
-	 * update不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好.
+	 * update不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好,若对象刚从数据库查询出来,请直接{@link #update}
 	 * 若要update clazz.id 为1 的student 实体类的 inDate为 当前时间,type为8,则可以这样写:
 	 * <pre>{@code
 	 * 	Student student = new Student();
@@ -295,7 +295,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 	}
 	
 	/**
-	 * 用id做where条件(调用该方法之前一定要设置实例id),update其它不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好
+	 * 用id做where条件(调用该方法之前一定要设置实例id),update其它不为空的字段,直接用hql update,只update需要update的字段,比{@link #updateNotNullField(List, boolean) }性能好,若对象刚从数据库查询出来,请直接{@link #update}
 	 * 
 	 * @param updateEvenNull 即使为null也update的字段,如果没有可以传null
 	 * @param strictlyMode 严格模式，如果为true则 字段==null才算空， 否则调用{@link BaseUtil#isObjEmpty(Object)} 判断字段是否为空
@@ -471,7 +471,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 			}
 		} catch (Exception e) {
 			logger.error("hibernate代理Collection转java内置Collection失败!!",e);
-		//	throw new RuntimeException(e);
+//			throw new RuntimeException(e);
 		}
 		return this;
 	}

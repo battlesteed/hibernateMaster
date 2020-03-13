@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import steed.ext.util.logging.LoggerFactory;
 import steed.hibernatemaster.Config;
 /**
  * 获取线程安全的session
@@ -113,6 +112,9 @@ public class HibernateUtil{
 	 * @param configFile hibernate配置文件名
 	 */
 	public static void switchDatabase(String configFile){
+		if (Config.isSignalDatabase) {
+			throw new IllegalArgumentException("当前为但数据库模式,无法切换数据库!请配置steed.hibernatemaster.Config.isSignalDatabase!");
+		}
 		currentDatabase.set(configFile);
 	} 
 	

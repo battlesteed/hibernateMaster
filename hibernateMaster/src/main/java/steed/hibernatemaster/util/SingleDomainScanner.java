@@ -23,9 +23,9 @@ public class SingleDomainScanner implements DomainScanner{
 	@SuppressWarnings("unchecked")
 	public List<Class<? extends BaseDatabaseDomain>> scan(String configFile){
 		List<Class<? extends BaseDatabaseDomain>> list = new ArrayList<>();
-		if(!Config.isSignalDatabase){
-			return list;
-		}
+//		if(!Config.isSignalDatabase){
+//			return list;
+//		}
 		String classesPath = PathUtil.getClassesPath();
 		
 		List<File> allFile = new ArrayList<>();

@@ -136,7 +136,7 @@ public class DaoUtil {
 	
 	/*-------#异常提示专用************/
 	
-	public final static Exception getExceptiontype() {
+	private final static Exception getExceptiontype() {
 		return exception.get();
 	}
 	
@@ -169,6 +169,7 @@ public class DaoUtil {
 		};
 		defaultOrderBy.put(target, orderBy);
 	}
+	
 	/**
 	 * 移除{@link #setDefaultOrderBy(Class, String, boolean)} 设置的实体类默认排序规则
 	 * 
@@ -205,6 +206,12 @@ public class DaoUtil {
 		DaoUtil.currentTransaction.set(currentTransaction);
 	}
 	
+	/**
+	 * 获取当前事务类型
+	 * @return 调用{@link #managTransaction()}是否提交提交事务
+	 * 
+	 * @see #managTransaction()
+	 */
 	public final static Boolean getTransactionType() {
 		return transactionType.get();
 	}
@@ -222,28 +229,10 @@ public class DaoUtil {
 	public final static void setTransactionType(Boolean transactionType) {
 		DaoUtil.transactionType.set(transactionType);
 	}
+	
 	public final static Boolean getAutoManagTransaction() {
 		return autoManagTransaction.get();
 	}
-	
-	/*
-	public final static void registCRUDListener(Class<?> clazz,CRUDListener<?> listener){
-		CRUDListenerMap.put(clazz, listener);
-	}
-	public final static void unRegistCRUDListener(Class<?> clazz){
-		CRUDListenerMap.remove(clazz);
-	}
-	public final static <T> CRUDListener<T> getCRUDListener(Class<?> clazz){
-		while (clazz != Object.class) {
-			CRUDListener<?> crudListener = CRUDListenerMap.get(clazz);
-			if (crudListener != null) {
-				return (CRUDListener<T>) crudListener;
-			}
-			clazz = clazz.getSuperclass();
-		}
-		return null;
-	}*/
-	
 	
 	/**
 	 * 立即事务开始，框架可能配置了多个数据库操作使用同一事务然后统一提交
@@ -271,6 +260,7 @@ public class DaoUtil {
 		HibernateUtil.setSession(null);
 		return immediatelyTransactionData;
 	}
+	
 	/**
 	 * 立即事务结束,调用该方法之前请先调用<code>{@link #managTransaction()}</code> 提交立即事务,否则
 	 * immediatelyTransactionBegin和immediatelyTransactionEnd之间做的数据库操作不会生效
@@ -290,12 +280,10 @@ public class DaoUtil {
 		logger.debug("立即事务结束");
 	}
 	
-	
-	
-	
 	public final static void setAutoManagTransaction(Boolean selfManagTransaction) {
 		DaoUtil.autoManagTransaction.set(selfManagTransaction);;
 	}
+	
 	/***************************增删查改开始******************************/
 	
 	/**
@@ -1143,6 +1131,7 @@ public class DaoUtil {
 	 * @return 结果是否存在
 	 */
 	public final static boolean isResultNull(BaseRelationalDatabaseDomain where){
+		//TODO where包含id时,where其它条件被忽略bug
 		return isResultNull(where.getClass(), DaoUtil.putField2Map(where));
 	}
 	
