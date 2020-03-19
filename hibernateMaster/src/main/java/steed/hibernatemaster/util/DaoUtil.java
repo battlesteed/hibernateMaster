@@ -1953,7 +1953,7 @@ public class DaoUtil {
 		
 		dealSortFieldsJoin(t, asc, domainSelected);
 		
-		if (where != null) {
+		if (where != null && !"delete".equals(prefix)) {
 			for(String temp:where.keySet()){
 				if (temp.contains(".") && !(where.get(temp) instanceof HqlGenerator)) {
 					String chain = getMaxDepthDomainChain(temp, t);
