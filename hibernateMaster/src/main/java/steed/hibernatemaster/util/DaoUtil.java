@@ -1958,8 +1958,20 @@ public class DaoUtil {
 				if (temp.contains(".") && !(where.get(temp) instanceof HqlGenerator)) {
 					String chain = getMaxDepthDomainChain(temp, t);
 					if (chain != null) {
-						innerJoin.add(chain);
-						domainSelected.remove(chain);
+						if (chain.contains(".")) {
+							innerJoin.add(chain);
+						}else {
+							//company.id这类,通过关联的实体类id查询的,不需要inner join,company.name之类才需要
+							Field field = ReflectUtil.getDeclaredField(t, chain);
+							if (field == null) {
+								throw new IllegalArgumentException(t.getName() + "中没有" + chain + "字段!");
+							}
+							@SuppressWarnings("unchecked")
+							String domainIDName = DomainUtil.getDomainIDName((Class<? extends BaseDomain>) field.getType());
+							if (!temp.substring(chain.length()+1).equals(domainIDName)) {
+								innerJoin.add(chain);
+							}
+						}
 					}
 				}
 			}
@@ -1971,6 +1983,9 @@ public class DaoUtil {
 		.append(domainSimpleName);
 		
 		for(String temp:domainSelected){
+			if (innerJoin.contains(temp)) {
+				continue;
+			}
 			hql.append(" left join ").append(domainSimpleName).append(".")
 				.append(temp).append(" ");
 		}
@@ -2091,6 +2106,12 @@ public class DaoUtil {
 		return group.replace(".", "__").replace("\r", "").replace("*", "_").replace("/", "_").replace("-", "_").replace("+", "_");
 	}
 	
+	/**
+	 * 截取带点的字段仅包含实体类最长的一段如 company.user.id,返回 company.user , company.user.school.name 返回company.user.school
+	 * @param chain
+	 * @param clazz
+	 * @return
+	 */
 	private static String getMaxDepthDomainChain(String chain,Class<?> clazz){
 		String maxDepthDomainChain = getMaxDepthDomainChain(clazz, getNoSelectIndexFieldName(chain));
 		if (!StringUtil.isStringEmpty(chain) && maxDepthDomainChain.endsWith(".")) {
