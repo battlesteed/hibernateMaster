@@ -20,6 +20,15 @@ import steed.ext.util.base.StringUtil;
 public abstract class UUIDDomain2 extends BaseRelationalDatabaseDomain{
 	private static final long serialVersionUID = 8998431532284882361L;
 	
+	public UUIDDomain2() {
+		super();
+	}
+
+	public UUIDDomain2(String id) {
+		super();
+		this.id = id;
+	}
+	
 	@Id
 	@GenericGenerator(name="generator",strategy="assigned")
 	@GeneratedValue(generator="generator")

@@ -22,6 +22,15 @@ public abstract class UUIDDomain extends BaseRelationalDatabaseDomain{
 	
 	protected String id;
 
+	public UUIDDomain() {
+		super();
+	}
+
+	public UUIDDomain(String id) {
+		super();
+		this.id = id;
+	}
+
 	@Id
 	@GenericGenerator(name="generator",strategy="assigned")
 	@GeneratedValue(generator="generator")
