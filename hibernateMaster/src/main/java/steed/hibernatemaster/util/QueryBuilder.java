@@ -17,7 +17,7 @@ import steed.hibernatemaster.domain.BaseDomain;
 
 /**
  * 查询构建器,复杂的查询(&gt; ,&lt; , in等等查询条件),请用该类构建
- * 
+ * like 条件可以不用该类,只要string含有'%'默认会添加like条件
  * @author battlesteed
  *
  */

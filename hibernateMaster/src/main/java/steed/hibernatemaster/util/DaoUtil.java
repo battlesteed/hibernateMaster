@@ -464,8 +464,8 @@ public class DaoUtil {
 		}
 	}
 	
-	public final static int executeUpdateBySql(String hql,Map<String,? extends Object> map){
-		return executeUpdate(hql, map, 1);
+	public final static int executeUpdateBySql(String sql,Map<String,? extends Object> map){
+		return executeUpdate(sql, map, 1);
 	}
 	
 	public final static int executeUpdate(String hql,Map<String,? extends Object> map){
@@ -1990,7 +1990,7 @@ public class DaoUtil {
 				.append(temp).append(" ");
 		}
 		for(String temp:innerJoin){
-			hql.append(" inner join ").append(domainSimpleName).append(".")
+			hql.append(" left join ").append(domainSimpleName).append(".")
 			.append(temp).append(" ");
 		}
 		

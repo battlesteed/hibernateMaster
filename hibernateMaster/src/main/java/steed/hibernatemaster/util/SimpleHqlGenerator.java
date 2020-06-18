@@ -85,7 +85,7 @@ public class SimpleHqlGenerator implements HqlGenerator{
 			if (isNotIn) {
 				innerJoinSB = new StringBuffer(" left join ");
 			}else {
-				innerJoinSB = new StringBuffer(" inner join ");
+				innerJoinSB = new StringBuffer(" left join ");
 			}
 			innerJoinSB.append(domainSimpleName);
 			innerJoinSB.append(".");
