@@ -2196,32 +2196,86 @@ public class DaoUtil {
 	
 	/**
 	 * 
-	 * 生成query并设置查询参数,如果udpate,delete等语句,确保之前调用了DaoUtil其它自动开启事务的方法否则请手动调用DaoUtil.beginTransaction()
-	 * 开启事务或手动管理事务,不然系统无法提交事务,造成udpate或delete不生效bug
-	 * @param where
+	 * 生成query并设置查询参数,使用例子:<br><code>
+	 * Map<String, Object> param = new HashMap<String, Object>();<br>
+		param.put("id", schoolId);<br>
+		String updateName = "schoolUpdated";<br>
+		param.put("updateName", updateName);<br>
+		Query createSQLQuery = DaoUtil.createQuery(param, " update School set name=:updateName where id=:id ");<br>
+		createSQLQuery.executeUpdate();<br>
+	 * </code>
+	 * @param param 参数,存放sql中类似 update School set name=:updateName where id=:id 中的 id,updateName对应的值
 	 * @param hql
-	 * @see #beginTransaction
 	 * @return
 	 */
-	public final static Query createQuery(Map<String, Object> where,StringBuffer hql) {
-		logger.debug("hql---->"+hql.toString());
-		logger.debug("参数---->"+where);
-		Query query = getSession().createQuery(hql.toString());
-		setMapParam(where, query);
+	public final static Query createQuery(Map<String, Object> param,StringBuffer hql) {
+		return createQuery(param, hql.toString());
+	}
+	/**
+	 * 
+	 * 生成query并设置查询参数,使用例子:<br><code>
+	 * Map<String, Object> param = new HashMap<String, Object>();<br>
+		param.put("id", schoolId);<br>
+		String updateName = "schoolUpdated";<br>
+		param.put("updateName", updateName);<br>
+		Query createSQLQuery = DaoUtil.createQuery(param, " update School set name=:updateName where id=:id ");<br>
+		createSQLQuery.executeUpdate();<br>
+	 * </code>
+	 * @param param 参数,存放sql中类似 update School set name=:updateName where id=:id 中的 id,updateName对应的值
+	 * @param hql
+	 * @return
+	 */
+	public final static Query createQuery(Map<String, Object> param,String hql) {
+		logger.debug("hql---->"+hql);
+		logger.debug("参数---->"+param);
+		Query query = getSession().createQuery(hql);
+		setMapParam(param, query);
+		openTransactionIfNeed(hql);
 		return query;
 	}
 	/**
-	 * 生成SQLquery并设置查询参数
-	 * @param where
+	 * 生成SQLquery并设置查询参数,使用例子:<br><code>
+	 * Map<String, Object> param = new HashMap<String, Object>();<br>
+		param.put("id", schoolId);<br>
+		String updateName = "schoolUpdated";<br>
+		param.put("updateName", updateName);<br>
+		Query createSQLQuery = DaoUtil.createSQLQuery(param, " update School set name=:updateName where id=:id ");<br>
+		createSQLQuery.executeUpdate();<br>
+	 * </code>
+	 * @param param 参数,存放sql中类似 update School set name=:updateName where id=:id 中的 id,updateName对应的值
 	 * @param sql
 	 * @return
 	 */
-	public final static Query createSQLQuery(Map<String, Object> where,StringBuffer sql) {
-		logger.debug("sql---->"+sql.toString());
-		logger.debug("参数---->"+where);
+	public final static Query createSQLQuery(Map<String, Object> param,String sql) {
+		logger.debug("sql---->" + sql);
+		logger.debug("参数---->" + param);
 		Query query = getSession().createSQLQuery(sql.toString());
-		setMapParam(where, query);
+		setMapParam(param, query);
+		openTransactionIfNeed(sql);
 		return query;
+	}
+
+	private static void openTransactionIfNeed(String sql) {
+		String lowerCase = sql.trim().toLowerCase();
+		if (lowerCase.startsWith("update ") || lowerCase.startsWith("delete ") || lowerCase.startsWith("insert ")) {
+			managTransaction(true);
+		}
+	}
+	/**
+	 * 生成SQLquery并设置查询参数,使用例子:<br><code>
+	 * Map<String, Object> param = new HashMap<String, Object>();<br>
+		param.put("id", schoolId);<br>
+		String updateName = "schoolUpdated";<br>
+		param.put("updateName", updateName);<br>
+		Query createSQLQuery = DaoUtil.createSQLQuery(param, new StringBuffer(" update School set name=:updateName where id=:id "));<br>
+		createSQLQuery.executeUpdate();<br>
+	 * </code>
+	 * @param param 参数,存放sql中类似 update School set name=:updateName where id=:id 中的 id,updateName对应的值
+	 * @param sql
+	 * @return
+	 */
+	public final static Query createSQLQuery(Map<String, Object> param,StringBuffer sql) {
+		return createSQLQuery(param, sql.toString());
 	}
 	
 	public final static Session getSession(){
