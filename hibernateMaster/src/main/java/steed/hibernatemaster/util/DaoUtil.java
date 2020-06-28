@@ -2197,7 +2197,7 @@ public class DaoUtil {
 	/**
 	 * 
 	 * 生成query并设置查询参数,使用例子:<br><code>
-	 * Map<String, Object> param = new HashMap<String, Object>();<br>
+	 * Map&lt;String, Object&gt; param = new Map&lt;String, Object&gt;();<br>
 		param.put("id", schoolId);<br>
 		String updateName = "schoolUpdated";<br>
 		param.put("updateName", updateName);<br>
@@ -2214,7 +2214,7 @@ public class DaoUtil {
 	/**
 	 * 
 	 * 生成query并设置查询参数,使用例子:<br><code>
-	 * Map<String, Object> param = new HashMap<String, Object>();<br>
+	 * Map&lt;String, Object&gt; param = new Map&lt;String, Object&gt;();<br>
 		param.put("id", schoolId);<br>
 		String updateName = "schoolUpdated";<br>
 		param.put("updateName", updateName);<br>
@@ -2235,7 +2235,7 @@ public class DaoUtil {
 	}
 	/**
 	 * 生成SQLquery并设置查询参数,使用例子:<br><code>
-	 * Map<String, Object> param = new HashMap<String, Object>();<br>
+	 * Map&lt;String, Object&gt; param = new Map&lt;String, Object&gt;();<br>
 		param.put("id", schoolId);<br>
 		String updateName = "schoolUpdated";<br>
 		param.put("updateName", updateName);<br>
@@ -2263,7 +2263,7 @@ public class DaoUtil {
 	}
 	/**
 	 * 生成SQLquery并设置查询参数,使用例子:<br><code>
-	 * Map<String, Object> param = new HashMap<String, Object>();<br>
+	 * Map&lt;String, Object&gt; param = new Map&lt;String, Object&gt;();<br>
 		param.put("id", schoolId);<br>
 		String updateName = "schoolUpdated";<br>
 		param.put("updateName", updateName);<br>
