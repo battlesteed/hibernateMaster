@@ -2030,8 +2030,10 @@ public class DaoUtil {
 				}
 			}
 		}
-		appendHqlOrder(hql, desc, asc, domainSimpleName);
-		
+		//select 1 from (isResultNull方法) 不需要排序,提升性能.
+		if (selectedFields.length > 1 || !selectedFields[0].equals("1")) {
+			appendHqlOrder(hql, desc, asc, domainSimpleName);
+		}
 		
 		if (where != null && where.get(personalHqlGeneratorKey) != null) {
 			((HqlGenerator)where.get(personalHqlGeneratorKey)).afterHqlGenered(domainSimpleName, hql, where);
