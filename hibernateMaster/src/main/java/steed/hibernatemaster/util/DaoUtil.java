@@ -2031,7 +2031,7 @@ public class DaoUtil {
 			}
 		}
 		//select 1 from (isResultNull方法) 不需要排序,提升性能.
-		if (selectedFields.length > 1 || !selectedFields[0].equals("1")) {
+		if (selectedFields.length != 1 || !selectedFields[0].equals("1")) {
 			appendHqlOrder(hql, desc, asc, domainSimpleName);
 		}
 		

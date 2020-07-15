@@ -12,7 +12,15 @@ public class TimeOrderUUIDDomain extends UUIDDomain2{
 private static final long serialVersionUID = 6249017384270298464L;
 	
 	protected Date addTime;
-	
+
+	public TimeOrderUUIDDomain() {
+		super();
+	}
+
+	public TimeOrderUUIDDomain(String id) {
+		super(id);
+	}
+
 	public Date getAddTime() {
 		return addTime;
 	}

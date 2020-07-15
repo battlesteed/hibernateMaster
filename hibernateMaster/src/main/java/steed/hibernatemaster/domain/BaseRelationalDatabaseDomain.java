@@ -151,6 +151,11 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 		return (T) DaoUtil.smartLoad(this);
 	}
 	
+	/**
+	 * 把实体类全部字段更新到数据库.
+	 * @see #updateNotNullField(List, boolean)
+	 * @see #updateNotNullFieldByHql()
+	 */
 	@Override
 	public boolean update(){
 		validate();

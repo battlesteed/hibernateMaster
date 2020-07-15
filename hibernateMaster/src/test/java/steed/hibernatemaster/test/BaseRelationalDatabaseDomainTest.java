@@ -15,6 +15,7 @@ public class BaseRelationalDatabaseDomainTest extends SteedTest{
 		Clazz clazz = new Clazz();
 		clazz.setId("testTrimEmptyDomain");
 		DaoUtil.deleteByQuery(clazz);
+		DaoUtil.managTransaction();
 		
 		clazz.setName("testTrimEmptyDomain");
 		School school = new School();

@@ -58,6 +58,7 @@ public class TestCreateQueryTransaction extends SteedTest{
 		DaoUtil.managTransaction();
 		DaoUtil.relese();
 		assert(!isTestSchoolInDatabase());
+		a1_insertTable();
 	}
 	
 	@Test
@@ -69,7 +70,7 @@ public class TestCreateQueryTransaction extends SteedTest{
 		DaoUtil.managTransaction();
 		DaoUtil.relese();
 		assert(!isTestSchoolInDatabase());
-	}
+	} 
 	
 	private boolean isTestSchoolInDatabase() {
 		School school = getSchool();
