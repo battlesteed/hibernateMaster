@@ -113,7 +113,7 @@ public class HibernateUtil{
 	 */
 	public static void switchDatabase(String configFile){
 		if (Config.isSignalDatabase) {
-			throw new IllegalArgumentException("当前为但数据库模式,无法切换数据库!请配置steed.hibernatemaster.Config.isSignalDatabase!");
+			throw new IllegalArgumentException("当前为单数据库模式,无法切换数据库!请配置steed.hibernatemaster.Config.isSignalDatabase!");
 		}
 		currentDatabase.set(configFile);
 	} 

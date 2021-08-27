@@ -561,6 +561,12 @@ public class DomainUtil{
 	
 	public static void setDomainId(BaseDomain baseDomain,
 			Serializable serializable) {
+		
+		Class<? extends Serializable> idClass = DomainUtil.getDomainIDClass(baseDomain.getClass());
+		if (idClass != String.class && serializable instanceof String) {
+			serializable = ReflectUtil.convertFromString(idClass, (String) serializable);
+		}
+		
 		Class<? extends BaseDomain> class1 = baseDomain.getClass();
 		String domainIDName = getDomainIDName(class1);
 		String fieldSetterName = StringUtil.getFieldSetterName(domainIDName);
