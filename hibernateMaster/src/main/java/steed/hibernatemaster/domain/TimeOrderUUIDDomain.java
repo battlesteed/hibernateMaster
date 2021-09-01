@@ -31,7 +31,9 @@ private static final long serialVersionUID = 6249017384270298464L;
 	
 	@Override
 	public boolean save() {
-		addTime = new Date();
+		if (addTime == null) {
+			addTime = new Date();
+		}
 		return super.save();
 	}
 	
