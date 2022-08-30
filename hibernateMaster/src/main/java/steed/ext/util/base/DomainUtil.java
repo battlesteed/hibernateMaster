@@ -5,6 +5,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -451,7 +452,7 @@ public class DomainUtil{
 		List<Field> allFields = ReflectUtil.getNotFinalFields(obj);
 		for (Field f:allFields) {
 			try {
-				if (DaoUtil.isSelectIndex(f.getName()) > 0) {
+				if (DaoUtil.isSelectIndex(f.getName()) > 0 || !Modifier.isStatic(f.getModifiers())) {
 					continue;
 				}
 				f.setAccessible(true);
