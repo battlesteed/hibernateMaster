@@ -27,12 +27,12 @@ maven如下添加依赖
 	<dependency>
 		<groupId>com.github.battlesteed</groupId>
 		<artifactId>hibernateMaster</artifactId>
-		<version>1.0.9</version>
+		<version>1.0.13-SNAPSHOT</version>
 	</dependency>
 ```
 gradle:
 ```
-compile group: 'com.github.battlesteed', name: 'hibernateMaster', version: '1.0.9'
+compile group: 'com.github.battlesteed', name: 'hibernateMaster', version: '1.0.13-SNAPSHOT'
 ```
 - 0sql完成增删查改
 

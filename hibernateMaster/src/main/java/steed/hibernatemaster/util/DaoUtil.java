@@ -1131,7 +1131,7 @@ public class DaoUtil {
 	 * @return 结果是否存在
 	 */
 	public final static boolean isResultNull(BaseRelationalDatabaseDomain where){
-		//TODO where包含id时,where其它条件被忽略bug
+		//where包含id时,where其它条件被忽略bug
 		return isResultNull(where.getClass(), DaoUtil.putField2Map(where));
 	}
 	
