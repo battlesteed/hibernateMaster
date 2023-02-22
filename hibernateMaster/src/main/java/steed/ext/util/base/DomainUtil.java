@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 
 import steed.ext.util.logging.Logger;
@@ -410,6 +411,11 @@ public class DomainUtil{
 		}
 		if (ReflectUtil.getDeclaredMethod(target, StringUtil.getFieldGetterName(field.getName())) == null 
 				&& ReflectUtil.getDeclaredMethod(target, StringUtil.getFieldIsMethodName(field.getName())) == null) {
+			return false;
+		}
+		JoinColumn annotation = ReflectUtil.getAnnotation(JoinColumn.class, target, field);
+		//解决 关联实体类和字段通用数据库列时 updateNotNullFieldByHql 生成的hql带两个同样字段bug
+		if (annotation != null && !annotation.insertable()) {
 			return false;
 		}
 		return true;
