@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 
 import steed.ext.util.logging.Logger;
@@ -396,6 +397,20 @@ public class DomainUtil{
 	}
 	
 	/**
+	 *  关联的判断实体类是否
+	 *  解决关联实体类和字段通用数据库列时 updateNotNullFieldByHql 生成的hql带两个同样字段bug
+	 * @param target
+	 * @param field
+	 * @return 
+	 */
+	public static boolean isColumnUpdateAble(Class<?> target,Field field) {
+		JoinColumn annotation = ReflectUtil.getAnnotation(JoinColumn.class, target, field);
+		if (annotation == null || annotation.updatable()) {
+			return true;
+		}
+		return false;
+	}
+	/**
 	 *  判断实体类字段是否属于数据库字段(是否映射了数据库列)
 	 * @param target
 	 * @param field
@@ -412,6 +427,7 @@ public class DomainUtil{
 				&& ReflectUtil.getDeclaredMethod(target, StringUtil.getFieldIsMethodName(field.getName())) == null) {
 			return false;
 		}
+		
 		return true;
 	}
 	

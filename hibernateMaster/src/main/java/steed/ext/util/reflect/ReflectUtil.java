@@ -203,11 +203,15 @@ public class ReflectUtil {
 	 * @param obj 
 	 * @param strictlyMode 是否严格模式
 	 * @param onlyPutDatabaseField 是否只放数据库映射字段
+	 * @param updateMode 是更新模式 
 	 * @return
 	 */
-	public static Map<String, Object> field2Map(Object obj,boolean strictlyMode, boolean onlyPutDatabaseField){
+	public static Map<String, Object> field2Map(Object obj,boolean strictlyMode, boolean onlyPutDatabaseField,boolean updateMode){
 		Map<String, Object> map = new HashMap<>();
-		return field2Map(0,obj, map, strictlyMode, onlyPutDatabaseField);
+		return field2Map(0,obj, map, strictlyMode, onlyPutDatabaseField, updateMode);
+	}
+	public static Map<String, Object> field2Map(Object obj,boolean strictlyMode, boolean onlyPutDatabaseField){
+		return field2Map(obj, strictlyMode, onlyPutDatabaseField, false);
 	}
 	
 	public static Map<String, Object> field2Map(Object obj){
@@ -231,6 +235,9 @@ public class ReflectUtil {
 	 * @return
 	 */
 	public static Map<String, Object> field2Map(int classDdeep,Object obj,Map<String, Object> map,boolean strictlyMode,boolean onlyPutDatabaseField){
+		return field2Map(classDdeep, obj, map, strictlyMode, onlyPutDatabaseField, false);
+	}
+	public static Map<String, Object> field2Map(int classDdeep,Object obj,Map<String, Object> map,boolean strictlyMode,boolean onlyPutDatabaseField,boolean updateMode){
 		Class<?> tempClass = obj.getClass();
 		for (int i = 0; i < classDdeep; i++) {
 			tempClass = tempClass.getSuperclass();
@@ -244,6 +251,9 @@ public class ReflectUtil {
 				Object obj2 = temp.get(obj);
 				if (!isNull(strictlyMode, obj2)) {
 					if (onlyPutDatabaseField && !DomainUtil.isDatabaseField(tempClass, temp)) {
+						continue;
+					}
+					if (updateMode && !DomainUtil.isColumnUpdateAble(tempClass, temp)) {
 						continue;
 					}
 					map.put(temp.getName(), obj2);

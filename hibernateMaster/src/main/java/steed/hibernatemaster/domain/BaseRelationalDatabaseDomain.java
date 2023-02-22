@@ -336,7 +336,7 @@ public class BaseRelationalDatabaseDomain extends BaseDatabaseDomain{
 		 * 
 		 * } });
 		 */
-		Map<String, Object> field2Map = ReflectUtil.field2Map(this, strictlyMode, true);
+		Map<String, Object> field2Map = ReflectUtil.field2Map(this, strictlyMode, true, true);
 		if (updateEvenNull != null) {
 			updateEvenNull.forEach((temp)->{
 				if (!field2Map.containsKey(temp)) {
