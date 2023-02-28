@@ -426,7 +426,10 @@ public class DaoUtil {
 		}
 		return failed;
 	}
-	
+	/**
+	 * Remove this instance from the session cache. Changes to the instance willnot be synchronized with the database. This operation cascades to associatedinstances if the association is mapped with cascade="evict".
+	 * @param obj
+	 */
 	public final static void evict(Object obj){
 		getSession().evict(obj);
 		closeSession();
@@ -1385,8 +1388,8 @@ public class DaoUtil {
 		return listCustomField(target, pageSize, currentPage, where, desc, asc, queryRecordCount);
 	}
 	
-	public final static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,Map<String, Object> map,List<String> desc,List<String> asc){
-		return listObj(t, pageSize, currentPage, map, desc, asc, true);
+	public final static <T> Page<T> listObj(Class<T> t,int pageSize,int currentPage,Map<String, Object> where,List<String> desc,List<String> asc){
+		return listObj(t, pageSize, currentPage, where, desc, asc, true);
 	}
 	
 	/**
