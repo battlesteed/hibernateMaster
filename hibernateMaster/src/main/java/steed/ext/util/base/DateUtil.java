@@ -48,7 +48,7 @@ public class DateUtil {
 	
 	public static Date parseDate(String source){
 		source = source.replace("/", "-").replace("年", "-").replace("月", "-").replace("日", "-");
-		String[] parsePatterns = new String[] {"yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm","yyyy-MM-dd"};
+		String[] parsePatterns = new String[] {"yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm","yyyy-MM-dd","yyyy-MM","yyyy"};
 		for(String temp:parsePatterns) {
 			try {
 				return getDateFormat(temp).parse(source);
