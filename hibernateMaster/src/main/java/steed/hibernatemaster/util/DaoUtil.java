@@ -1456,6 +1456,41 @@ public class DaoUtil {
 			closeSession();
 		}
 	}
+	/**
+	 * 查询target里面指定的字段
+	 * 
+	 * @param <T> 要查询的实体类
+	 * 
+	 * @param target 要查询的类
+	 * @param pageSize 分页大小
+	 * @param currentPage 当前页码
+	 * @param where 查询条件
+	 * @param queryRecordCount 是否查询总记录数(记录很多时查询较费时间),若传false,则返回的page实体类的记录数为Long.MAX_VALUE,<br>
+	 * 			前端可做无限分页
+	 * @return
+	 */
+	public final static <T> Page<T> listCustomField(Class<?> target,int pageSize,int currentPage,Map<String, Object> where,
+			boolean queryRecordCount,StringBuffer hql){
+		try {
+			Long recordCount = (long) Integer.MAX_VALUE;
+			if (queryRecordCount) {
+				recordCount = getRecordCount(where, hql);
+			}
+			
+			Query query = createQuery(where,hql);
+			
+			paging(pageSize,currentPage, query);
+			@SuppressWarnings("unchecked")
+			List<T> list = query.list();
+			
+			return setPage(currentPage, recordCount, pageSize, list);
+		} catch (Exception e) {
+			setException(e);
+			return null;
+		}finally{
+			closeSession();
+		}
+	}
 	
 	/**
 	 * 根据实体类id加载实体类
@@ -2305,6 +2340,10 @@ public class DaoUtil {
 		return hql;
 	}
 	
+	private static boolean isSqlKeyWord(String fieldName) {
+		return fieldName.contains("(") && fieldName.contains(")");
+	}
+	
 	private static boolean appendHqlOrder(StringBuffer hql, List<String> orderField, String domainSimpleName,
 			boolean hasOrderByAppened,boolean desc) {
 		String order = desc ? "desc":"asc";
@@ -2321,7 +2360,11 @@ public class DaoUtil {
 				}else {
 					hql.append(", ");
 				}
-				hql.append(" ").append(dealedSelectedField).append(" ").append(order);
+				if (isSqlKeyWord(name)) {
+					hql.append(" ").append(name).append(" ").append(order);
+				}else {
+					hql.append(" ").append(dealedSelectedField).append(" ").append(order);
+				}
 			}
 		}
 		return hasOrderByAppened;
