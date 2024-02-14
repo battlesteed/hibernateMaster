@@ -29,7 +29,7 @@
         
         <property name="username">root</property>
         <property name="password">root</property>
-        <property name="url">jdbc:mysql://localhost:3306/hibernatemaster?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
+        <property name="url">jdbc:mysql://localhost:3306/hibernatemaster?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true&amp;serverTimezone=GMT%2B8</property>
       <!--
       	做读写分离请加上这行
          <property name="slaveUrl">jdbc:mysql://localhost:3306/hibernatemaster1?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>

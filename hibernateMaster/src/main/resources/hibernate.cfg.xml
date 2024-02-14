@@ -29,7 +29,7 @@
         
         <property name="username">root</property>
         <property name="password">root</property>
-        <property name="url">jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true</property>
+        <property name="url">jdbc:mysql://localhost:3306/hibernatemaster?useUnicode=true&amp;aaaaanullCatalogMeansCurrent=true&amp;characterEncoding=UTF8&amp;autoReconnect=true&amp;serverTimezone=GMT%2B8</property>
         <property name="hibernate.dialect">steed.hibernatemaster.dialect.MySQL57InnoDNOForeignKeyDialect</property>
         
         <property name="hibernate.connection.provider_class">com.alibaba.druid.support.hibernate.DruidConnectionProvider</property>

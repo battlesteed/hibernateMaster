@@ -5,7 +5,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import steed.hibernatemaster.sample.domain.user.User;
+import steed.hibernatemaster.sample.domain.user.User2;
 import steed.hibernatemaster.test.SteedTest;
 
 /**
@@ -21,7 +21,7 @@ public class QuickStart extends SteedTest{
 	 */
 	@Test
 	public void save(){
-		User user = new User();
+		User2 user = new User2();
 		user.setNickName("战马");
 		user.save();
 	}
@@ -34,7 +34,7 @@ public class QuickStart extends SteedTest{
 	@Test
 	public void update(){
 //		save();
-		User user = new User();
+		User2 user = new User2();
 		user.setNickName("战马");
 		user.setName("战小马");
 		user.update();
@@ -48,7 +48,7 @@ public class QuickStart extends SteedTest{
 	 */
 	@Test
 	public void updateNotNullFild(){
-		User user = new User();
+		User2 user = new User2();
 		user.setNickName("战马");
 		user.setE_mail("battle_steed@163.com");
 		user.updateNotNullField(null);
@@ -61,7 +61,7 @@ public class QuickStart extends SteedTest{
 	 */
 	@Test
 	public void delete(){
-		User user = new User();
+		User2 user = new User2();
 		user.setNickName("战马");
 		user.delete();
 	}
