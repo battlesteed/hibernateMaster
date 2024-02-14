@@ -328,7 +328,7 @@ public class ReflectUtil {
 		Object target = obj;
 		for(String temp:fields){
 			if (getFieldByGetter) {
-				target = getFieldValueByGetter(obj, temp);
+				target = getFieldValueByGetter(target, temp);
 			}else {
 				target = getValue(temp, target);
 			}
