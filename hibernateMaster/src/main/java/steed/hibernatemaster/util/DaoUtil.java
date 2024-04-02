@@ -2518,6 +2518,8 @@ public class DaoUtil {
 									|| !(!annotation.insertable() 
 											&& !annotation.updatable())) {
 								map.put(prefixName + fieldName, value);
+							}else {
+								logger.debug(prefixName + fieldName + "是只读字段,不参与where条件构建,请用对应的另外字段构建");
 							}
 						}else {
 							map.put(prefixName + fieldName, value);
