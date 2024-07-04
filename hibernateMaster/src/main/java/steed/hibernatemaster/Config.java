@@ -91,6 +91,11 @@ public class Config {
 	 */
 	public static Validator validator;
 	
+	/**
+	 * 默认hibernate配置文件名
+	 */
+	public static String mainFactory = "hibernate.cfg.xml";
+	
 	public static QueryFilterManager queryFilterManager = new QueryFilterManager() {
 		
 		@Override

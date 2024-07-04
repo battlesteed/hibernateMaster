@@ -20,7 +20,6 @@ public class HibernateUtil{
 	private static ThreadLocal<Map<String, Session>> sessionStory = new ThreadLocal<Map<String, Session>>();
 //	private static boolean whole_closeSession = false;
 	private static Map<String, SessionFactory> factoryMap = new HashMap<String, SessionFactory>();
-	public static final String mainFactory = "hibernate.cfg.xml";
 	
 //	private static final Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
 	
@@ -47,7 +46,7 @@ public class HibernateUtil{
 		threadLocal.set(session);
 	}
 	private static void buildFactory() {
-		factory = buildFactory(mainFactory);
+		factory = buildFactory(Config.mainFactory);
 	}
 
 	private static SessionFactory buildFactory(String configFile) {
@@ -92,7 +91,7 @@ public class HibernateUtil{
 		return sessionStory.get();
 	}
 	private static String getCurrentDatabase(){
-		return currentDatabase.get()==null?mainFactory:currentDatabase.get();
+		return currentDatabase.get()==null?Config.mainFactory:currentDatabase.get();
 	}
 	
 	public static SessionFactory getFactory(){

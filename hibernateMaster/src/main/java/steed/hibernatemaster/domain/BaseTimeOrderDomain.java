@@ -5,6 +5,9 @@ import java.util.List;
 
 import javax.persistence.MappedSuperclass;
 
+import steed.hibernatemaster.annotation.DefaultOrderBy;
+
+@DefaultOrderBy(value="addTime",desc = true)
 @MappedSuperclass
 public class BaseTimeOrderDomain extends BaseRelationalDatabaseDomain{
 	private static final long serialVersionUID = 6249017384270298464L;
